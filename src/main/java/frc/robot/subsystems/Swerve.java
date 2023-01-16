@@ -7,7 +7,7 @@ import frc.robot.Constants.*;
 
 import com.kauailabs.navx.frc.AHRS;
 
-import edu.wpi.first.wpilibj.I2C;
+import edu.wpi.first.wpilibj.SPI;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -70,7 +70,7 @@ public final class Swerve extends Subsystem {
     private SlewRateLimiter yLimiter = new SlewRateLimiter(DriveConstants.DRIVE_MAX_ACCELERATION);
     private SlewRateLimiter steerLimiter = new SlewRateLimiter(DriveConstants.DRIVE_MAX_ROTATIONAL_ACCELERATION);
 
-    private final AHRS gyro = new AHRS(I2C.Port.kMXP);
+    private AHRS gyro = new AHRS(SPI.Port.kMXP);
 
     private Pose2d swervePose = new Pose2d();
 
@@ -141,7 +141,7 @@ public final class Swerve extends Subsystem {
         ChassisSpeeds chassisSpeeds;
         if (fieldRelative) {
             chassisSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(
-                xSpeed, ySpeed, steerSpeed, this.swervePose.getRotation()
+                xSpeed, ySpeed, steerSpeed, Rotation2d.fromDegrees(-this.gyro.getAngle())
             );
         } else {
             chassisSpeeds = new ChassisSpeeds(xSpeed, ySpeed, steerSpeed);
@@ -157,7 +157,7 @@ public final class Swerve extends Subsystem {
             return new Loop() {
                 @Override
                 public void onStart(double timestamp) {
-                    Swerve.getInstance().drive(new Translation2d(), 0.0, true, true);
+                    Swerve.getInstance().drive(new Translation2d(), 0.0, false, true);
                 }
 
                 @Override
@@ -166,13 +166,13 @@ public final class Swerve extends Subsystem {
                         Translation2d swerveTranslation = DriveController.getInstance().getSwerveTranslation();
                         double swerveRotation = DriveController.getInstance().getSwerveRotation();
 
-                        Swerve.getInstance().drive(swerveTranslation, swerveRotation, true, true);
+                        Swerve.getInstance().drive(swerveTranslation, swerveRotation, false, true);
                     }
                 }
 
                 @Override
                 public void onStop(double timestamp) {
-                    Swerve.getInstance().drive(new Translation2d(), 0.0, true, true);
+                    Swerve.getInstance().drive(new Translation2d(), 0.0, false, true);
                 }
             };
         }
