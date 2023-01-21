@@ -12,7 +12,8 @@ import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.geometry.Rotation2d;
 
-public final class SwerveModule { 
+public final class SwerveModule {
+    // TODO: Make a Profiled PID Controller and a Feedforward Controller for the drive motor 
     private final CANSparkMax driveMotor;
 
     private final CANSparkMax steerMotor;
@@ -20,6 +21,7 @@ public final class SwerveModule {
     private final RelativeEncoder driveEncoder;
     private final RelativeEncoder steerEncoder;
 
+    // TODO: Make this a Profiled PID Controller, and add a Feedforward Controller as well
     private final PIDController steerPIDController;
 
     private final CANCoder absoluteEncoder;
@@ -82,7 +84,7 @@ public final class SwerveModule {
 
     public void resetEncoders() {
         this.driveEncoder.setPosition(0.0);
-        this.steerEncoder.setPosition(this.getAbsoluteEncoderRad() / (2.0 * Math.PI));
+        this.steerEncoder.setPosition(this.getAbsoluteEncoderRad());
     }
 
     public SwerveModulePosition getModulePosition() {
@@ -90,7 +92,7 @@ public final class SwerveModule {
     }
 
     public SwerveModuleState getState() {
-        return new SwerveModuleState(this.getDriveVelocity(), new Rotation2d(this.getSteerPosition() * 2.0 * Math.PI));
+        return new SwerveModuleState(this.getDriveVelocity(), new Rotation2d(this.getSteerPosition()));
     }
 
     public void setDesiredState(SwerveModuleState state) {

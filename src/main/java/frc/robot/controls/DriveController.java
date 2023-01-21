@@ -23,15 +23,17 @@ public final class DriveController extends PSController {
     // DRIVER CONTROLS
     
     public Translation2d getSwerveTranslation() {
-        double forwardAxis = Math.pow(this.getAxis(Side.LEFT, Axis.Y), 3) * DriveConstants.DRIVE_MAX_VELOCITY;
-        double strafeAxis = Math.pow(this.getAxis(Side.LEFT, Axis.X), 3) * DriveConstants.DRIVE_MAX_VELOCITY;
+        double forwardAxis = this.getAxis(Side.LEFT, Axis.Y);
+        double strafeAxis = this.getAxis(Side.LEFT, Axis.X);
 
         Translation2d tAxes = new Translation2d(forwardAxis, strafeAxis);
+
+        double dist = tAxes.getNorm();
 
         if (Math.abs(tAxes.getNorm()) < swerveDeadband) {
             return new Translation2d();
         } else {
-            return tAxes;
+            return new Translation2d(forwardAxis * dist, strafeAxis * dist);
         }
     }
 

@@ -14,20 +14,11 @@ import edu.wpi.first.wpilibj.AnalogInput;
 public class Gripper extends Subsystem {
     public static Gripper mInstance;
 
-    private final Compressor compressor = new Compressor(PneumaticsModuleType.CTREPCM);
     private final Solenoid gripperCylinder = new Solenoid(PneumaticsModuleType.CTREPCM, GripperConstants.GRIPPER_PCM_PORT);
 
     private final AnalogInput distanceSensor = new AnalogInput(GripperConstants.DISTANCE_SENSOR_PORT);
 
     public boolean isDroppingObject = false;
-
-    public void enableCompressor() {
-        compressor.enableDigital();
-    }
-
-    public void disableCompressor() {
-        compressor.disable();
-    }
 
     public void enableGripper() {
         gripperCylinder.set(true);
@@ -64,32 +55,34 @@ public class Gripper extends Subsystem {
         public Loop defaultGripperLoop() {
             return new Loop() {
                 @Override
-                public void onStart(double timestamp) {
-                    mGripper.enableCompressor();
-                    mGripper.disableGripper();
-                }
+                public void onStart(double timestamp) {}
 
                 @Override
                 public void onLoop(double timestamp) {
-                    double dropTime = 0;
+                    // double dropTime = 0;
 
-                    if (mController.getButton(Button.A)) {
-                        if (!mGripper.isDroppingObject) {
-                            mGripper.dropObject(timestamp);
-                            dropTime = timestamp;
-                        }
-                    } else if (mGripper.isDroppingObject && Timer.getFPGATimestamp() - dropTime > 0.25) {
-                        mGripper.isDroppingObject = false;
-                    } else if (mGripper.objectInGripper()) {
+                    // if (mController.getButton(Button.A)) {
+                    //     if (!mGripper.isDroppingObject) {
+                    //         mGripper.dropObject(timestamp);
+                    //         dropTime = timestamp;
+                    //     }
+                    // } else if (mGripper.isDroppingObject && Timer.getFPGATimestamp() - dropTime > 0.25) {
+                    //     mGripper.isDroppingObject = false;
+                    // } else if (!mGripper.isDroppingObject && mGripper.objectInGripper()) {
+                    //     mGripper.enableGripper();
+                    // } else {
+                    //     mGripper.disableGripper();
+                    // }
+
+                    if (mController.getButton(Button.X)) {
                         mGripper.enableGripper();
-                    } else {
+                    } else if (mController.getButton(Button.Y)) {
                         mGripper.disableGripper();
                     }
                 }
 
                 @Override
                 public void onStop(double timestamp) {
-                    mGripper.disableCompressor();
                     mGripper.disableGripper();
                 }
             };

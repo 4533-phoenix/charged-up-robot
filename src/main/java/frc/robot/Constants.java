@@ -9,6 +9,8 @@ public final class Constants {
 	public static final class GlobalConstants {
 		// Robot loop time
 		public static final double LOOPER_TIME = 0.02;
+
+        public static final int PCM_ID = 14;
 	}
 
     public static final class AutoConstants {
@@ -48,9 +50,9 @@ public final class Constants {
 
     public static final class DriveConstants {
 		// Left-to-right distance between wheel centers in meters
-        public static final double TRACK_WIDTH = Units.inchesToMeters(22.5);
+        public static final double TRACK_WIDTH = Units.inchesToMeters(19.5);
 		// Front-to-back distance between wheel centers in meters
-        public static final double WHEEL_BASE = Units.inchesToMeters(22.5);
+        public static final double WHEEL_BASE = Units.inchesToMeters(24.5);
         
 		// Creates kinematics object for swerve subsystem
         public static final SwerveDriveKinematics SWERVE_KINEMATICS = new SwerveDriveKinematics(
@@ -80,10 +82,10 @@ public final class Constants {
         public static final boolean BACK_LEFT_STEER_ENCODER_REVERSED = false;
         public static final boolean BACK_RIGHT_STEER_ENCODER_REVERSED = false;
 
-        public static final int FRONT_LEFT_STEER_ABSOLUTE_ENCODER_ID = 9;
-        public static final int FRONT_RIGHT_STEER_ABSOLUTE_ENCODER_ID = 10;
-        public static final int BACK_LEFT_STEER_ABSOLUTE_ENCODER_ID = 11;
-        public static final int BACK_RIGHT_STEER_ABSOLUTE_ENCODER_ID = 12;
+        public static final int FRONT_LEFT_STEER_ABSOLUTE_ENCODER_ID = 10;
+        public static final int FRONT_RIGHT_STEER_ABSOLUTE_ENCODER_ID = 11;
+        public static final int BACK_LEFT_STEER_ABSOLUTE_ENCODER_ID = 12;
+        public static final int BACK_RIGHT_STEER_ABSOLUTE_ENCODER_ID = 13;
 
         public static final boolean FRONT_LEFT_STEER_ABSOLUTE_ENCODER_REVERSED = false;
         public static final boolean FRONT_RIGHT_STEER_ABSOLUTE_ENCODER_REVERSED = false;
@@ -96,7 +98,9 @@ public final class Constants {
         public static final double BACK_LEFT_STEER_ABSOLUTE_ENCODER_OFFSET = 6.1605;
         public static final double BACK_RIGHT_STEER_ABSOLUTE_ENCODER_OFFSET = 2.9207;
 
-        public static final double DRIVE_MAX_VELOCITY = 1.5; // 3.9624; // m/s
+        public static final double DRIVE_MAX_PHYSICAL_VELOCITY = Units.feetToMeters(14.6);
+
+        public static final double DRIVE_MAX_VELOCITY = Units.feetToMeters(5.0);
         public static final double DRIVE_MAX_ROTATIONAL_VELOCITY = 3.5 * 2.0 * Math.PI; // rad/s
 
         public static final double DRIVE_MAX_ACCELERATION = 3.0; // 5.0; // m/s^2

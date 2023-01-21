@@ -97,7 +97,7 @@ public final class Auto extends Subsystem {
                         )
                     );
 
-                    Pose2d startPose = Swerve.getInstance().getSwervePose();
+                    Pose2d startPose = PoseEstimator.getInstance().getSwervePose();
 
                     ArrayList<Translation2d> trajectoryPoints = new ArrayList<Translation2d>(
                         Arrays.asList(
@@ -142,7 +142,7 @@ public final class Auto extends Subsystem {
                         Trajectory.State trajectoryState = this.testAutonomousTrajectory.sample(currTime - this.startTime);
 
                         ChassisSpeeds chassisSpeeds = autoController.calculate(
-                            Swerve.getInstance().getSwervePose(),
+                            PoseEstimator.getInstance().getSwervePose(),
                             trajectoryState,
                             trajectoryState.poseMeters.getRotation()
                         );
@@ -186,7 +186,7 @@ public final class Auto extends Subsystem {
                         PathState currState = testAuto.sample(time);
 
                         ChassisSpeeds chassisSpeeds = Auto.getInstance().getAutoController().calculate(
-                            Swerve.getInstance().getSwervePose(),
+                            PoseEstimator.getInstance().getSwervePose(),
                             currState.getTrajectoryState(),
                             currState.rotation
                         );
@@ -212,16 +212,10 @@ public final class Auto extends Subsystem {
     }
 
     @Override
-    public void stop() {
-        // TODO: Add code that will fully stop this subsystem
-    }
+    public void stop() {}
 
     @Override
     public boolean checkSystem() {
-        // TODO: Add code that checks possible system faults (should be SERIOUS FAULTS)
-        // Serious faults should be things that could damage or hurt other people/things
-        // Serious faults due to the fact that stop() will most likely be called
-        // after this returning false
         return true;
     }
 }

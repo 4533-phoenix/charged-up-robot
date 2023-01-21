@@ -23,14 +23,20 @@ public final class Robot extends TimedRobot {
   // Subsystem instances
   private final SubsystemManager mSubsystemManager = SubsystemManager.getInstance();
   private final Auto mAuto = Auto.getInstance();
+  private final Extension mExtension = Extension.getInstance();
   private final Gripper mGripper = Gripper.getInstance();
+  private final Pneumatics mPneumatics = Pneumatics.getInstance();
+  private final PoseEstimator mPoseEstimator = PoseEstimator.getInstance();
   private final Swerve mSwerve = Swerve.getInstance();
 
   @Override
   public void robotInit() {
     mSubsystemManager.setSubsystems(
       mAuto,
+      mExtension,
       mGripper,
+      mPneumatics,
+      mPoseEstimator,
       mSwerve
     );
 
