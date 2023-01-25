@@ -9,6 +9,9 @@ import edu.wpi.first.wpilibj.TimedRobot;
 import frc.robot.loops.Looper;
 import frc.robot.subsystems.*;
 
+import frc.libs.java.actionLib.ActionRunner;
+import frc.libs.java.actionLib.Controller;
+
 /**
  * The VM is configured to automatically run this class, and to call the functions corresponding to
  * each mode, as described in the TimedRobot documentation. If you change the name of this class or
@@ -19,6 +22,12 @@ public final class Robot extends TimedRobot {
   // Instantiate enabled and disabled loopers
   private final Looper mEnabledLooper = new Looper();
   private final Looper mDisabledLooper = new Looper();
+
+  public static final ActionRunner autonomousRunner = new ActionRunner();
+  public static final ActionRunner teleopRunner = new ActionRunner();
+
+  public static final Controller driveControllerOne = new Controller(Constants.OIConstants.DRIVER_CONTROLLER_ONE_PORT);
+  public static final Controller driveControllerTwo = new Controller(Constants.OIConstants.DRIVER_CONTROLLER_TWO_PORT);
 
   // Subsystem instances
   private final SubsystemManager mSubsystemManager = SubsystemManager.getInstance();

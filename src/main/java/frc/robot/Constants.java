@@ -115,7 +115,9 @@ public final class Constants {
     }
 
 	public static final class OIConstants {
-		public static final int DRIVER_CONTROLLER_PORT = 0;
+		public static final int DRIVER_CONTROLLER_ONE_PORT = 0;
+
+        public static final int DRIVER_CONTROLLER_TWO_PORT = 1;
 
 		// Controller axis IDs        
         public static final int DRIVER_X_AXIS = 0;

@@ -3,6 +3,7 @@ package frc.robot.subsystems;
 import frc.robot.controls.*;
 import frc.robot.controls.PSController.Button;
 import frc.robot.loops.*;
+import frc.robot.Robot;
 import frc.robot.Constants.*;
 
 import com.kauailabs.navx.frc.AHRS;
@@ -16,6 +17,9 @@ import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+
+import frc.libs.java.actionLib.Action;
+import frc.libs.java.actionLib.Subsystem;
 
 public final class Swerve extends Subsystem {
     private static Swerve mInstance;
@@ -142,9 +146,51 @@ public final class Swerve extends Subsystem {
         this.setModuleStates(moduleStates);
     }
 
-    private static final class SwerveLoops {
-        Swerve mSwerve = Swerve.getInstance();
-        DriveController mController = DriveController.getInstance();
+    public Translation2d getSwerveTranslation() {
+        double forwardAxis = Robot.driveControllerOne.getAxis(Side.LEFT, Axis.Y);
+        double strafeAxis = this.getAxis(Side.LEFT, Axis.X);
+
+        Translation2d tAxes = new Translation2d(forwardAxis, strafeAxis);
+
+        double dist = tAxes.getNorm();
+
+        if (Math.abs(tAxes.getNorm()) < swerveDeadband) {
+            return new Translation2d();
+        } else {
+            return new Translation2d(forwardAxis * dist, strafeAxis * dist);
+        }
+    }
+
+    public double getSwerveRotation() {
+        double rotAxis = Math.pow(this.getAxis(Side.RIGHT, Axis.X), 3) * DriveConstants.DRIVE_MAX_VELOCITY;
+
+        if (Math.abs(rotAxis) < swerveDeadband) {
+            return 0.0;
+        } else {
+            return rotAxis;
+        }
+    }
+
+    public static final class SwerveLoops {
+        public Action defaultDriveAction() {
+            Runnable startMethod = () -> {
+                Swerve.getInstance().drive(new Translation2d(), 0.0, false, true);
+            };
+
+            Runnable runMethod = () -> {
+                Translation2d swerveTranslation = mController.getSwerveTranslation();
+                
+                double swerveRotation = mController.getSwerveRotation();
+
+                Swerve.getInstance().drive(swerveTranslation, swerveRotation, false, true);
+            };
+
+            Runnable endMethod = () -> {
+                Swerve.getInstance().drive(new Translation2d(), 0.0, false, true);
+            };
+
+            return new Action(startMethod, runMethod, endMethod, false);
+        }
 
         public Loop defaultDriveLoop() {
             return new Loop() {
