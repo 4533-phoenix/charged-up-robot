@@ -107,8 +107,13 @@ public final class Constants {
         public static final double DRIVE_MAX_ROTATIONAL_ACCELERATION = 3.0; // rad/s^2
     }
 
+    public static final class ExtensionConstants {
+        public static final int EXTENSION_PCM_PORT_FORWARD = 1;
+        public static final int EXTENSION_PCM_PORT_REVERSE = 2;
+    }
+
     public static final class GripperConstants{
-        public static final int GRIPPER_PCM_PORT = 1;
+        public static final int GRIPPER_PCM_PORT = 0;
         public static final int DISTANCE_SENSOR_PORT = 0;
 
         public static final double DISTANCE_VOLTAGE_THRESHOLD = 2.5;

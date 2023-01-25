@@ -79,6 +79,8 @@ public class Gripper extends Subsystem {
                     } else if (mController.getButton(Button.Y)) {
                         mGripper.disableGripper();
                     }
+
+                    System.out.println("voltage: " + mGripper.distanceSensor.getVoltage());
                 }
 
                 @Override
