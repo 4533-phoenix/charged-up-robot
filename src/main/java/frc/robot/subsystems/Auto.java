@@ -1,8 +1,6 @@
 package frc.robot.subsystems;
 
 import frc.robot.Constants.*;
-import frc.robot.auto.SwervePath;
-import frc.robot.auto.SwervePath.PathState;
 import frc.robot.Robot;
 
 import edu.wpi.first.math.controller.*;
@@ -18,12 +16,20 @@ import edu.wpi.first.wpilibj.Timer;
 
 import frc.libs.java.actionLib.Action;
 import frc.libs.java.actionLib.Subsystem;
+import frc.libs.java.swervePathLib.SwervePath;
+import frc.libs.java.swervePathLib.SwervePath.PathState;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Map;
 
 public final class Auto extends Subsystem {
     private static Auto mInstance;
+
+    private static final Map<String, Action> autoCommands = Map.ofEntries(
+        Map.entry("Test Autonomous", AutoActions.testAutonomous()),
+        Map.entry("Test Pathplanner Autonomous", AutoActions.testPathplannerAutonomous())
+    );
 
     private HolonomicDriveController autoController = new HolonomicDriveController(
         new PIDController(
@@ -127,7 +133,7 @@ public final class Auto extends Subsystem {
                 });
             };
 
-            return new Action(startMethod, runMethod, endMethod, true);
+            return new Action(startMethod, runMethod, endMethod, true).withSubsystem(Auto.getInstance());
         }
 
         public static final Action testPathplannerAutonomous() {
@@ -164,7 +170,7 @@ public final class Auto extends Subsystem {
                 });
             };
 
-            return new Action(startMethod, runMethod, endMethod, true);
+            return new Action(startMethod, runMethod, endMethod, true).withSubsystem(Auto.getInstance());
         }
     }
 
@@ -180,5 +186,9 @@ public final class Auto extends Subsystem {
             this.getLoggingAction(),
             this.getPeriodicAction() 
         );
+    }
+
+    public Action getAutonomous(String key) {
+        return autoCommands.get(key);
     }
 }

@@ -1,6 +1,7 @@
 package frc.robot.controls;
 
 import edu.wpi.first.wpilibj.XboxController;
+
 import frc.robot.Constants.*;
 
 public class PSController {
@@ -25,7 +26,7 @@ public class PSController {
         }
     }
 
-    PSController(int port) {
+    public PSController(int port) {
         mController = new XboxController(port);
     }
 

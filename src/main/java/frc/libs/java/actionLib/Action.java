@@ -33,24 +33,6 @@ public class Action extends Thread implements Listener {
         }
     }
 
-    public Action(Runnable startMethod, Runnable runMethod, Runnable endMethod, Controller controller, int buttonID) {
-        super(runMethod);
-
-        this.startMethod = startMethod;
-
-        this.runMethod = runMethod;
-
-        this.endMethod = endMethod;
-
-        this.willCancel = false;
-
-        this.willThreadRun = true;
-        
-        this.willRun = false;
-
-        controller.addButtonEventThread(buttonID, this);
-    }
-
     public Action withSubsystem(Subsystem subsystem) {
         this.threadLock = subsystem.getSubsystemThreadLock();
 
@@ -61,11 +43,7 @@ public class Action extends Thread implements Listener {
         this.startMethod.run();
     }
 
-    public void run() {
-        if (!this.willRun()) {
-            return;
-        }
-        
+    public void run() {    
         if (this.willThreadRun()) {
             try {
                 this.getThreadLock().lock();

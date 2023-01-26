@@ -1,15 +1,13 @@
 package frc.robot.subsystems;
 
-import frc.robot.Constants;
-import frc.robot.Constants.GripperConstants;
-import frc.robot.controls.DriveController;
-import frc.robot.controls.PSController.Button;
-import frc.robot.loops.*;
-import edu.wpi.first.wpilibj.Compressor;
 import edu.wpi.first.wpilibj.PneumaticsModuleType;
 import edu.wpi.first.wpilibj.Solenoid;
-import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.AnalogInput;
+
+import frc.libs.java.actionLib.*;
+import frc.robot.Robot;
+import frc.robot.Constants.*;
+import frc.robot.controls.PSController.*;
 
 public class Gripper extends Subsystem {
     public static Gripper mInstance;
@@ -20,24 +18,7 @@ public class Gripper extends Subsystem {
 
     public boolean isDroppingObject = false;
 
-    public void enableGripper() {
-        gripperCylinder.set(true);
-    }
-
-    public void disableGripper() {
-        gripperCylinder.set(false);
-    }
-
-    public boolean objectInGripper() {
-        return distanceSensor.getVoltage() > GripperConstants.DISTANCE_VOLTAGE_THRESHOLD;
-    }
-
-    public void dropObject(double timestamp) {
-        if (!isDroppingObject && Timer.getFPGATimestamp() - timestamp < 0.25) {
-            isDroppingObject = true;
-            disableGripper();
-        }
-    }
+    private Gripper() {}
 
     public static Gripper getInstance() {
         if (mInstance == null) {
@@ -46,64 +27,53 @@ public class Gripper extends Subsystem {
         return mInstance;
     }
 
-    public Gripper() {}
+    public void enableGripper() {
+        this.isDroppingObject = false;
 
-    private static final class GripperLoops {
-        private Gripper mGripper = Gripper.getInstance();
-        private DriveController mController = DriveController.getInstance();
+        gripperCylinder.set(true);
+    }
 
-        public Loop defaultGripperLoop() {
-            return new Loop() {
-                @Override
-                public void onStart(double timestamp) {}
+    public void disableGripper() {
+        this.isDroppingObject = true;
 
-                @Override
-                public void onLoop(double timestamp) {
-                    // double dropTime = 0;
+        gripperCylinder.set(false);
+    }
 
-                    // if (mController.getButton(Button.A)) {
-                    //     if (!mGripper.isDroppingObject) {
-                    //         mGripper.dropObject(timestamp);
-                    //         dropTime = timestamp;
-                    //     }
-                    // } else if (mGripper.isDroppingObject && Timer.getFPGATimestamp() - dropTime > 0.25) {
-                    //     mGripper.isDroppingObject = false;
-                    // } else if (!mGripper.isDroppingObject && mGripper.objectInGripper()) {
-                    //     mGripper.enableGripper();
-                    // } else {
-                    //     mGripper.disableGripper();
-                    // }
+    public boolean objectInGripper() {
+        return distanceSensor.getVoltage() > GripperConstants.DISTANCE_VOLTAGE_THRESHOLD;
+    }
 
-                    if (mController.getButton(Button.X)) {
-                        mGripper.enableGripper();
-                    } else if (mController.getButton(Button.Y)) {
-                        mGripper.disableGripper();
-                    }
+    private static final class GripperActions {
+        public static final Action defaultGripperAction() {
+            Runnable startMethod = () -> {};
+
+            Runnable runMethod = () -> {
+                if (Robot.driveControllerOne.getButton(Button.X)) {
+                    Gripper.getInstance().enableGripper();
                 }
-
-                @Override
-                public void onStop(double timestamp) {
-                    mGripper.disableGripper();
+                else if (Robot.driveControllerOne.getButton(Button.Y)) {
+                    Gripper.getInstance().disableGripper();
                 }
             };
+
+            Runnable endMethod = () -> {
+                Gripper.getInstance().disableGripper();
+            };
+
+            return new Action(startMethod, runMethod, endMethod, false).withSubsystem(Gripper.getInstance());
         }
     }
 
     @Override
-    public void registerEnabledLoops(ILooper mEnabledLooper) {
-        GripperLoops gripperLoops = new GripperLoops();
+    public void log() {}
 
-        mEnabledLooper.register(gripperLoops.defaultGripperLoop());
+    @Override
+    public void periodic() {}
+
+    @Override
+    public void queryInitialActions() {
+        Robot.teleopRunner.add(
+            GripperActions.defaultGripperAction()
+        );
     }
-
-    @Override
-    public void stop() {}
-
-    @Override
-    public boolean checkSystem() {
-        return true;
-    }
-
-    @Override
-    public void writeToDashboard() {}
 }

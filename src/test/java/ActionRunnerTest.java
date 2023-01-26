@@ -1,7 +1,6 @@
 import frc.libs.java.actionLib.*;
 
 import java.util.concurrent.Callable;
-import frc.robot.subsystems.Subsystem;
 
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
@@ -107,8 +106,8 @@ public final class ActionRunnerTest {
 
         Subsystem abLock = new Subsystem();
 
-        FunctionalAction aThread = new FunctionalAction(() -> {}, aRunMethod, aConditionalMethod, () -> {}, true).withSubsystem(abLock);
-        FunctionalAction bThread = new FunctionalAction(() -> {}, bRunMethod, bConditionalMethod, () -> {}, true).withSubsystem(abLock);
+        FunctionalAction aThread = new FunctionalAction(() -> {}, aRunMethod, aConditionalMethod, () -> {}).withSubsystem(abLock);
+        FunctionalAction bThread = new FunctionalAction(() -> {}, bRunMethod, bConditionalMethod, () -> {}).withSubsystem(abLock);
 
         runner.add(
             aThread,

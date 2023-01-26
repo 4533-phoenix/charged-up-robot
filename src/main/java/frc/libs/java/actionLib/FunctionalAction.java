@@ -5,14 +5,8 @@ import java.util.concurrent.Callable;
 public final class FunctionalAction extends Action {
     private Callable<Boolean> conditionMethod;
 
-    public FunctionalAction(Runnable startMethod, Runnable runMethod, Callable<Boolean> conditionMethod, Runnable endMethod, boolean willCancel) {
-        super(startMethod, runMethod, endMethod, willCancel);
-
-        this.conditionMethod = conditionMethod;
-    }
-
-    public FunctionalAction(Runnable startMethod, Runnable runMethod, Callable<Boolean> conditionMethod, Runnable endMethod, Controller controller, int buttonID) {
-        super(startMethod, runMethod, endMethod, controller, buttonID);
+    public FunctionalAction(Runnable startMethod, Runnable runMethod, Callable<Boolean> conditionMethod, Runnable endMethod) {
+        super(startMethod, runMethod, endMethod, true);
 
         this.conditionMethod = conditionMethod;
     }
@@ -26,10 +20,6 @@ public final class FunctionalAction extends Action {
 
     @Override
     public void run() {
-        if (!this.willRun()) {
-            return;
-        }
-
         if (this.willThreadRun()) {
             try {
                 this.getThreadLock().lock();

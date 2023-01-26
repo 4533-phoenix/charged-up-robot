@@ -10,14 +10,14 @@ public class Subsystem {
         () -> { this.periodic(); },
         () -> {}, 
         false
-    );
+    ).withSubsystem(this);
 
     private final Action loggingAction = new Action(
         () -> {},
         () -> { this.log(); },
         () -> {}, 
         false
-    );
+    ).withSubsystem(this);
 
     public Subsystem() {}
 

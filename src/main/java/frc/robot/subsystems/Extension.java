@@ -1,13 +1,12 @@
 package frc.robot.subsystems;
 
-import frc.robot.Constants.*;
-import frc.robot.controls.DriveController;
-import frc.robot.controls.PSController.Button;
-import frc.robot.loops.*;
-import edu.wpi.first.wpilibj.DoubleSolenoid;
+import frc.robot.Robot;
+import frc.libs.java.actionLib.*;
 
 public class Extension extends Subsystem {
     public static Extension mInstance;
+
+    private Extension() {}
 
     public static Extension getInstance() {
         if (mInstance == null) {
@@ -16,41 +15,28 @@ public class Extension extends Subsystem {
         return mInstance;
     }
 
-    public Extension() {}
+    private static final class ExtensionActions {
+        public static final Action defaultExtensionAction() {
+            Runnable startMethod = () -> {};
 
-    private static final class ExtensionLoops {
-        private Extension mExtension = Extension.getInstance();
-        private DriveController mController = DriveController.getInstance();
+            Runnable runMethod = () -> {};
 
-        public Loop defaultExtensionLoop() {
-            return new Loop() {
-                @Override
-                public void onStart(double timestamp) {}
+            Runnable endMethod = () -> {};
 
-                @Override
-                public void onLoop(double timestamp) {}
-
-                @Override
-                public void onStop(double timestamp) {}
-            };
+            return new Action(startMethod, runMethod, endMethod, false).withSubsystem(Extension.getInstance());
         }
     }
 
     @Override
-    public void registerEnabledLoops(ILooper mEnabledLooper) {
-        ExtensionLoops extensionLoops = new ExtensionLoops();
+    public void log() {}
 
-        mEnabledLooper.register(extensionLoops.defaultExtensionLoop());
+    @Override
+    public void periodic() {}
+
+    @Override
+    public void queryInitialActions() {
+        Robot.teleopRunner.add(
+            ExtensionActions.defaultExtensionAction()
+        );
     }
-
-    @Override
-    public void stop() {}
-
-    @Override
-    public boolean checkSystem() {
-        return true;
-    }
-
-    @Override
-    public void writeToDashboard() {}
 }

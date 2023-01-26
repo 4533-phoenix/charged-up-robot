@@ -24,7 +24,7 @@ public final class ActionRunner {
         }
 
         for (int i = 0; i < this.actions.size(); i++) {
-            Action action = (Action) this.actions.get(i);
+            Action action = this.actions.get(i);
 
             if (action.willThreadRun() && action.getState() == State.NEW) {
                 action.start();
