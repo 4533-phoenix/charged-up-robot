@@ -35,7 +35,7 @@ public final class ActionRunner {
                 action.run();
             }
 
-            if (action.willCancel() && action.getState() == State.TERMINATED) {
+            if (action.willThreadRun() && action.getState() == State.TERMINATED) {
                 action.runEnd();
 
                 this.actions.remove(i);

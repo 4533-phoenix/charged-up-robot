@@ -28,7 +28,7 @@ public final class Auto extends Subsystem {
 
     private static final Map<String, Action> autoCommands = Map.ofEntries(
         Map.entry("Test Autonomous", AutoActions.testAutonomous()),
-        Map.entry("Test Pathplanner Autonomous", AutoActions.testPathplannerAutonomous())
+        Map.entry("Test Pathplanner Autonomous", AutoActions.testOneCubeAutonomous())
     );
 
     private HolonomicDriveController autoController = new HolonomicDriveController(
@@ -64,7 +64,17 @@ public final class Auto extends Subsystem {
         return this.autoController;
     }
 
-    public static final class AutoActions {
+    public SwerveModuleState[] getSwerveModuleStates(Trajectory.State trajectoryState) {
+        ChassisSpeeds chassisSpeeds = this.autoController.calculate(
+            PoseEstimator.getInstance().getSwervePose(),
+            trajectoryState,
+            trajectoryState.poseMeters.getRotation()
+        );
+
+        return DriveConstants.SWERVE_KINEMATICS.toSwerveModuleStates(chassisSpeeds);
+    }
+
+    private static final class AutoActions {
         public static final Action testAutonomous() {
             TrajectoryConfig config = new TrajectoryConfig(
                 DriveConstants.DRIVE_MAX_VELOCITY, 
@@ -107,37 +117,48 @@ public final class Auto extends Subsystem {
                 timer.reset();
                 timer.start();
 
-                while (timer.get() <= testAutonomousTrajectory.getTotalTimeSeconds()) {
-                    HolonomicDriveController autoController = Auto.getInstance().getAutoController();
-                    
+                while (timer.get() <= 3.45) {               
                     Trajectory.State trajectoryState = testAutonomousTrajectory.sample(timer.get());
 
-                    ChassisSpeeds chassisSpeeds = autoController.calculate(
-                        PoseEstimator.getInstance().getSwervePose(),
-                        trajectoryState,
-                        trajectoryState.poseMeters.getRotation()
-                    );
+                    Swerve.getInstance().setModuleStates(Auto.getInstance().getSwerveModuleStates(trajectoryState));
+                }
 
-                    SwerveModuleState[] swerveModuleStates = DriveConstants.SWERVE_KINEMATICS.toSwerveModuleStates(chassisSpeeds);
+                timer.stop();
 
-                    Swerve.getInstance().setModuleStates(swerveModuleStates);
+                if (Gripper.getInstance().isDroppingObject()) {
+                    Gripper.getInstance().enableGripper();
+                }
+                else {
+                    Gripper.getInstance().disableGripper();
+
+                    try {
+                        Thread.sleep(250);
+                    }
+                    catch (Exception e) {
+                        e.printStackTrace();
+                    }
+
+                    Gripper.getInstance().enableGripper();
+                }
+
+                timer.start();
+
+                while (timer.get() <= testAutonomousTrajectory.getTotalTimeSeconds()) {
+                    Trajectory.State trajectoryState = testAutonomousTrajectory.sample(timer.get());
+
+                    Swerve.getInstance().setModuleStates(Auto.getInstance().getSwerveModuleStates(trajectoryState));
                 }
             };
 
             Runnable endMethod = () -> {
-                Swerve.getInstance().setModuleStates(new SwerveModuleState[] {
-                    new SwerveModuleState(),
-                    new SwerveModuleState(),
-                    new SwerveModuleState(),
-                    new SwerveModuleState()
-                });
+                Swerve.getInstance().setModuleStates(DriveConstants.SWERVE_KINEMATICS.toSwerveModuleStates(new ChassisSpeeds()));
             };
 
             return new Action(startMethod, runMethod, endMethod, true).withSubsystem(Auto.getInstance());
         }
 
-        public static final Action testPathplannerAutonomous() {
-            SwervePath testAuto = SwervePath.fromCSV("Test Path");
+        public static final Action testOneCubeAutonomous() {
+            SwervePath testAuto = SwervePath.fromCSV("Test One Cube Auto");
 
             Runnable startMethod = () -> {};
 

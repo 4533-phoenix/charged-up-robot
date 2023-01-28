@@ -147,7 +147,6 @@ public final class Swerve extends Subsystem {
     }
 
     public Translation2d getSwerveTranslation() {
-        // TODO: Make these their correct values as constants.
         double forwardAxis = Robot.driveControllerOne.getAxis(Side.LEFT, Axis.Y);
         double strafeAxis = Robot.driveControllerOne.getAxis(Side.LEFT, Axis.X);
 
@@ -158,13 +157,12 @@ public final class Swerve extends Subsystem {
         if (Math.abs(tAxes.getNorm()) < OIConstants.DRIVE_DEADBAND) {
             return new Translation2d();
         } else {
-            return new Translation2d(Math.pow(forwardAxis * dist, 3), Math.pow(strafeAxis * dist, 3));
+            return new Translation2d(forwardAxis * dist, strafeAxis * dist);
         }
     }
 
     public double getSwerveRotation() {
-        // TODO: Make this its correct value as a constant.
-        double rotAxis = Math.pow(Robot.driveControllerOne.getAxis(Side.RIGHT, Axis.X), 3) * DriveConstants.DRIVE_MAX_VELOCITY;
+        double rotAxis = Math.pow(Robot.driveControllerOne.getAxis(Side.RIGHT, Axis.X), 2);
 
         if (Math.abs(rotAxis) < OIConstants.DRIVE_DEADBAND) {
             return 0.0;

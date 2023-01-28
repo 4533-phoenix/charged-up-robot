@@ -2,18 +2,14 @@ package frc.libs.java.actionLib;
 
 import java.util.concurrent.locks.ReentrantLock;
 
-public class Action extends Thread implements Listener {
+public class Action extends Thread {
     private Runnable startMethod;
 
     private Runnable runMethod;
 
     private Runnable endMethod;
 
-    private boolean willCancel;
-
-    private boolean willThreadRun = false;
-    
-    private boolean willRun = true;
+    private boolean willThreadRun;
 
     private ReentrantLock threadLock;
 
@@ -26,11 +22,7 @@ public class Action extends Thread implements Listener {
 
         this.endMethod = endMethod;
 
-        this.willCancel = willCancel;
-
-        if (this.willCancel) {
-            this.willThreadRun = true;
-        }
+        this.willThreadRun = willCancel;
     }
 
     public Action withSubsystem(Subsystem subsystem) {
@@ -65,26 +57,8 @@ public class Action extends Thread implements Listener {
         this.endMethod.run();
     }
 
-    @Override
-    public void respondTrue() {
-        this.willRun = true;
-    }
-
-    @Override
-    public void respondFalse() {
-        this.willRun = false;
-    }
-
-    public boolean willCancel() {
-        return this.willCancel;
-    }
-
     public boolean willThreadRun() {
         return this.willThreadRun;
-    }
-
-    public boolean willRun() {
-        return this.willRun;
     }
 
     public ReentrantLock getThreadLock() {

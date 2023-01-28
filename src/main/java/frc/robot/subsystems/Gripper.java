@@ -16,7 +16,7 @@ public class Gripper extends Subsystem {
 
     private final AnalogInput distanceSensor = new AnalogInput(GripperConstants.DISTANCE_SENSOR_PORT);
 
-    public boolean isDroppingObject = false;
+    private boolean isDroppingObject = false;
 
     private Gripper() {}
 
@@ -37,6 +37,10 @@ public class Gripper extends Subsystem {
         this.isDroppingObject = true;
 
         gripperCylinder.set(false);
+    }
+
+    public boolean isDroppingObject() {
+        return this.isDroppingObject;
     }
 
     public boolean objectInGripper() {
