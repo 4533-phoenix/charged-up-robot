@@ -48,16 +48,35 @@ public class Gripper extends Subsystem {
     }
 
     private static final class GripperActions {
+        private Gripper mGripper = Gripper.getInstance();
+        private DriveController mController = DriveController.getInstance();
+    
         public static final Action defaultGripperAction() {
             Runnable startMethod = () -> {};
 
             Runnable runMethod = () -> {
-                if (Robot.driveControllerOne.getButton(Button.X)) {
-                    Gripper.getInstance().enableGripper();
-                }
-                else if (Robot.driveControllerOne.getButton(Button.Y)) {
-                    Gripper.getInstance().disableGripper();
-                }
+                    // double dropTime = 0;
+
+                    // if (mController.getButton(Button.A)) {
+                    //     if (!mGripper.isDroppingObject) {
+                    //         mGripper.dropObject(timestamp);
+                    //         dropTime = timestamp;
+                    //     }
+                    // } else if (mGripper.isDroppingObject && Timer.getFPGATimestamp() - dropTime > 0.25) {
+                    //     mGripper.isDroppingObject = false;
+                    // } else if (!mGripper.isDroppingObject && mGripper.objectInGripper()) {
+                    //     mGripper.enableGripper();
+                    // } else {
+                    //     mGripper.disableGripper();
+                    // }
+
+                    if (mController.getButton(Button.X)) {
+                        mGripper.enableGripper();
+                    } else if (mController.getButton(Button.Y)) {
+                        mGripper.disableGripper();
+                    }
+
+                    System.out.println("voltage: " + mGripper.distanceSensor.getVoltage());
             };
 
             Runnable endMethod = () -> {

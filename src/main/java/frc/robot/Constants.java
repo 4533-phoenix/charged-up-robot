@@ -107,8 +107,25 @@ public final class Constants {
         public static final double DRIVE_MAX_ROTATIONAL_ACCELERATION = 3.0; // rad/s^2
     }
 
+    public static final class ExtensionConstants {
+        public static final int LOWER_EXTENSION_PCM_PORT_FORWARD = 1;
+        public static final int LOWER_EXTENSION_PCM_PORT_REVERSE = 2;
+        public static final int UPPER_EXTENSION_PCM_PORT_FORWARD = 3;
+        public static final int UPPER_EXTENSION_PCM_PORT_REVERSE = 4;
+
+        public static final int ELBOW_MOTOR_ID = 15;
+
+        public static final int ELBOW_POTENTIOMETER_PORT = 1;
+        public static final double ELBOW_POTENTIOMETER_RANGE = 180.0;
+        public static final double ELBOW_POTENTIOMETER_OFFSET = 0.0;
+
+        public static final double ELBOW_KP = 0.1;
+        public static final double ELBOW_KI = 0.0;
+        public static final double ELBOW_KD = 0.0;
+    }
+
     public static final class GripperConstants{
-        public static final int GRIPPER_PCM_PORT = 1;
+        public static final int GRIPPER_PCM_PORT = 0;
         public static final int DISTANCE_SENSOR_PORT = 0;
 
         public static final double DISTANCE_VOLTAGE_THRESHOLD = 2.5;
