@@ -1,8 +1,9 @@
 package frc.robot.subsystems;
 
-import frc.robot.controls.*;
+import frc.robot.controls.PSController.Axis;
 import frc.robot.controls.PSController.Button;
-import frc.robot.loops.*;
+import frc.robot.controls.PSController.Side;
+import frc.robot.Robot;
 import frc.robot.Constants.*;
 
 import com.kauailabs.navx.frc.AHRS;
@@ -16,6 +17,9 @@ import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+
+import frc.libs.java.actionLib.Action;
+import frc.libs.java.actionLib.Subsystem;
 
 public final class Swerve extends Subsystem {
     private static Swerve mInstance;
@@ -142,94 +146,95 @@ public final class Swerve extends Subsystem {
         this.setModuleStates(moduleStates);
     }
 
-    private static final class SwerveLoops {
-        Swerve mSwerve = Swerve.getInstance();
-        DriveController mController = DriveController.getInstance();
+    public Translation2d getSwerveTranslation() {
+        double forwardAxis = Robot.driveControllerOne.getAxis(Side.LEFT, Axis.Y);
+        double strafeAxis = Robot.driveControllerOne.getAxis(Side.LEFT, Axis.X);
 
-        public Loop defaultDriveLoop() {
-            return new Loop() {
-                @Override
-                public void onStart(double timestamp) {
-                    Swerve.getInstance().drive(new Translation2d(), 0.0, false, true);
-                }
+        Translation2d tAxes = new Translation2d(forwardAxis, strafeAxis);
 
-                @Override
-                public void onLoop(double timestamp) {
-                    if (!Auto.getInstance().isEnabled()) {
-                        Translation2d swerveTranslation = mController.getSwerveTranslation();
-                        double swerveRotation = mController.getSwerveRotation();
+        double dist = tAxes.getNorm();
 
-                        Swerve.getInstance().drive(swerveTranslation, swerveRotation, false, true);
-                    }
-                }
+        if (Math.abs(tAxes.getNorm()) < OIConstants.DRIVE_DEADBAND) {
+            return new Translation2d();
+        } else {
+            return new Translation2d(forwardAxis * dist, strafeAxis * dist);
+        }
+    }
 
-                @Override
-                public void onStop(double timestamp) {
-                    Swerve.getInstance().drive(new Translation2d(), 0.0, false, true);
-                }
+    public double getSwerveRotation() {
+        double rotAxis = Math.pow(Robot.driveControllerOne.getAxis(Side.RIGHT, Axis.X), 2);
+
+        if (Math.abs(rotAxis) < OIConstants.DRIVE_DEADBAND) {
+            return 0.0;
+        } else {
+            return rotAxis;
+        }
+    }
+
+    private static final class SwerveActions {
+        public static final Action defaultDriveAction() {
+            Runnable startMethod = () -> {
+                Swerve.getInstance().drive(new Translation2d(), 0.0, false, true);
             };
+
+            Runnable runMethod = () -> {
+                Translation2d swerveTranslation = Swerve.getInstance().getSwerveTranslation();
+                
+                double swerveRotation = Swerve.getInstance().getSwerveRotation();
+
+                Swerve.getInstance().drive(swerveTranslation, swerveRotation, false, true);
+            };
+
+            Runnable endMethod = () -> {
+                Swerve.getInstance().drive(new Translation2d(), 0.0, false, true);
+            };
+
+            return new Action(startMethod, runMethod, endMethod, false).withSubsystem(Swerve.getInstance());
         }
 
-        public Loop swervePeriodic() {
-            return new Loop() {
-                @Override
-                public void onStart(double timestamp) {}
+        public static final Action startButtonAction() {
+            Runnable startMethod = () -> {};
 
-                @Override
-                public void onLoop(double timestamp) {
-                    SwerveModuleState[] swerveModuleStates = new SwerveModuleState[4];
-
-                    for (int i = 0; i < 4; i++) {
-                        swerveModuleStates[i] = Swerve.getInstance().swerveMods[i].getState();
-                    }
-
-                    Swerve.getInstance().writeToDashboard();
+            Runnable runMethod = () -> {
+                if (Robot.driveControllerOne.getButton(Button.START)) {
+                    Swerve.getInstance().zeroGyro();
                 }
-
-                @Override
-                public void onStop(double timestamp) {}
             };
-        }
 
-        public Loop startButton() {
-            return new Loop() {
-                @Override
-                public void onStart(double timestamp) {}
+            Runnable endMethod = () -> {};
 
-                @Override
-                public void onLoop(double timestamp) {
-                    if (DriveController.getInstance().getButton(Button.START)) {
-                        Swerve.getInstance().zeroGyro();
-                    }
-                }
-
-                @Override
-                public void onStop(double timestamp) {}
-            };
+            return new Action(startMethod, runMethod, endMethod, false).withSubsystem(Swerve.getInstance());
         }
     }
 
     @Override
-    public void registerEnabledLoops(ILooper mEnabledLooper) {
-        SwerveLoops swerveLoops = new SwerveLoops();
-
-        mEnabledLooper.register(swerveLoops.defaultDriveLoop());
-        mEnabledLooper.register(swerveLoops.swervePeriodic());
-        mEnabledLooper.register(swerveLoops.startButton());
-    }
-
-    @Override
-    public void stop() {}
-
-    @Override
-    public boolean checkSystem() {
-        return true;
-    }
-
-    @Override
-    public void writeToDashboard() {
+    public void log() {
         SmartDashboard.putNumber("Gyro Yaw", this.gyro.getYaw());
         SmartDashboard.putNumber("Gyro Pitch", this.gyro.getPitch());
         SmartDashboard.putNumber("Gyro Roll", this.gyro.getRoll());
+    }
+
+    @Override
+    public void periodic() {
+        SwerveModuleState[] swerveModuleStates = new SwerveModuleState[4];
+
+        for (int i = 0; i < 4; i++) {
+            swerveModuleStates[i] = Swerve.getInstance().swerveMods[i].getState();
+        }
+    }
+
+    @Override
+    public void queryInitialActions() {
+        Robot.autonomousRunner.add(
+            this.getLoggingAction(),
+            this.getPeriodicAction()
+        );
+
+        Robot.teleopRunner.add(
+            this.getLoggingAction(),
+            this.getPeriodicAction(),
+            SwerveActions.defaultDriveAction(),
+            SwerveActions.startButtonAction()
+        );
     }
 }

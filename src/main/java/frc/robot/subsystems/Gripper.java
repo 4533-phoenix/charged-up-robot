@@ -1,15 +1,13 @@
 package frc.robot.subsystems;
 
-import frc.robot.Constants;
-import frc.robot.Constants.GripperConstants;
-import frc.robot.controls.DriveController;
-import frc.robot.controls.PSController.Button;
-import frc.robot.loops.*;
-import edu.wpi.first.wpilibj.Compressor;
 import edu.wpi.first.wpilibj.PneumaticsModuleType;
 import edu.wpi.first.wpilibj.Solenoid;
-import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.AnalogInput;
+
+import frc.libs.java.actionLib.*;
+import frc.robot.Robot;
+import frc.robot.Constants.*;
+import frc.robot.controls.PSController.*;
 
 public class Gripper extends Subsystem {
     public static Gripper mInstance;
@@ -18,26 +16,9 @@ public class Gripper extends Subsystem {
 
     private final AnalogInput distanceSensor = new AnalogInput(GripperConstants.DISTANCE_SENSOR_PORT);
 
-    public boolean isDroppingObject = false;
+    private boolean isDroppingObject = false;
 
-    public void enableGripper() {
-        gripperCylinder.set(true);
-    }
-
-    public void disableGripper() {
-        gripperCylinder.set(false);
-    }
-
-    public boolean objectInGripper() {
-        return distanceSensor.getVoltage() > GripperConstants.DISTANCE_VOLTAGE_THRESHOLD;
-    }
-
-    public void dropObject(double timestamp) {
-        if (!isDroppingObject && Timer.getFPGATimestamp() - timestamp < 0.25) {
-            isDroppingObject = true;
-            disableGripper();
-        }
-    }
+    private Gripper() {}
 
     public static Gripper getInstance() {
         if (mInstance == null) {
@@ -46,19 +27,34 @@ public class Gripper extends Subsystem {
         return mInstance;
     }
 
-    public Gripper() {}
+    public void enableGripper() {
+        this.isDroppingObject = false;
 
-    private static final class GripperLoops {
+        gripperCylinder.set(true);
+    }
+
+    public void disableGripper() {
+        this.isDroppingObject = true;
+
+        gripperCylinder.set(false);
+    }
+
+    public boolean isDroppingObject() {
+        return this.isDroppingObject;
+    }
+
+    public boolean objectInGripper() {
+        return distanceSensor.getVoltage() > GripperConstants.DISTANCE_VOLTAGE_THRESHOLD;
+    }
+
+    private static final class GripperActions {
         private Gripper mGripper = Gripper.getInstance();
         private DriveController mController = DriveController.getInstance();
+    
+        public static final Action defaultGripperAction() {
+            Runnable startMethod = () -> {};
 
-        public Loop defaultGripperLoop() {
-            return new Loop() {
-                @Override
-                public void onStart(double timestamp) {}
-
-                @Override
-                public void onLoop(double timestamp) {
+            Runnable runMethod = () -> {
                     // double dropTime = 0;
 
                     // if (mController.getButton(Button.A)) {
@@ -81,31 +77,26 @@ public class Gripper extends Subsystem {
                     }
 
                     System.out.println("voltage: " + mGripper.distanceSensor.getVoltage());
-                }
-
-                @Override
-                public void onStop(double timestamp) {
-                    mGripper.disableGripper();
-                }
             };
+
+            Runnable endMethod = () -> {
+                Gripper.getInstance().disableGripper();
+            };
+
+            return new Action(startMethod, runMethod, endMethod, false).withSubsystem(Gripper.getInstance());
         }
     }
 
     @Override
-    public void registerEnabledLoops(ILooper mEnabledLooper) {
-        GripperLoops gripperLoops = new GripperLoops();
+    public void log() {}
 
-        mEnabledLooper.register(gripperLoops.defaultGripperLoop());
+    @Override
+    public void periodic() {}
+
+    @Override
+    public void queryInitialActions() {
+        Robot.teleopRunner.add(
+            GripperActions.defaultGripperAction()
+        );
     }
-
-    @Override
-    public void stop() {}
-
-    @Override
-    public boolean checkSystem() {
-        return true;
-    }
-
-    @Override
-    public void writeToDashboard() {}
 }

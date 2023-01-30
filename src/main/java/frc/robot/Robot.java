@@ -4,10 +4,13 @@
 
 package frc.robot;
 
-import edu.wpi.first.wpilibj.TimedRobot;
+import frc.robot.Constants.*;
+import frc.robot.controls.PSController;
+import frc.robot.subsystems.Auto;
+import frc.libs.java.actionLib.ActionRunner;
 
-import frc.robot.loops.Looper;
-import frc.robot.subsystems.*;
+import edu.wpi.first.wpilibj.TimedRobot;
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 
 /**
  * The VM is configured to automatically run this class, and to call the functions corresponding to
@@ -16,81 +19,63 @@ import frc.robot.subsystems.*;
  * project.
  */
 public final class Robot extends TimedRobot {
-  // Instantiate enabled and disabled loopers
-  private final Looper mEnabledLooper = new Looper();
-  private final Looper mDisabledLooper = new Looper();
+  public static final ActionRunner autonomousRunner = new ActionRunner();
+  public static final ActionRunner teleopRunner = new ActionRunner();
 
-  // Subsystem instances
-  private final SubsystemManager mSubsystemManager = SubsystemManager.getInstance();
-  private final Auto mAuto = Auto.getInstance();
-  private final Extension mExtension = Extension.getInstance();
-  private final Gripper mGripper = Gripper.getInstance();
-  private final Pneumatics mPneumatics = Pneumatics.getInstance();
-  private final PoseEstimator mPoseEstimator = PoseEstimator.getInstance();
-  private final Swerve mSwerve = Swerve.getInstance();
+  public static final PSController driveControllerOne = new PSController(OIConstants.DRIVER_CONTROLLER_ONE_PORT);
+  public static final PSController driveControllerTwo = new PSController(OIConstants.DRIVER_CONTROLLER_TWO_PORT);
+
+  public static final SendableChooser<String> chooser = new SendableChooser<String>();
 
   @Override
   public void robotInit() {
-    mSubsystemManager.setSubsystems(
-      mAuto,
-      mExtension,
-      mGripper,
-      mPneumatics,
-      mPoseEstimator,
-      mSwerve
-    );
-
-    mSubsystemManager.registerEnabledLoops(mEnabledLooper);
-
-    mSubsystemManager.registerDisabledLoops(mDisabledLooper);
+    RobotContainer.queryInitialActions();
   }
 
   @Override
-  public void robotPeriodic() {
-    mEnabledLooper.loop();
-  }
+  public void robotPeriodic() {}
 
   @Override
   public void autonomousInit() {
-    mDisabledLooper.stop();
+    autonomousRunner.add(
+      Auto.getInstance().getAutonomous(chooser.getSelected())
+    );
 
-    mAuto.enable();
-
-    mEnabledLooper.start();
+    autonomousRunner.enable();
   }
 
   @Override
-  public void autonomousPeriodic() {}
+  public void autonomousPeriodic() {
+    autonomousRunner.run();
+  }
 
   @Override
   public void teleopInit() {
-    mDisabledLooper.stop();
+    autonomousRunner.disable();
 
-    mAuto.disable();
-
-    mEnabledLooper.start();
+    teleopRunner.enable();
   }
 
   @Override
-  public void teleopPeriodic() {}
+  public void teleopPeriodic() {
+    teleopRunner.run();
+  }
 
   @Override
   public void disabledInit() {
-    mEnabledLooper.stop();
+    autonomousRunner.disable();
 
-    mDisabledLooper.start();
+    teleopRunner.disable();
   }
 
   @Override
-  public void disabledPeriodic() {
-    mDisabledLooper.loop();
-  }
+  public void disabledPeriodic() {}
 
   @Override
   public void testInit() {
-    mEnabledLooper.stop();
+    autonomousRunner.disable();
 
-    mDisabledLooper.stop();
+    teleopRunner.disable();
   }
 
   @Override

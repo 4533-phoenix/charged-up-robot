@@ -1,9 +1,7 @@
 package frc.robot.subsystems;
 
 import frc.robot.Constants.*;
-import frc.robot.auto.SwervePath;
-import frc.robot.auto.SwervePath.PathState;
-import frc.robot.loops.*;
+import frc.robot.Robot;
 
 import edu.wpi.first.math.controller.*;
 import edu.wpi.first.math.geometry.*;
@@ -16,15 +14,22 @@ import edu.wpi.first.math.trajectory.constraint.MaxVelocityConstraint;
 import edu.wpi.first.math.trajectory.constraint.SwerveDriveKinematicsConstraint;
 import edu.wpi.first.wpilibj.Timer;
 
-import java.io.File;
-import java.util.Scanner;
+import frc.libs.java.actionLib.Action;
+import frc.libs.java.actionLib.Subsystem;
+import frc.libs.java.swervePathLib.SwervePath;
+import frc.libs.java.swervePathLib.SwervePath.PathState;
+
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Map;
 
 public final class Auto extends Subsystem {
     private static Auto mInstance;
 
-    private boolean isEnabled = false;
+    private static final Map<String, Action> autoCommands = Map.ofEntries(
+        Map.entry("Test Autonomous", AutoActions.testAutonomous()),
+        Map.entry("Test Pathplanner Autonomous", AutoActions.testOneCubeAutonomous())
+    );
 
     private HolonomicDriveController autoController = new HolonomicDriveController(
         new PIDController(
@@ -55,167 +60,156 @@ public final class Auto extends Subsystem {
 
     public Auto() {}
 
-    public void enable() {
-        this.isEnabled = true;
-    }
-
-    public void disable() {
-        this.isEnabled = false;
-    }
-
-    public boolean isEnabled() {
-        return this.isEnabled;
-    }
-
     public HolonomicDriveController getAutoController() {
         return this.autoController;
     }
 
-    private static final class AutoLoops {
-        public Loop testAutonomous() {
-            return new Loop() {
-                private Trajectory testAutonomousTrajectory;
-                
-                private boolean hasStarted = false;
-                private double startTime;
+    public SwerveModuleState[] getSwerveModuleStates(Trajectory.State trajectoryState) {
+        ChassisSpeeds chassisSpeeds = this.autoController.calculate(
+            PoseEstimator.getInstance().getSwervePose(),
+            trajectoryState,
+            trajectoryState.poseMeters.getRotation()
+        );
 
-                @Override
-                public void onStart(double timestamp) {
-                    TrajectoryConfig config = new TrajectoryConfig(
-                        DriveConstants.DRIVE_MAX_VELOCITY, 
-                        DriveConstants.DRIVE_MAX_ACCELERATION
-                    )
-                    .addConstraint(
-                        new MaxVelocityConstraint(
-                            DriveConstants.DRIVE_MAX_VELOCITY
-                        )
-                    )
-                    .addConstraint(
-                        new SwerveDriveKinematicsConstraint(
-                            DriveConstants.SWERVE_KINEMATICS, 
-                            DriveConstants.DRIVE_MAX_VELOCITY
-                        )
-                    );
+        return DriveConstants.SWERVE_KINEMATICS.toSwerveModuleStates(chassisSpeeds);
+    }
 
-                    Pose2d startPose = PoseEstimator.getInstance().getSwervePose();
+    private static final class AutoActions {
+        public static final Action testAutonomous() {
+            TrajectoryConfig config = new TrajectoryConfig(
+                DriveConstants.DRIVE_MAX_VELOCITY, 
+                DriveConstants.DRIVE_MAX_ACCELERATION
+            )
+            .addConstraint(
+                new MaxVelocityConstraint(
+                    DriveConstants.DRIVE_MAX_VELOCITY
+                )
+            )
+            .addConstraint(
+                new SwerveDriveKinematicsConstraint(
+                    DriveConstants.SWERVE_KINEMATICS, 
+                    DriveConstants.DRIVE_MAX_VELOCITY
+                )
+            );
 
-                    ArrayList<Translation2d> trajectoryPoints = new ArrayList<Translation2d>(
-                        Arrays.asList(
-                            new Translation2d(startPose.getX() + 0.25, startPose.getY() + 0.25),
-                            new Translation2d(startPose.getX() + 0.50, startPose.getY() - 0.25)
-                        )
-                    );
+            Pose2d startPose = PoseEstimator.getInstance().getSwervePose();
 
-                    Pose2d endPose = new Pose2d(startPose.getX() + 0.75 , startPose.getY(), startPose.getRotation());
+            ArrayList<Translation2d> trajectoryPoints = new ArrayList<Translation2d>(
+                Arrays.asList(
+                    new Translation2d(startPose.getX() + 0.25, startPose.getY() + 0.25),
+                    new Translation2d(startPose.getX() + 0.50, startPose.getY() - 0.25)
+                )
+            );
 
-                    this.testAutonomousTrajectory = TrajectoryGenerator.generateTrajectory(
-                        startPose, 
-                        trajectoryPoints, 
-                        endPose, 
-                        config
-                    );
+            Pose2d endPose = new Pose2d(startPose.getX() + 0.75 , startPose.getY(), startPose.getRotation());
+
+            Trajectory testAutonomousTrajectory = TrajectoryGenerator.generateTrajectory(
+                startPose, 
+                trajectoryPoints, 
+                endPose, 
+                config
+            );
+
+            Runnable startMethod = () -> {};
+
+            Runnable runMethod = () -> {
+                Timer timer = new Timer();
+                timer.reset();
+                timer.start();
+
+                while (timer.get() <= 3.45) {               
+                    Trajectory.State trajectoryState = testAutonomousTrajectory.sample(timer.get());
+
+                    Swerve.getInstance().setModuleStates(Auto.getInstance().getSwerveModuleStates(trajectoryState));
                 }
 
-                @Override
-                public void onLoop(double timestamp) {
-                    if (Auto.getInstance().isEnabled()) {
-                        double currTime = Timer.getFPGATimestamp();
+                timer.stop();
 
-                        if (!this.hasStarted) {
-                            this.startTime = currTime;
+                if (Gripper.getInstance().isDroppingObject()) {
+                    Gripper.getInstance().enableGripper();
+                }
+                else {
+                    Gripper.getInstance().disableGripper();
 
-                            this.hasStarted = true;
-                        }
-
-                        if (currTime - this.startTime > this.testAutonomousTrajectory.getTotalTimeSeconds()) {
-                            SwerveModuleState[] swerveModuleStates = DriveConstants.SWERVE_KINEMATICS.toSwerveModuleStates(
-                                new ChassisSpeeds(0.0, 0.0, 0.0)
-                            );
-
-                            Swerve.getInstance().setModuleStates(swerveModuleStates);
-
-                            return;
-                        }
-
-                        HolonomicDriveController autoController = Auto.getInstance().getAutoController();
-                        
-                        Trajectory.State trajectoryState = this.testAutonomousTrajectory.sample(currTime - this.startTime);
-
-                        ChassisSpeeds chassisSpeeds = autoController.calculate(
-                            PoseEstimator.getInstance().getSwervePose(),
-                            trajectoryState,
-                            trajectoryState.poseMeters.getRotation()
-                        );
-
-                        SwerveModuleState[] swerveModuleStates = DriveConstants.SWERVE_KINEMATICS.toSwerveModuleStates(chassisSpeeds);
-
-                        Swerve.getInstance().setModuleStates(swerveModuleStates);
+                    try {
+                        Thread.sleep(250);
                     }
+                    catch (Exception e) {
+                        e.printStackTrace();
+                    }
+
+                    Gripper.getInstance().enableGripper();
                 }
 
-                @Override
-                public void onStop(double timestamp) {}
+                timer.start();
+
+                while (timer.get() <= testAutonomousTrajectory.getTotalTimeSeconds()) {
+                    Trajectory.State trajectoryState = testAutonomousTrajectory.sample(timer.get());
+
+                    Swerve.getInstance().setModuleStates(Auto.getInstance().getSwerveModuleStates(trajectoryState));
+                }
             };
+
+            Runnable endMethod = () -> {
+                Swerve.getInstance().setModuleStates(DriveConstants.SWERVE_KINEMATICS.toSwerveModuleStates(new ChassisSpeeds()));
+            };
+
+            return new Action(startMethod, runMethod, endMethod, true).withSubsystem(Auto.getInstance());
         }
 
-        public Loop testPathplannerAutonomous() {
-            return new Loop() {
-                private SwervePath testAuto;
-                
-                private boolean hasStarted = false;
-                private double startTime;
+        public static final Action testOneCubeAutonomous() {
+            SwervePath testAuto = SwervePath.fromCSV("Test One Cube Auto");
 
-                @Override
-                public void onStart(double timestamp) {
-                    this.testAuto = SwervePath.fromCSV("Test Path");
+            Runnable startMethod = () -> {};
+
+            Runnable runMethod = () -> {
+                Timer timer = new Timer();
+                timer.reset();
+                timer.start();
+
+                while (timer.get() <= testAuto.getRuntime()) {
+                    PathState currState = testAuto.sample(timer.get());
+
+                    ChassisSpeeds chassisSpeeds = Auto.getInstance().getAutoController().calculate(
+                        PoseEstimator.getInstance().getSwervePose(),
+                        currState.getTrajectoryState(),
+                        currState.rotation
+                    );
+
+                    SwerveModuleState[] swerveModuleStates = DriveConstants.SWERVE_KINEMATICS.toSwerveModuleStates(chassisSpeeds);
+
+                    Swerve.getInstance().setModuleStates(swerveModuleStates);
                 }
-
-                @Override
-                public void onLoop(double timestamp) {
-                    if (Auto.getInstance().isEnabled()) {
-                        double currTime = Timer.getFPGATimestamp();
-
-                        if (!hasStarted) {
-                            this.startTime = currTime;
-
-                            this.hasStarted = true;
-                        }
-
-                        double time = currTime - startTime;
-
-                        PathState currState = testAuto.sample(time);
-
-                        ChassisSpeeds chassisSpeeds = Auto.getInstance().getAutoController().calculate(
-                            PoseEstimator.getInstance().getSwervePose(),
-                            currState.getTrajectoryState(),
-                            currState.rotation
-                        );
-
-                        SwerveModuleState[] swerveModuleStates = DriveConstants.SWERVE_KINEMATICS.toSwerveModuleStates(chassisSpeeds);
-
-                        Swerve.getInstance().setModuleStates(swerveModuleStates);
-                    }
-                }
-
-                @Override
-                public void onStop(double timestamp) {}
             };
+
+            Runnable endMethod = () -> {
+                Swerve.getInstance().setModuleStates(new SwerveModuleState[] {
+                    new SwerveModuleState(),
+                    new SwerveModuleState(),
+                    new SwerveModuleState(),
+                    new SwerveModuleState()
+                });
+            };
+
+            return new Action(startMethod, runMethod, endMethod, true).withSubsystem(Auto.getInstance());
         }
     }
 
     @Override
-    public void registerEnabledLoops(ILooper looper) {
-        AutoLoops autoLoops = new AutoLoops();
+    public void log() {}
 
-        looper.register(autoLoops.testAutonomous());
-        // looper.register(autoLoops.testPathplannerAutonomous());
+    @Override
+    public void periodic() {}
+
+    @Override
+    public void queryInitialActions() {
+        Robot.autonomousRunner.add(
+            this.getLoggingAction(),
+            this.getPeriodicAction() 
+        );
     }
 
-    @Override
-    public void stop() {}
-
-    @Override
-    public boolean checkSystem() {
-        return true;
+    public Action getAutonomous(String key) {
+        return autoCommands.get(key);
     }
 }
