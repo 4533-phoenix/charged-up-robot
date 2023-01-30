@@ -49,7 +49,7 @@ public class Gripper extends Subsystem {
 
     private static final class GripperActions {
         private Gripper mGripper = Gripper.getInstance();
-        private DriveController mController = DriveController.getInstance();
+        // private DriveController mController = DriveController.getInstance();
     
         public static final Action defaultGripperAction() {
             Runnable startMethod = () -> {};
@@ -70,13 +70,13 @@ public class Gripper extends Subsystem {
                     //     mGripper.disableGripper();
                     // }
 
-                    if (mController.getButton(Button.X)) {
-                        mGripper.enableGripper();
-                    } else if (mController.getButton(Button.Y)) {
-                        mGripper.disableGripper();
-                    }
+                    // if (mController.getButton(Button.X)) {
+                    //     mGripper.enableGripper();
+                    // } else if (mController.getButton(Button.Y)) {
+                    //     mGripper.disableGripper();
+                    // }
 
-                    System.out.println("voltage: " + mGripper.distanceSensor.getVoltage());
+                    // System.out.println("voltage: " + mGripper.distanceSensor.getVoltage());
             };
 
             Runnable endMethod = () -> {

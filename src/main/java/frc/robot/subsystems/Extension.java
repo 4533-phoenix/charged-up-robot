@@ -3,7 +3,6 @@ package frc.robot.subsystems;
 import frc.robot.Robot;
 import frc.libs.java.actionLib.*;
 import frc.robot.Constants.*;
-import frc.robot.controls.DriveController;
 import frc.robot.controls.PSController.Button;
 
 import com.revrobotics.CANSparkMax;
@@ -49,16 +48,13 @@ public class Extension extends Subsystem {
     }
 
     private static final class ExtensionActions {
-        private Extension mExtension = Extension.getInstance();
-        private DriveController mController = DriveController.getInstance();
-    
         public static final Action defaultExtensionAction() {
             Runnable startMethod = () -> {};
 
             Runnable runMethod = () -> {};
 
             Runnable endMethod = () -> {
-              mExtension.setLowerExtensionState(LowerExtensionState.OFF);
+            //   Extension.getInstance().setLowerExtensionState(LowerExtensionState.OFF);
             };
 
             return new Action(startMethod, runMethod, endMethod, false).withSubsystem(Extension.getInstance());
