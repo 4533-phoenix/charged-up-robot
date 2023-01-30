@@ -7,6 +7,7 @@ import edu.wpi.first.wpilibj.AnalogInput;
 import frc.libs.java.actionLib.*;
 import frc.robot.Robot;
 import frc.robot.Constants.*;
+import frc.robot.controls.DriveController;
 import frc.robot.controls.PSController.*;
 
 public class Gripper extends Subsystem {
@@ -48,9 +49,6 @@ public class Gripper extends Subsystem {
     }
 
     private static final class GripperActions {
-        private Gripper mGripper = Gripper.getInstance();
-        private DriveController mController = DriveController.getInstance();
-    
         public static final Action defaultGripperAction() {
             Runnable startMethod = () -> {};
 
@@ -70,13 +68,13 @@ public class Gripper extends Subsystem {
                     //     mGripper.disableGripper();
                     // }
 
-                    if (mController.getButton(Button.X)) {
-                        mGripper.enableGripper();
-                    } else if (mController.getButton(Button.Y)) {
-                        mGripper.disableGripper();
+                    if (Robot.driverController.getButton(Button.X)) {
+                        Gripper.getInstance().enableGripper();
+                    } else if (Robot.driverController.getButton(Button.Y)) {
+                        Gripper.getInstance().disableGripper();
                     }
 
-                    System.out.println("voltage: " + mGripper.distanceSensor.getVoltage());
+                    System.out.println("voltage: " + Gripper.getInstance().distanceSensor.getVoltage());
             };
 
             Runnable endMethod = () -> {

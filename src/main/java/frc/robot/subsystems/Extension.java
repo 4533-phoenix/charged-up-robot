@@ -48,17 +48,57 @@ public class Extension extends Subsystem {
         return mInstance;
     }
 
+    public void setLowerExtensionState(LowerExtensionState state) {
+        switch (state) {
+            case ZERO_INCHES:
+                lowerExtensionCylinder.set(Value.kReverse);
+                upperExtensionCylinder.set(Value.kReverse);
+            case FIVE_INCHES:
+                lowerExtensionCylinder.set(Value.kReverse);
+                upperExtensionCylinder.set(Value.kForward);
+            case SEVEN_INCHES:
+                lowerExtensionCylinder.set(Value.kForward);
+                upperExtensionCylinder.set(Value.kReverse);
+            case TWELVE_INCHES:
+                lowerExtensionCylinder.set(Value.kForward);
+                upperExtensionCylinder.set(Value.kForward);
+            case OFF:
+                lowerExtensionCylinder.set(Value.kOff);
+                upperExtensionCylinder.set(Value.kOff);
+        }
+    }
+
+    public void setExtensionState(ExtensionState state) {
+        switch (state) {
+            case GROUND_INTAKE:
+                this.setLowerExtensionState(LowerExtensionState.ZERO_INCHES);
+                this.elbowController.setSetpoint(elbowSetpoints[0]);
+            case MIDDLE_ROW:
+                this.setLowerExtensionState(LowerExtensionState.FIVE_INCHES);
+                this.elbowController.setSetpoint(elbowSetpoints[1]);
+            case HIGH_ROW:
+                this.setLowerExtensionState(LowerExtensionState.TWELVE_INCHES);
+                this.elbowController.setSetpoint(elbowSetpoints[2]);
+            case SUBSTATION:
+                this.setLowerExtensionState(LowerExtensionState.SEVEN_INCHES);
+                this.elbowController.setSetpoint(elbowSetpoints[3]);
+        }
+    }
+
+    public void updateElbowController() {
+        double elbowPosition = elbowPotentiometer.get();
+
+        elbowMotor.set(elbowController.calculate(elbowPosition));
+    }
+
     private static final class ExtensionActions {
-        private Extension mExtension = Extension.getInstance();
-        private DriveController mController = DriveController.getInstance();
-    
         public static final Action defaultExtensionAction() {
             Runnable startMethod = () -> {};
 
             Runnable runMethod = () -> {};
 
             Runnable endMethod = () -> {
-              mExtension.setLowerExtensionState(LowerExtensionState.OFF);
+              Extension.getInstance().setLowerExtensionState(LowerExtensionState.OFF);
             };
 
             return new Action(startMethod, runMethod, endMethod, false).withSubsystem(Extension.getInstance());

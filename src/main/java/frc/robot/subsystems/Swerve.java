@@ -147,8 +147,8 @@ public final class Swerve extends Subsystem {
     }
 
     public Translation2d getSwerveTranslation() {
-        double forwardAxis = Robot.driveControllerOne.getAxis(Side.LEFT, Axis.Y);
-        double strafeAxis = Robot.driveControllerOne.getAxis(Side.LEFT, Axis.X);
+        double forwardAxis = Robot.driverController.getAxis(Side.LEFT, Axis.Y);
+        double strafeAxis = Robot.driverController.getAxis(Side.LEFT, Axis.X);
 
         Translation2d tAxes = new Translation2d(forwardAxis, strafeAxis);
 
@@ -162,7 +162,7 @@ public final class Swerve extends Subsystem {
     }
 
     public double getSwerveRotation() {
-        double rotAxis = Math.pow(Robot.driveControllerOne.getAxis(Side.RIGHT, Axis.X), 2);
+        double rotAxis = Math.pow(Robot.driverController.getAxis(Side.RIGHT, Axis.X), 2);
 
         if (Math.abs(rotAxis) < OIConstants.DRIVE_DEADBAND) {
             return 0.0;
@@ -196,7 +196,7 @@ public final class Swerve extends Subsystem {
             Runnable startMethod = () -> {};
 
             Runnable runMethod = () -> {
-                if (Robot.driveControllerOne.getButton(Button.START)) {
+                if (Robot.driverController.getButton(Button.START)) {
                     Swerve.getInstance().zeroGyro();
                 }
             };

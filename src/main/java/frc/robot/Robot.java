@@ -22,8 +22,8 @@ public final class Robot extends TimedRobot {
   public static final ActionRunner autonomousRunner = new ActionRunner();
   public static final ActionRunner teleopRunner = new ActionRunner();
 
-  public static final PSController driveControllerOne = new PSController(OIConstants.DRIVER_CONTROLLER_ONE_PORT);
-  public static final PSController driveControllerTwo = new PSController(OIConstants.DRIVER_CONTROLLER_TWO_PORT);
+  public static final PSController driverController = new PSController(OIConstants.DRIVER_CONTROLLER_PORT);
+  public static final PSController operatorController = new PSController(OIConstants.OPERATOR_CONTROLLER_PORT);
 
   public static final SendableChooser<String> chooser = new SendableChooser<String>();
 
