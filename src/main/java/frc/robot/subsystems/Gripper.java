@@ -7,7 +7,6 @@ import edu.wpi.first.wpilibj.AnalogInput;
 import frc.libs.java.actionLib.*;
 import frc.robot.Robot;
 import frc.robot.Constants.*;
-import frc.robot.controls.DriveController;
 import frc.robot.controls.PSController.*;
 
 public class Gripper extends Subsystem {
@@ -70,7 +69,8 @@ public class Gripper extends Subsystem {
 
                     if (Robot.driverController.getButton(Button.X)) {
                         Gripper.getInstance().enableGripper();
-                    } else if (Robot.driverController.getButton(Button.Y)) {
+                    } 
+                    else if (Robot.driverController.getButton(Button.Y)) {
                         Gripper.getInstance().disableGripper();
                     }
 

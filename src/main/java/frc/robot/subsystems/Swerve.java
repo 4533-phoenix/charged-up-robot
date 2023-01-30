@@ -116,13 +116,10 @@ public final class Swerve extends Subsystem {
         backRight.setDesiredState(desiredStates[3]);
     }
 
-    public void drive(Translation2d translation, double rotation, boolean fieldRelative, boolean isOpenLoop) {
-        double translationScale = DriveConstants.DRIVE_MAX_VELOCITY / DriveConstants.DRIVE_MAX_PHYSICAL_VELOCITY;
-        double rotationScale = DriveConstants.DRIVE_MAX_ROTATIONAL_VELOCITY / DriveConstants.DRIVE_MAX_PHYSICAL_VELOCITY;
-
-        double xSpeed = translationScale * translation.getX();
-        double ySpeed = translationScale * translation.getY();
-        double steerSpeed = rotationScale * rotation;
+    public void drive(Translation2d translation, double rotation, boolean fieldRelative) {
+        double xSpeed = translation.getX();
+        double ySpeed = translation.getY();
+        double steerSpeed = rotation;
 
         xSpeed = Math.abs(xSpeed) > OIConstants.DRIVE_DEADBAND ? xSpeed : 0.0;
         ySpeed = Math.abs(ySpeed) > OIConstants.DRIVE_DEADBAND ? ySpeed : 0.0;
@@ -133,6 +130,7 @@ public final class Swerve extends Subsystem {
         steerSpeed = steerLimiter.calculate(steerSpeed);
 
         ChassisSpeeds chassisSpeeds;
+
         if (fieldRelative) {
             chassisSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(
                 xSpeed, ySpeed, steerSpeed, PoseEstimator.getInstance().getSwerveRotation()
@@ -157,7 +155,7 @@ public final class Swerve extends Subsystem {
         if (Math.abs(tAxes.getNorm()) < OIConstants.DRIVE_DEADBAND) {
             return new Translation2d();
         } else {
-            return new Translation2d(forwardAxis * dist, strafeAxis * dist);
+            return new Translation2d(forwardAxis * dist * DriveConstants.DRIVE_MAX_VELOCITY, strafeAxis * dist * DriveConstants.DRIVE_MAX_VELOCITY);
         }
     }
 
@@ -167,14 +165,14 @@ public final class Swerve extends Subsystem {
         if (Math.abs(rotAxis) < OIConstants.DRIVE_DEADBAND) {
             return 0.0;
         } else {
-            return rotAxis;
+            return rotAxis * DriveConstants.DRIVE_MAX_ROTATIONAL_VELOCITY;
         }
     }
 
     private static final class SwerveActions {
         public static final Action defaultDriveAction() {
             Runnable startMethod = () -> {
-                Swerve.getInstance().drive(new Translation2d(), 0.0, false, true);
+                Swerve.getInstance().drive(new Translation2d(), 0.0, false);
             };
 
             Runnable runMethod = () -> {
@@ -182,11 +180,11 @@ public final class Swerve extends Subsystem {
                 
                 double swerveRotation = Swerve.getInstance().getSwerveRotation();
 
-                Swerve.getInstance().drive(swerveTranslation, swerveRotation, false, true);
+                Swerve.getInstance().drive(swerveTranslation, swerveRotation, true);
             };
 
             Runnable endMethod = () -> {
-                Swerve.getInstance().drive(new Translation2d(), 0.0, false, true);
+                Swerve.getInstance().drive(new Translation2d(), 0.0, false);
             };
 
             return new Action(startMethod, runMethod, endMethod, false).withSubsystem(Swerve.getInstance());
