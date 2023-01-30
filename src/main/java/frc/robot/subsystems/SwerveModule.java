@@ -5,7 +5,6 @@ import com.revrobotics.CANSparkMax;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
-import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.ModuleConstants;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
@@ -103,7 +102,7 @@ public final class SwerveModule {
 
         state = SwerveModuleState.optimize(state, this.getState().angle);
 
-        this.driveMotor.set(state.speedMetersPerSecond / DriveConstants.DRIVE_MAX_VELOCITY);
+        this.driveMotor.set(state.speedMetersPerSecond);
         this.steerMotor.set(this.steerPIDController.calculate(this.getSteerPosition(), state.angle.getRadians()));
     }
 

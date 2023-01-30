@@ -64,17 +64,18 @@ public final class Auto extends Subsystem {
         return this.autoController;
     }
 
-    public SwerveModuleState[] getSwerveModuleStates(Trajectory.State trajectoryState) {
-        ChassisSpeeds chassisSpeeds = this.autoController.calculate(
-            PoseEstimator.getInstance().getSwervePose(),
-            trajectoryState,
-            trajectoryState.poseMeters.getRotation()
-        );
-
-        return DriveConstants.SWERVE_KINEMATICS.toSwerveModuleStates(chassisSpeeds);
-    }
-
+    
     private static final class AutoActions {
+        private static final SwerveModuleState[] getSwerveModuleStates(Trajectory.State trajectoryState) {
+            ChassisSpeeds chassisSpeeds = Auto.getInstance().getAutoController().calculate(
+                PoseEstimator.getInstance().getSwervePose(),
+                trajectoryState,
+                trajectoryState.poseMeters.getRotation()
+            );
+    
+            return DriveConstants.SWERVE_KINEMATICS.toSwerveModuleStates(chassisSpeeds);
+        }
+    
         public static final Action testAutonomous() {
             TrajectoryConfig config = new TrajectoryConfig(
                 DriveConstants.DRIVE_MAX_VELOCITY, 
@@ -120,7 +121,7 @@ public final class Auto extends Subsystem {
                 while (timer.get() <= 3.45) {               
                     Trajectory.State trajectoryState = testAutonomousTrajectory.sample(timer.get());
 
-                    Swerve.getInstance().setModuleStates(Auto.getInstance().getSwerveModuleStates(trajectoryState));
+                    Swerve.getInstance().setModuleStates(getSwerveModuleStates(trajectoryState));
                 }
 
                 timer.stop();
@@ -146,8 +147,10 @@ public final class Auto extends Subsystem {
                 while (timer.get() <= testAutonomousTrajectory.getTotalTimeSeconds()) {
                     Trajectory.State trajectoryState = testAutonomousTrajectory.sample(timer.get());
 
-                    Swerve.getInstance().setModuleStates(Auto.getInstance().getSwerveModuleStates(trajectoryState));
+                    Swerve.getInstance().setModuleStates(getSwerveModuleStates(trajectoryState));
                 }
+
+                Gripper.getInstance().disableGripper();
             };
 
             Runnable endMethod = () -> {
