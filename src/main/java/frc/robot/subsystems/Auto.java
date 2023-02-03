@@ -117,28 +117,25 @@ public final class Auto extends Subsystem {
                 timer.reset();
                 timer.start();
 
-                while (timer.get() <= 3.45) {               
+                while (timer.get() <= 1.5) {               
                     Trajectory.State trajectoryState = testAutonomousTrajectory.sample(timer.get());
 
                     Swerve.getInstance().setModuleStates(Auto.getInstance().getSwerveModuleStates(trajectoryState));
                 }
 
+                System.out.println(testAutonomousTrajectory.getTotalTimeSeconds());
+
                 timer.stop();
 
-                if (Gripper.getInstance().isDroppingObject()) {
-                    Gripper.getInstance().enableGripper();
+                Swerve.getInstance().setModuleStates(DriveConstants.SWERVE_KINEMATICS.toSwerveModuleStates(new ChassisSpeeds()));
+
+                Gripper.getInstance().enableGripper();
+
+                try {
+                    Thread.sleep(2500);
                 }
-                else {
-                    Gripper.getInstance().disableGripper();
-
-                    try {
-                        Thread.sleep(250);
-                    }
-                    catch (Exception e) {
-                        e.printStackTrace();
-                    }
-
-                    Gripper.getInstance().enableGripper();
+                catch (Exception e) {
+                    e.printStackTrace();
                 }
 
                 timer.start();
@@ -147,6 +144,10 @@ public final class Auto extends Subsystem {
                     Trajectory.State trajectoryState = testAutonomousTrajectory.sample(timer.get());
 
                     Swerve.getInstance().setModuleStates(Auto.getInstance().getSwerveModuleStates(trajectoryState));
+                }
+
+                if (timer.get() > testAutonomousTrajectory.getTotalTimeSeconds()) {
+                    Gripper.getInstance().disableGripper();
                 }
             };
 
