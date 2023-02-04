@@ -7,8 +7,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.networktables.*;
-
-import frc.libs.java.actionLib.*;
+import frc.libs.java.actions.*;
 import frc.robot.Robot;
 import frc.robot.Constants.*;
 

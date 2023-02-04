@@ -1,4 +1,4 @@
-package frc.libs.java.actionLib;
+package frc.libs.java.actions;
 
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -59,6 +59,10 @@ public class Action extends Thread {
 
     public boolean willThreadRun() {
         return this.willThreadRun;
+    }
+
+    public boolean isFinished() {
+        return this.getState() == State.TERMINATED;
     }
 
     public ReentrantLock getThreadLock() {

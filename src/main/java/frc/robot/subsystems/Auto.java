@@ -13,11 +13,10 @@ import edu.wpi.first.math.trajectory.TrajectoryGenerator;
 import edu.wpi.first.math.trajectory.constraint.MaxVelocityConstraint;
 import edu.wpi.first.math.trajectory.constraint.SwerveDriveKinematicsConstraint;
 import edu.wpi.first.wpilibj.Timer;
-
-import frc.libs.java.actionLib.Action;
-import frc.libs.java.actionLib.Subsystem;
-import frc.libs.java.swervePathLib.SwervePath;
-import frc.libs.java.swervePathLib.SwervePath.PathState;
+import frc.libs.java.actions.Action;
+import frc.libs.java.actions.Subsystem;
+import frc.libs.java.swerve.SwervePath;
+import frc.libs.java.swerve.SwervePath.PathState;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -59,6 +58,11 @@ public final class Auto extends Subsystem {
     }
 
     public Auto() {}
+
+    public static Runnable getEmptyRunnable() {
+        Runnable doNothing = () -> {};
+        return doNothing;
+    }
 
     public HolonomicDriveController getAutoController() {
         return this.autoController;
