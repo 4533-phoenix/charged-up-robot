@@ -49,19 +49,14 @@ public final class Auto extends Subsystem {
         )
     );
 
+    private Auto() {}
+
     public static Auto getInstance() {
         if (mInstance == null) {
             mInstance = new Auto();
         }
 
         return mInstance;
-    }
-
-    public Auto() {}
-
-    public static Runnable getEmptyRunnable() {
-        Runnable doNothing = () -> {};
-        return doNothing;
     }
 
     public HolonomicDriveController getAutoController() {

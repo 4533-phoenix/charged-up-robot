@@ -2,45 +2,53 @@ package frc.libs.java.actions.auto;
 
 import frc.libs.java.actions.*;
 import java.util.*;
-import frc.robot.subsystems.Auto;
 
 public class ParallelAction extends Action {
     private final ArrayList<Action> mActions;
 
-    public ParallelAction(ArrayList<Action> mActions) {
-        super(Auto.getEmptyRunnable(), Auto.getEmptyRunnable(), Auto.getEmptyRunnable(), true);
-
-        this.mActions = mActions;
-    }
-
     public ParallelAction(Action... mActions) {
-        super(Auto.getEmptyRunnable(), Auto.getEmptyRunnable(), Auto.getEmptyRunnable(), true);
+        super(() -> {}, () -> {}, () -> {}, true);
 
         this.mActions = (ArrayList<Action>) Arrays.asList(mActions);
     }
 
     @Override
-    public void runStart() {
-        mActions.forEach(Action::runStart);
-    }
-
-    @Override
     public void run() {
-        mActions.forEach(Action::run);
-    }
+        if (this.willThreadRun()) {
+            this.getThreadLock().lock();
+        }
+        
+        this.mActions.forEach(Action::runStart);
 
-    @Override
-    public void runEnd() {
-        mActions.forEach(Action::runEnd);
-    }
+        for (Action action : this.mActions) {
+            if (action.willThreadRun() && action.getState() == State.NEW) {
+                action.start();
 
-    @Override
-    public boolean isFinished() {
-        for (Action action : mActions) {
-            if (!action.isFinished()) {
-                return false;
+                while (!action.getThreadLock().isLocked()) {}
+            }
+            else {
+                action.run();
             }
         }
-        return true;
+
+        boolean isFinished = false;
+
+        while (!isFinished) {
+            isFinished = true;
+
+            for (Action action : this.mActions) {
+                if (action.willThreadRun() && !(action.getState() == State.TERMINATED)) {
+                    isFinished = false;
+
+                    break;
+                }
+            }
+        }
+
+        this.mActions.forEach(Action::runEnd);
+
+        if (this.willThreadRun()) {
+            this.getThreadLock().unlock();
+        }
     }
 }

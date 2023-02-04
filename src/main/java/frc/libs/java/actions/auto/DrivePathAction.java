@@ -11,39 +11,31 @@ import edu.wpi.first.wpilibj.Timer;
 
 public class DrivePathAction extends Action {
     private final SwervePath mPath;
-    private double mStartTime;
 
     public DrivePathAction(String path) {
-        super(Auto.getEmptyRunnable(), Auto.getEmptyRunnable(), Auto.getEmptyRunnable(), true);
+        super(() -> {}, () -> {}, () -> {}, true);
 
         this.mPath = SwervePath.fromCSV(path);
     }
 
     @Override
-    public void runStart() {
-        mStartTime = Timer.getFPGATimestamp();
-    }
-
-    @Override
     public void run() {
-        PathState currState = mPath.sample(Timer.getFPGATimestamp() - mStartTime);
+        double startTime = Timer.getFPGATimestamp();
 
-        ChassisSpeeds chassisSpeeds = Auto.getInstance().getAutoController().calculate(
-            PoseEstimator.getInstance().getSwervePose(),
-            currState.getTrajectoryState(),
-            currState.rotation
-        );
+        while (Timer.getFPGATimestamp() <= this.mPath.getRuntime()) {
+            PathState currState = this.mPath.sample(Timer.getFPGATimestamp() - startTime);
 
-        SwerveModuleState[] swerveModuleStates = DriveConstants.SWERVE_KINEMATICS.toSwerveModuleStates(chassisSpeeds);
+            ChassisSpeeds chassisSpeeds = Auto.getInstance().getAutoController().calculate(
+                PoseEstimator.getInstance().getSwervePose(),
+                currState.getTrajectoryState(),
+                currState.rotation
+            );
 
-        Swerve.getInstance().setModuleStates(swerveModuleStates);
-    }
+            SwerveModuleState[] swerveModuleStates = DriveConstants.SWERVE_KINEMATICS.toSwerveModuleStates(chassisSpeeds);
 
-    @Override
-    public void runEnd() {}
-
-    @Override
-    public boolean isFinished() {
-        return Timer.getFPGATimestamp() - mStartTime >= mPath.getRuntime();
+            Swerve.getInstance().setModuleStates(swerveModuleStates);
+        }
+        
+        Swerve.getInstance().setModuleStates(DriveConstants.SWERVE_KINEMATICS.toSwerveModuleStates(new ChassisSpeeds()));
     }
 }
