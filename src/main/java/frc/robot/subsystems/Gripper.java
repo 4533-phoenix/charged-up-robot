@@ -103,42 +103,42 @@ public class Gripper extends Subsystem {
             Runnable startMethod = () -> {};
 
             Runnable runMethod = () -> {
-                     double dropTime = 0;
-                     double timestamp = Timer.getFPGATimestamp();
+                    //  double dropTime = 0;
+                    //  double timestamp = Timer.getFPGATimestamp();
 
-                    if (Robot.driverController.getButton(Button.A)) {
-                        if (!Gripper.getInstance().isDroppingObject) {
-                            Gripper.getInstance().dropObject(timestamp);
-                            dropTime = timestamp;
-                        }
-                    } else if (Gripper.getInstance().isDroppingObject && Timer.getFPGATimestamp() - dropTime > 0.25) {
-                        Gripper.getInstance().isDroppingObject = false;
-                    } else if (!Gripper.getInstance().isDroppingObject && Gripper.getInstance().objectInGripper()) {
-                        Gripper.getInstance().enableGripper();
-                    } else {
-                        Gripper.getInstance().disableGripper();
-                    }
-
-                    if (Gripper.getInstance().objectInGripper() == true) {
-                        if (Gripper.getInstance().colorSensor.getGreen()/Gripper.getInstance().colorSensor.getBlue() > 2.1) {
-                            System.out.println("CONE GRABBED");
-                            Gripper.getInstance().enableGripper();
-                        }
-                        else {
-                            System.out.println("CUBE GRABBED");
-                            Gripper.getInstance().enableGripper();
-                        }
-                    }
-                    else {
-                        Gripper.getInstance().disableGripper();
-                    }
-
-
-                    // if (Robot.driverController.getButton(Button.X)) {
+                    // if (Robot.driverController.getButton(Button.A)) {
+                    //     if (!Gripper.getInstance().isDroppingObject) {
+                    //         Gripper.getInstance().dropObject(timestamp);
+                    //         dropTime = timestamp;
+                    //     }
+                    // } else if (Gripper.getInstance().isDroppingObject && Timer.getFPGATimestamp() - dropTime > 0.25) {
+                    //     Gripper.getInstance().isDroppingObject = false;
+                    // } else if (!Gripper.getInstance().isDroppingObject && Gripper.getInstance().objectInGripper()) {
                     //     Gripper.getInstance().enableGripper();
-                    // } else if (Robot.driverController.getButton(Button.Y)) {
+                    // } else {
                     //     Gripper.getInstance().disableGripper();
                     // }
+
+                    // if (Gripper.getInstance().objectInGripper() == true) {
+                    //     if (Gripper.getInstance().colorSensor.getGreen()/Gripper.getInstance().colorSensor.getBlue() > 2.1) {
+                    //         System.out.println("CONE GRABBED");
+                    //         Gripper.getInstance().enableGripper();
+                    //     }
+                    //     else {
+                    //         System.out.println("CUBE GRABBED");
+                    //         Gripper.getInstance().enableGripper();
+                    //     }
+                    // }
+                    // else {
+                    //     Gripper.getInstance().disableGripper();
+                    // }
+
+
+                    if (Robot.driverController.getButton(Button.X)) {
+                        Gripper.getInstance().enableGripper();
+                    } else if (Robot.driverController.getButton(Button.Y)) {
+                        Gripper.getInstance().disableGripper();
+                    }
 
                     //System.out.println("voltage: " + Gripper.getInstance().distanceSensor.getVoltage());
                     //Gripper.getInstance().printObject();

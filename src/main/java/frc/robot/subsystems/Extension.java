@@ -53,18 +53,23 @@ public class Extension extends Subsystem {
             case ZERO_INCHES:
                 lowerExtensionCylinder.set(Value.kReverse);
                 upperExtensionCylinder.set(Value.kReverse);
+                break;
             case FIVE_INCHES:
                 lowerExtensionCylinder.set(Value.kReverse);
                 upperExtensionCylinder.set(Value.kForward);
+                break;
             case SEVEN_INCHES:
                 lowerExtensionCylinder.set(Value.kForward);
                 upperExtensionCylinder.set(Value.kReverse);
+                break;
             case TWELVE_INCHES:
                 lowerExtensionCylinder.set(Value.kForward);
                 upperExtensionCylinder.set(Value.kForward);
+                break;
             case OFF:
                 lowerExtensionCylinder.set(Value.kOff);
                 upperExtensionCylinder.set(Value.kOff);
+                break;
         }
     }
 
@@ -73,15 +78,19 @@ public class Extension extends Subsystem {
             case GROUND_INTAKE:
                 this.setLowerExtensionState(LowerExtensionState.ZERO_INCHES);
                 this.elbowController.setSetpoint(elbowSetpoints[0]);
+                break;
             case MIDDLE_ROW:
                 this.setLowerExtensionState(LowerExtensionState.FIVE_INCHES);
                 this.elbowController.setSetpoint(elbowSetpoints[1]);
+                break;
             case HIGH_ROW:
                 this.setLowerExtensionState(LowerExtensionState.TWELVE_INCHES);
                 this.elbowController.setSetpoint(elbowSetpoints[2]);
+                break;
             case SUBSTATION:
                 this.setLowerExtensionState(LowerExtensionState.SEVEN_INCHES);
                 this.elbowController.setSetpoint(elbowSetpoints[3]);
+                break;
         }
     }
 
@@ -92,11 +101,11 @@ public class Extension extends Subsystem {
     }
 
     public void upperExtensionUp() {
-        elbowMotor.set(0.4);
+        elbowMotor.set(-0.25);
     }
 
     public void upperExtensionDown() {
-        elbowMotor.set(-0.4);
+        elbowMotor.set(0.25);
     }
 
     public void upperExtensionStop() {

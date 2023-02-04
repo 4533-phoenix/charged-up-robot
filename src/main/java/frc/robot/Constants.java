@@ -113,7 +113,7 @@ public final class Constants {
         public static final int UPPER_EXTENSION_PCM_PORT_FORWARD = 3;
         public static final int UPPER_EXTENSION_PCM_PORT_REVERSE = 4;
 
-        public static final int ELBOW_MOTOR_ID = 15;
+        public static final int ELBOW_MOTOR_ID = 16;
 
         public static final int ELBOW_POTENTIOMETER_PORT = 1;
         public static final double ELBOW_POTENTIOMETER_RANGE = 180.0;
