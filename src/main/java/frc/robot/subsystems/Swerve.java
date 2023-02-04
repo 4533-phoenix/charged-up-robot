@@ -162,7 +162,7 @@ public final class Swerve extends Subsystem {
     }
 
     public double getSwerveRotation() {
-        double rotAxis = Math.pow(Robot.driverController.getAxis(Side.RIGHT, Axis.X), 2);
+        double rotAxis = Math.pow(Robot.driverController.getAxis(Side.RIGHT, Axis.X), 3);
 
         if (Math.abs(rotAxis) < OIConstants.DRIVE_DEADBAND) {
             return 0.0;
