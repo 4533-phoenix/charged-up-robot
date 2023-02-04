@@ -126,21 +126,27 @@ public final class Auto extends Subsystem {
 
                 timer.stop();
 
-                if (Gripper.getInstance().isDroppingObject()) {
-                    Gripper.getInstance().enableGripper();
-                }
-                else {
-                    Gripper.getInstance().disableGripper();
+                Swerve.getInstance().setModuleStates(new SwerveModuleState[] {
+                    new SwerveModuleState(),
+                    new SwerveModuleState(),
+                    new SwerveModuleState(),
+                    new SwerveModuleState()
+                });
+                
+                Gripper.getInstance().enableGripper();
+                
+                // else {
+                //     Gripper.getInstance().disableGripper();
 
-                    try {
-                        Thread.sleep(250);
-                    }
-                    catch (Exception e) {
-                        e.printStackTrace();
-                    }
+                //     try {
+                //         Thread.sleep(250);
+                //     }
+                //     catch (Exception e) {
+                //         e.printStackTrace();
+                //     }
 
-                    Gripper.getInstance().enableGripper();
-                }
+                //     Gripper.getInstance().enableGripper();
+                // }
 
                 timer.start();
 

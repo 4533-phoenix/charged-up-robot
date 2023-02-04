@@ -45,7 +45,7 @@ public final class Constants {
         public static final double DRIVE_ENCODER_METERS_PER_SECOND = DRIVE_ENCODER_METERS_PER_ROTATION / 60.0;
         public static final double STEER_ENCODER_RADIANS_PER_SECOND = STEER_ENCODER_RADIANS_PER_ROTATION / 60.0;
         
-        public static final double STEER_KP = ((DriveConstants.DRIVE_MAX_VELOCITY / DriveConstants.DRIVE_MAX_PHYSICAL_VELOCITY) * (1 / 3)) / (2 * Math.PI); // Increase of one third throttle for every rotation of steer error
+        public static final double STEER_KP = 0.5; // ((DriveConstants.DRIVE_MAX_VELOCITY / DriveConstants.DRIVE_MAX_PHYSICAL_VELOCITY) * (1 / 3)) / (2 * Math.PI); // Increase of one third throttle for every rotation of steer error
     }
 
     public static final class DriveConstants {

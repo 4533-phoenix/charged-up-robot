@@ -38,7 +38,7 @@ public final class Robot extends TimedRobot {
   @Override
   public void autonomousInit() {
     autonomousRunner.add(
-      Auto.getInstance().getAutonomous(chooser.getSelected())
+      Auto.getInstance().getAutonomous("Test Pathplanner Autonomous")
     );
 
     autonomousRunner.enable();
