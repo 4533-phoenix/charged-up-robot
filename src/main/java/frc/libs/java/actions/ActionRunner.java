@@ -1,4 +1,4 @@
-package frc.libs.java.actionLib;
+package frc.libs.java.actions;
 
 import java.lang.Thread.State;
 import java.util.ArrayList;
