@@ -1,4 +1,4 @@
-package frc.libs.java.actionLib;
+package frc.libs.java.actions;
 
 import java.util.concurrent.Callable;
 

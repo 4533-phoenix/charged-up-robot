@@ -1,8 +1,10 @@
 package frc.robot.subsystems;
 
+import frc.libs.java.actions.*;
 import frc.robot.Robot;
-import frc.libs.java.actionLib.*;
 import frc.robot.Constants.*;
+import frc.robot.controls.DriveController;
+import frc.robot.controls.PSController.Button;
 
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
@@ -89,14 +91,44 @@ public class Extension extends Subsystem {
         elbowMotor.set(elbowController.calculate(elbowPosition));
     }
 
+    public void upperExtensionUp() {
+        elbowMotor.set(0.4);
+    }
+
+    public void upperExtensionDown() {
+        elbowMotor.set(-0.4);
+    }
+
+    public void upperExtensionStop() {
+        elbowMotor.stopMotor();
+    }
+
     private static final class ExtensionActions {
         public static final Action defaultExtensionAction() {
             Runnable startMethod = () -> {};
 
-            Runnable runMethod = () -> {};
+            Runnable runMethod = () -> {
+                if (Robot.driverController.getButton(Button.A)) {
+                    Extension.getInstance().upperExtensionUp();
+                } else if (Robot.driverController.getButton(Button.B)) {
+                    Extension.getInstance().upperExtensionDown();
+                } else {
+                    Extension.getInstance().upperExtensionStop();
+                }
+
+                if (Robot.operatorController.getButton(Button.Y)) {
+                    Extension.getInstance().setLowerExtensionState(LowerExtensionState.ZERO_INCHES);
+                } else if (Robot.operatorController.getButton(Button.X)) {
+                    Extension.getInstance().setLowerExtensionState(LowerExtensionState.FIVE_INCHES);
+                } else if (Robot.operatorController.getButton(Button.B)) {
+                    Extension.getInstance().setLowerExtensionState(LowerExtensionState.SEVEN_INCHES);
+                } else if (Robot.operatorController.getButton(Button.A)) {
+                    Extension.getInstance().setLowerExtensionState(LowerExtensionState.TWELVE_INCHES);
+                }
+            };
 
             Runnable endMethod = () -> {
-              Extension.getInstance().setLowerExtensionState(LowerExtensionState.OFF);
+                Extension.getInstance().setLowerExtensionState(LowerExtensionState.OFF);
             };
 
             return new Action(startMethod, runMethod, endMethod, false).withSubsystem(Extension.getInstance());

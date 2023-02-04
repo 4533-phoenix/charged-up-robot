@@ -7,19 +7,21 @@ import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
 import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.ModuleConstants;
-import frc.robot.Constants.OIConstants;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.geometry.Rotation2d;
 
-public final class SwerveModule { 
+public final class SwerveModule {
+    // TODO: Make a Profiled PID Controller and a Feedforward Controller for the drive motor 
     private final CANSparkMax driveMotor;
+
     private final CANSparkMax steerMotor;
 
     private final RelativeEncoder driveEncoder;
     private final RelativeEncoder steerEncoder;
 
+    // TODO: Make this a Profiled PID Controller, and add a Feedforward Controller as well
     private final PIDController steerPIDController;
 
     private final CANCoder absoluteEncoder;
@@ -43,7 +45,6 @@ public final class SwerveModule {
 
         this.driveEncoder.setPositionConversionFactor(ModuleConstants.DRIVE_ENCODER_METERS_PER_ROTATION);
         this.driveEncoder.setVelocityConversionFactor(ModuleConstants.DRIVE_ENCODER_METERS_PER_SECOND);
-
         this.steerEncoder.setPositionConversionFactor(ModuleConstants.STEER_ENCODER_RADIANS_PER_ROTATION);
         this.steerEncoder.setVelocityConversionFactor(ModuleConstants.STEER_ENCODER_RADIANS_PER_SECOND);
 
@@ -95,15 +96,14 @@ public final class SwerveModule {
     }
 
     public void setDesiredState(SwerveModuleState state) {
-        if (Math.abs(state.speedMetersPerSecond) < OIConstants.DRIVE_DEADBAND) {
+        if (Math.abs(state.speedMetersPerSecond) < 0.001) {
             this.stop();
-
             return;
         }
 
         state = SwerveModuleState.optimize(state, this.getState().angle);
 
-        this.driveMotor.set(state.speedMetersPerSecond / DriveConstants.DRIVE_MAX_PHYSICAL_VELOCITY);
+        this.driveMotor.set(state.speedMetersPerSecond / DriveConstants.DRIVE_MAX_VELOCITY);
         this.steerMotor.set(this.steerPIDController.calculate(this.getSteerPosition(), state.angle.getRadians()));
     }
 

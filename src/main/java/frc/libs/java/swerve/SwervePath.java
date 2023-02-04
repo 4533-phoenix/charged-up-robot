@@ -1,4 +1,4 @@
-package frc.libs.java.swervePathLib;
+package frc.libs.java.swerve;
 
 // Credit: Team 3015
 

@@ -3,6 +3,8 @@ package frc.robot.subsystems;
 import frc.robot.controls.PSController.Axis;
 import frc.robot.controls.PSController.Button;
 import frc.robot.controls.PSController.Side;
+import frc.libs.java.actions.Action;
+import frc.libs.java.actions.Subsystem;
 import frc.robot.Robot;
 import frc.robot.Constants.*;
 
@@ -17,9 +19,6 @@ import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-
-import frc.libs.java.actionLib.Action;
-import frc.libs.java.actionLib.Subsystem;
 
 public final class Swerve extends Subsystem {
     private static Swerve mInstance;
@@ -116,10 +115,13 @@ public final class Swerve extends Subsystem {
         backRight.setDesiredState(desiredStates[3]);
     }
 
-    public void drive(Translation2d translation, double rotation, boolean fieldRelative) {
-        double xSpeed = translation.getX();
-        double ySpeed = translation.getY();
-        double steerSpeed = rotation;
+    public void drive(Translation2d translation, double rotation, boolean fieldRelative, boolean isOpenLoop) {
+        double translationScale = DriveConstants.DRIVE_MAX_VELOCITY / DriveConstants.DRIVE_MAX_PHYSICAL_VELOCITY;
+        double rotationScale = DriveConstants.DRIVE_MAX_ROTATIONAL_VELOCITY / DriveConstants.DRIVE_MAX_PHYSICAL_VELOCITY;
+
+        double xSpeed = translationScale * translation.getX();
+        double ySpeed = translationScale * translation.getY();
+        double steerSpeed = rotationScale * rotation;
 
         xSpeed = Math.abs(xSpeed) > OIConstants.DRIVE_DEADBAND ? xSpeed : 0.0;
         ySpeed = Math.abs(ySpeed) > OIConstants.DRIVE_DEADBAND ? ySpeed : 0.0;
@@ -130,7 +132,6 @@ public final class Swerve extends Subsystem {
         steerSpeed = steerLimiter.calculate(steerSpeed);
 
         ChassisSpeeds chassisSpeeds;
-
         if (fieldRelative) {
             chassisSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(
                 xSpeed, ySpeed, steerSpeed, PoseEstimator.getInstance().getSwerveRotation()
@@ -155,24 +156,24 @@ public final class Swerve extends Subsystem {
         if (Math.abs(tAxes.getNorm()) < OIConstants.DRIVE_DEADBAND) {
             return new Translation2d();
         } else {
-            return new Translation2d(forwardAxis * dist * DriveConstants.DRIVE_MAX_VELOCITY, strafeAxis * dist * DriveConstants.DRIVE_MAX_VELOCITY);
+            return new Translation2d(forwardAxis * dist, strafeAxis * dist);
         }
     }
 
     public double getSwerveRotation() {
-        double rotAxis = Math.pow(Robot.driverController.getAxis(Side.RIGHT, Axis.X), 2);
+        double rotAxis = Math.pow(Robot.driverController.getAxis(Side.RIGHT, Axis.X), 3);
 
         if (Math.abs(rotAxis) < OIConstants.DRIVE_DEADBAND) {
             return 0.0;
         } else {
-            return rotAxis * DriveConstants.DRIVE_MAX_ROTATIONAL_VELOCITY;
+            return rotAxis;
         }
     }
 
     private static final class SwerveActions {
         public static final Action defaultDriveAction() {
             Runnable startMethod = () -> {
-                Swerve.getInstance().drive(new Translation2d(), 0.0, false);
+                Swerve.getInstance().drive(new Translation2d(), 0.0, false, true);
             };
 
             Runnable runMethod = () -> {
@@ -180,11 +181,11 @@ public final class Swerve extends Subsystem {
                 
                 double swerveRotation = Swerve.getInstance().getSwerveRotation();
 
-                Swerve.getInstance().drive(swerveTranslation, swerveRotation, true);
+                Swerve.getInstance().drive(swerveTranslation, swerveRotation, false, true);
             };
 
             Runnable endMethod = () -> {
-                Swerve.getInstance().drive(new Translation2d(), 0.0, false);
+                Swerve.getInstance().drive(new Translation2d(), 0.0, false, true);
             };
 
             return new Action(startMethod, runMethod, endMethod, false).withSubsystem(Swerve.getInstance());

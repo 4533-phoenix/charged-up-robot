@@ -52,7 +52,7 @@ public final class Constants {
 		// Left-to-right distance between wheel centers in meters
         public static final double TRACK_WIDTH = Units.inchesToMeters(19.5);
 		// Front-to-back distance between wheel centers in meters
-        public static final double WHEEL_BASE = Units.inchesToMeters(24.5);
+        public static final double WHEEL_BASE = Units.inchesToMeters(21.5);
         
 		// Creates kinematics object for swerve subsystem
         public static final SwerveDriveKinematics SWERVE_KINEMATICS = new SwerveDriveKinematics(
@@ -128,7 +128,7 @@ public final class Constants {
         public static final int GRIPPER_PCM_PORT = 0;
         public static final int DISTANCE_SENSOR_PORT = 0;
 
-        public static final double DISTANCE_VOLTAGE_THRESHOLD = 2.5;
+        public static final double DISTANCE_VOLTAGE_THRESHOLD = 1.7;
     }
 
 	public static final class OIConstants {
