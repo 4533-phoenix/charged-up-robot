@@ -71,14 +71,7 @@ public final class Swerve extends Subsystem {
 
     private AHRS gyro = new AHRS(SPI.Port.kMXP);
     
-    public static Swerve getInstance() {
-        if (mInstance == null) {
-            mInstance = new Swerve();
-        }
-        return mInstance;
-    }
-
-    public Swerve() {
+    private Swerve() {
         this.zeroGyro();
 
         this.swerveMods = new SwerveModule[] {
@@ -87,6 +80,14 @@ public final class Swerve extends Subsystem {
            backLeft,
            backRight 
         };
+    }
+
+    public static Swerve getInstance() {
+        if (mInstance == null) {
+            mInstance = new Swerve();
+        }
+
+        return mInstance;
     }
 
     public void zeroGyro() {

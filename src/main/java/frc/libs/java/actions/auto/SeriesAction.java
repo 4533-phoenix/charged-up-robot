@@ -3,7 +3,7 @@ package frc.libs.java.actions.auto;
 import frc.libs.java.actions.*;
 import java.util.*;
 
-public class SeriesAction extends Action {
+public final class SeriesAction extends Action {
     private final ArrayList<Action> mRemainingActions;
 
     public SeriesAction(Action... mActions) {

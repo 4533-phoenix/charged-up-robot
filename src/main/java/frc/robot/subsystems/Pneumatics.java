@@ -6,8 +6,8 @@ import frc.libs.java.actions.*;
 import frc.robot.Robot;
 import frc.robot.Constants.*;
 
-public class Pneumatics extends Subsystem {
-    public static Pneumatics mInstance;
+public final class Pneumatics extends Subsystem {
+    private static Pneumatics mInstance;
 
     private final Compressor compressor = new Compressor(GlobalConstants.PCM_ID, PneumaticsModuleType.CTREPCM);
 
@@ -17,6 +17,7 @@ public class Pneumatics extends Subsystem {
         if (mInstance == null) {
             mInstance = new Pneumatics();
         }
+
         return mInstance;
     }
 

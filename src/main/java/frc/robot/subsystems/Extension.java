@@ -10,19 +10,14 @@ import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.controller.ArmFeedforward;
-import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.DutyCycleEncoder;
 import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.wpilibj.PneumaticsModuleType;
 import edu.wpi.first.wpilibj.DoubleSolenoid.Value;
 
-public class Extension extends Subsystem {
-    public static Extension mInstance;
-
-    private Extension() {
-        elbowMotor.setInverted(true);
-    }
+public final class Extension extends Subsystem {
+    private static Extension mInstance;
 
     private final DoubleSolenoid lowerExtensionCylinder = new DoubleSolenoid(PneumaticsModuleType.CTREPCM, 
         ExtensionConstants.LOWER_EXTENSION_PCM_PORT_FORWARD, ExtensionConstants.LOWER_EXTENSION_PCM_PORT_REVERSE);
@@ -50,6 +45,10 @@ public class Extension extends Subsystem {
 
     public static enum ExtensionState {
         GROUND_INTAKE, MIDDLE_ROW, HIGH_ROW, SUBSTATION
+    }
+
+    private Extension() {
+        elbowMotor.setInverted(true);
     }
 
     public static Extension getInstance() {

@@ -10,8 +10,8 @@ import frc.robot.controls.PSController.*;
 import com.revrobotics.ColorSensorV3;
 import edu.wpi.first.wpilibj.I2C.Port;
 
-public class Gripper extends Subsystem {
-    public static Gripper mInstance;
+public final class Gripper extends Subsystem {
+    private static Gripper mInstance;
 
     private final Solenoid gripperCylinder = new Solenoid(PneumaticsModuleType.CTREPCM, GripperConstants.GRIPPER_PCM_PORT);
 

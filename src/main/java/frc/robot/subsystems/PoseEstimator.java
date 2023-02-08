@@ -11,8 +11,8 @@ import frc.libs.java.actions.*;
 import frc.robot.Robot;
 import frc.robot.Constants.*;
 
-public class PoseEstimator extends Subsystem {
-    public static PoseEstimator mInstance;
+public final class PoseEstimator extends Subsystem {
+    private static PoseEstimator mInstance;
 
     Pose2d initialPose = new Pose2d();
 
@@ -33,6 +33,7 @@ public class PoseEstimator extends Subsystem {
         if (mInstance == null) {
             mInstance = new PoseEstimator();
         }
+
         return mInstance;
     }
 

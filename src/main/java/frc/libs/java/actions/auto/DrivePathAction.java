@@ -9,7 +9,7 @@ import frc.robot.Constants.*;
 import frc.robot.subsystems.*;
 import edu.wpi.first.wpilibj.Timer;
 
-public class DrivePathAction extends Action {
+public final class DrivePathAction extends Action {
     private final SwervePath mPath;
 
     public DrivePathAction(String path) {
