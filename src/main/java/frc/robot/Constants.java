@@ -115,13 +115,26 @@ public final class Constants {
 
         public static final int ELBOW_MOTOR_ID = 16;
 
-        public static final int ELBOW_POTENTIOMETER_PORT = 1;
-        public static final double ELBOW_POTENTIOMETER_RANGE = 180.0;
-        public static final double ELBOW_POTENTIOMETER_OFFSET = 0.0;
+        public static final double ELBOW_MOTOR_TO_LOWER_SHAFT_RATIO = 44.0;
+        public static final double ELBOW_CHAIN_GEAR_RATIO = 18.0 / 48.0;
 
-        public static final double ELBOW_KP = 0.1;
-        public static final double ELBOW_KI = 0.0;
-        public static final double ELBOW_KD = 0.0;
+        public static final double ELBOW_MAX_VELOCITY = 0.5;
+        public static final double ELBOW_MAX_ACCELERATION = 1.0;
+
+        public static final int ELBOW_ABSOLUTE_ENCODER_PORT = 0;
+        public static final double ELBOW_ABSOLUTE_ENCODER_OFFSET = 0.3753;
+
+        public static final int ELBOW_ENCODER_PORT_A = 1;
+        public static final int ELBOW_ENCODER_PORT_B = 2;
+
+        public static final double ELBOW_KP = 1.0;
+        public static final double ELBOW_KI = 2.3;
+        public static final double ELBOW_KD = 1.5;
+
+        public static final double ELBOW_KS = 0.0;
+        public static final double ELBOW_KG = 0.26;
+        public static final double ELBOW_KV = 0.26;
+        public static final double ELBOW_KA = 0.03;
     }
 
     public static final class GripperConstants{
