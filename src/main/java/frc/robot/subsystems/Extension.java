@@ -3,13 +3,11 @@ package frc.robot.subsystems;
 import frc.libs.java.actions.*;
 import frc.robot.Robot;
 import frc.robot.Constants.*;
-import frc.robot.controls.DriveController;
 import frc.robot.controls.PSController.Button;
 
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import edu.wpi.first.math.controller.PIDController;
-import edu.wpi.first.wpilibj.AnalogAccelerometer;
 import edu.wpi.first.wpilibj.AnalogPotentiometer;
 import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.wpilibj.PneumaticsModuleType;
@@ -22,22 +20,25 @@ public class Extension extends Subsystem {
 
     private final DoubleSolenoid lowerExtensionCylinder = new DoubleSolenoid(PneumaticsModuleType.CTREPCM, 
         ExtensionConstants.LOWER_EXTENSION_PCM_PORT_FORWARD, ExtensionConstants.LOWER_EXTENSION_PCM_PORT_REVERSE);
+
     private final DoubleSolenoid upperExtensionCylinder = new DoubleSolenoid(PneumaticsModuleType.CTREPCM,
         ExtensionConstants.UPPER_EXTENSION_PCM_PORT_FORWARD, ExtensionConstants.UPPER_EXTENSION_PCM_PORT_REVERSE);
 
     private final CANSparkMax elbowMotor = new CANSparkMax(ExtensionConstants.ELBOW_MOTOR_ID, MotorType.kBrushless);
+
     private final PIDController elbowController = new PIDController(ExtensionConstants.ELBOW_KP, 
         ExtensionConstants.ELBOW_KI, ExtensionConstants.ELBOW_KD);
+
     private final AnalogPotentiometer elbowPotentiometer = new AnalogPotentiometer(ExtensionConstants.ELBOW_POTENTIOMETER_PORT, 
         ExtensionConstants.ELBOW_POTENTIOMETER_RANGE, ExtensionConstants.ELBOW_POTENTIOMETER_OFFSET);
 
-    enum LowerExtensionState {
+    public static enum LowerExtensionState {
         ZERO_INCHES, FIVE_INCHES, SEVEN_INCHES, TWELVE_INCHES, OFF
     }
 
     private final double[] elbowSetpoints = {10.0, 75.0, 130.0, 100.0};
 
-    enum ExtensionState {
+    public static enum ExtensionState {
         GROUND_INTAKE, MIDDLE_ROW, HIGH_ROW, SUBSTATION
     }
 
@@ -45,6 +46,7 @@ public class Extension extends Subsystem {
         if (mInstance == null) {
             mInstance = new Extension();
         }
+        
         return mInstance;
     }
 
@@ -148,7 +150,9 @@ public class Extension extends Subsystem {
     public void log() {}
 
     @Override
-    public void periodic() {}
+    public void periodic() {
+        Extension.getInstance().elbowMotor.set(Extension.getInstance().elbowController.calculate(0));
+    }
 
     @Override
     public void queryInitialActions() {

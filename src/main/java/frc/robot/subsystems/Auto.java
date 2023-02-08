@@ -1,6 +1,8 @@
 package frc.robot.subsystems;
 
 import frc.robot.Constants.*;
+import frc.robot.subsystems.Extension.ExtensionState;
+import frc.robot.subsystems.Extension.LowerExtensionState;
 import frc.robot.Robot;
 
 import edu.wpi.first.math.controller.*;
@@ -15,8 +17,8 @@ import edu.wpi.first.math.trajectory.constraint.SwerveDriveKinematicsConstraint;
 import edu.wpi.first.wpilibj.Timer;
 import frc.libs.java.actions.Action;
 import frc.libs.java.actions.Subsystem;
-import frc.libs.java.swerve.SwervePath;
-import frc.libs.java.swerve.SwervePath.PathState;
+import frc.libs.java.actions.auto.DrivePathAction;
+import frc.libs.java.actions.auto.SeriesAction;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -27,7 +29,7 @@ public final class Auto extends Subsystem {
 
     private static final Map<String, Action> autoCommands = Map.ofEntries(
         Map.entry("Test Autonomous", AutoActions.testAutonomous()),
-        Map.entry("Test Pathplanner Autonomous", AutoActions.testOneCubeAutonomous())
+        Map.entry("Blue Bottom Cube Autonomous", AutoActions.blueBottomCubeAutonomous())
     );
 
     private HolonomicDriveController autoController = new HolonomicDriveController(
@@ -157,41 +159,60 @@ public final class Auto extends Subsystem {
             return new Action(startMethod, runMethod, endMethod, true).withSubsystem(Auto.getInstance());
         }
 
-        public static final Action testOneCubeAutonomous() {
-            SwervePath testAuto = SwervePath.fromCSV("Test One Cube Auto");
+        public static final Action blueBottomCubeAutonomous() {
+            Action blueBottomCubeRetrieve = new DrivePathAction("Blue Bottom Cube Retrieve").withSubsystem(Auto.getInstance());
 
-            Runnable startMethod = () -> {};
+            Action getBlueBottomCube = new Action(
+                () -> {}, 
+                () -> {
+                    if (Gripper.getInstance().isDroppingObject()) {
+                        Gripper.getInstance().enableGripper();
+                    }
+                    else {
+                        Gripper.getInstance().disableGripper();
 
-            Runnable runMethod = () -> {
-                Timer timer = new Timer();
-                timer.reset();
-                timer.start();
+                        try {
+                            Thread.sleep(250);
+                        }
+                        catch (Exception e) {
+                            e.printStackTrace();
+                        }
 
-                while (timer.get() <= testAuto.getRuntime()) {
-                    PathState currState = testAuto.sample(timer.get());
+                        Gripper.getInstance().enableGripper();
+                    }
+                }, 
+                () -> {}, 
+                true
+            ).withSubsystem(Auto.getInstance());
 
-                    ChassisSpeeds chassisSpeeds = Auto.getInstance().getAutoController().calculate(
-                        PoseEstimator.getInstance().getSwervePose(),
-                        currState.getTrajectoryState(),
-                        currState.rotation
-                    );
+            Action blueBottomCubeScore = new DrivePathAction("Blue Bottom Cube Score").withSubsystem(Auto.getInstance());
 
-                    SwerveModuleState[] swerveModuleStates = DriveConstants.SWERVE_KINEMATICS.toSwerveModuleStates(chassisSpeeds);
+            Action scoreBlueBottomCube = new Action(
+                () -> {}, 
+                () -> {
+                    Extension.getInstance().setExtensionState(ExtensionState.HIGH_ROW);
 
-                    Swerve.getInstance().setModuleStates(swerveModuleStates);
-                }
-            };
+                    try {
+                        Thread.sleep(1000);
+                    }
+                    catch (Exception e) {
+                        e.printStackTrace();
+                    }
 
-            Runnable endMethod = () -> {
-                Swerve.getInstance().setModuleStates(new SwerveModuleState[] {
-                    new SwerveModuleState(),
-                    new SwerveModuleState(),
-                    new SwerveModuleState(),
-                    new SwerveModuleState()
-                });
-            };
+                    Gripper.getInstance().disableGripper();
+                }, 
+                () -> {
+                    Extension.getInstance().setLowerExtensionState(LowerExtensionState.OFF);
+                }, 
+                true
+            ).withSubsystem(Auto.getInstance());
 
-            return new Action(startMethod, runMethod, endMethod, true).withSubsystem(Auto.getInstance());
+            return new SeriesAction(
+                blueBottomCubeRetrieve,
+                getBlueBottomCube,
+                blueBottomCubeScore,
+                scoreBlueBottomCube
+            ).withSubsystem(Auto.getInstance());
         }
     }
 

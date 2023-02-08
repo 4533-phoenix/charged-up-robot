@@ -6,11 +6,9 @@ import edu.wpi.first.wpilibj.AnalogInput;
 import frc.libs.java.actions.*;
 import frc.robot.Robot;
 import frc.robot.Constants.*;
-import frc.robot.controls.DriveController;
 import frc.robot.controls.PSController.*;
 import com.revrobotics.ColorSensorV3;
 import edu.wpi.first.wpilibj.I2C.Port;
-import edu.wpi.first.wpilibj.Timer;
 
 public class Gripper extends Subsystem {
     public static Gripper mInstance;
@@ -21,7 +19,7 @@ public class Gripper extends Subsystem {
 
     private final ColorSensorV3 colorSensor = new ColorSensorV3(Port.kOnboard);
 
-    private boolean isDroppingObject = false;
+    private boolean isDroppingObject = true;
 
     private Gripper() {}
 
@@ -29,6 +27,7 @@ public class Gripper extends Subsystem {
         if (mInstance == null) {
             mInstance = new Gripper();
         }
+
         return mInstance;
     }
 
@@ -47,14 +46,6 @@ public class Gripper extends Subsystem {
     public boolean isDroppingObject() {
         return this.isDroppingObject;
     }
-
-    public void dropObject(double timestamp) {
-        if (!isDroppingObject && Timer.getFPGATimestamp() - timestamp > 0.25) {
-            isDroppingObject = true;
-            disableGripper();
-        }
-    }
-    
 
     public boolean objectInGripper() {
         return distanceSensor.getVoltage() > GripperConstants.DISTANCE_VOLTAGE_THRESHOLD;
