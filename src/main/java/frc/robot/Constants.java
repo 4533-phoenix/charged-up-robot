@@ -127,14 +127,14 @@ public final class Constants {
         public static final int ELBOW_ENCODER_PORT_A = 1;
         public static final int ELBOW_ENCODER_PORT_B = 2;
 
-        public static final double ELBOW_KP = 1.0;
-        public static final double ELBOW_KI = 2.3;
-        public static final double ELBOW_KD = 1.5;
+        public static final double ELBOW_KP = 0.5;
+        public static final double ELBOW_KI = 0.0;
+        public static final double ELBOW_KD = 0.3;
 
         public static final double ELBOW_KS = 0.0;
-        public static final double ELBOW_KG = 0.26;
-        public static final double ELBOW_KV = 0.26;
-        public static final double ELBOW_KA = 0.03;
+        public static final double ELBOW_KG = 0.5;
+        public static final double ELBOW_KV = 0.0;
+        public static final double ELBOW_KA = 0.0;
     }
 
     public static final class GripperConstants{
