@@ -19,15 +19,12 @@ import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.wpilibj.PneumaticsModuleType;
 import edu.wpi.first.wpilibj.DoubleSolenoid.Value;
 
-public class Extension extends Subsystem {
-    public static Extension mInstance;
-
-    private Extension() {
-        elbowMotor.setInverted(true);
-    }
+public final class Extension extends Subsystem {
+    private static Extension mInstance;
 
     private final DoubleSolenoid lowerExtensionCylinder = new DoubleSolenoid(PneumaticsModuleType.CTREPCM, 
         ExtensionConstants.LOWER_EXTENSION_PCM_PORT_FORWARD, ExtensionConstants.LOWER_EXTENSION_PCM_PORT_REVERSE);
+
     private final DoubleSolenoid upperExtensionCylinder = new DoubleSolenoid(PneumaticsModuleType.CTREPCM,
         ExtensionConstants.UPPER_EXTENSION_PCM_PORT_FORWARD, ExtensionConstants.UPPER_EXTENSION_PCM_PORT_REVERSE);
 
@@ -49,14 +46,19 @@ public class Extension extends Subsystem {
 
     public final double[] elbowSetpoints = {10.0, 75.0, 130.0, 100.0};
 
-    enum ExtensionState {
+    public static enum ExtensionState {
         GROUND_INTAKE, MIDDLE_ROW, HIGH_ROW, SUBSTATION
+    }
+
+    private Extension() {
+        elbowMotor.setInverted(true);
     }
 
     public static Extension getInstance() {
         if (mInstance == null) {
             mInstance = new Extension();
         }
+        
         return mInstance;
     }
 

@@ -9,7 +9,7 @@ import edu.wpi.first.math.trajectory.Trajectory.State;
 import java.io.*;
 import java.util.*;
 
-public class SwervePath {
+public final class SwervePath {
     private ArrayList<PathState> states;
 
     /**

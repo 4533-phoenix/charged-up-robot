@@ -3,7 +3,7 @@ package frc.libs.java.actions.auto;
 import frc.libs.java.actions.*;
 import java.util.*;
 
-public class ParallelAction extends Action {
+public final class ParallelAction extends Action {
     private final ArrayList<Action> mActions;
 
     public ParallelAction(Action... mActions) {

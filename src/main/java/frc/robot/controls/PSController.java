@@ -4,7 +4,7 @@ import edu.wpi.first.wpilibj.XboxController;
 
 import frc.robot.Constants.*;
 
-public class PSController {
+public final class PSController {
     private final XboxController mController;
 
     public enum Side {

@@ -3,7 +3,7 @@ package frc.libs.java.actions.auto;
 import frc.libs.java.actions.*;
 import edu.wpi.first.wpilibj.Timer;
 
-public class WaitAction extends Action {
+public final class WaitAction extends Action {
     private final double mTime;
 
     public WaitAction(double time) {
