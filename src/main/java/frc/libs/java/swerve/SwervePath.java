@@ -65,7 +65,7 @@ public final class SwervePath {
     public static SwervePath fromCSV(String filename) {
         SwervePath traj = new SwervePath();
 
-        try (BufferedReader br = new BufferedReader(new FileReader(new File(Filesystem.getDeployDirectory(), "paths/" + filename + ".csv")))) {
+        try (BufferedReader br = new BufferedReader(new FileReader(new File(Filesystem.getDeployDirectory(), "pathplanner/generatedCSV/" + filename + ".csv")))) {
             String line = "";
             
             br.readLine();
