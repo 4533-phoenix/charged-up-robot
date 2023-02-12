@@ -189,7 +189,7 @@ public final class Swerve extends Subsystem {
                 Swerve.getInstance().drive(new Translation2d(), 0.0, false, true);
             };
 
-            return new Action(startMethod, runMethod, endMethod, false).withSubsystem(Swerve.getInstance());
+            return new Action(startMethod, runMethod, endMethod, ActionConstants.WILL_NOT_CANCEL);
         }
 
         public static final Action startButtonAction() {
@@ -203,7 +203,7 @@ public final class Swerve extends Subsystem {
 
             Runnable endMethod = () -> {};
 
-            return new Action(startMethod, runMethod, endMethod, false).withSubsystem(Swerve.getInstance());
+            return new Action(startMethod, runMethod, endMethod, ActionConstants.WILL_NOT_CANCEL);
         }
     }
 

@@ -139,7 +139,7 @@ public final class Gripper extends Subsystem {
                 Gripper.getInstance().disableGripper();
             };
 
-            return new Action(startMethod, runMethod, endMethod, false).withSubsystem(Gripper.getInstance());
+            return new Action(startMethod, runMethod, endMethod, ActionConstants.WILL_NOT_CANCEL);
         }
     }
 

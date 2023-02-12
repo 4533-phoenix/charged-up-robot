@@ -2,6 +2,8 @@ package frc.libs.java.actions;
 
 import java.util.concurrent.locks.ReentrantLock;
 
+import frc.robot.Constants.ActionConstants;
+
 public class Subsystem {
     private ReentrantLock subsystemThreadLock = new ReentrantLock(true);
 
@@ -9,15 +11,15 @@ public class Subsystem {
         () -> {},
         () -> { this.periodic(); },
         () -> {}, 
-        false
-    ).withSubsystem(this);
+        ActionConstants.WILL_NOT_CANCEL
+    );
 
     private final Action loggingAction = new Action(
         () -> {},
         () -> { this.log(); },
         () -> {}, 
-        false
-    ).withSubsystem(this);
+        ActionConstants.WILL_NOT_CANCEL
+    );
 
     public Subsystem() {}
 

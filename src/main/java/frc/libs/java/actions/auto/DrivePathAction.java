@@ -13,16 +13,23 @@ public final class DrivePathAction extends Action {
     private final SwervePath mPath;
 
     public DrivePathAction(String path) {
-        super(() -> {}, () -> {}, () -> {}, true);
+        super(() -> {}, () -> {}, () -> {}, ActionConstants.WILL_CANCEL);
 
         this.mPath = SwervePath.fromCSV(path);
     }
 
     @Override
     public void run() {
+        if (this.willThreadRun()) {
+            try {
+                this.getThreadLock().lock();
+            }
+            finally {}
+        }
+
         double startTime = Timer.getFPGATimestamp();
 
-        while (Timer.getFPGATimestamp() <= this.mPath.getRuntime()) {
+        while (Timer.getFPGATimestamp() - startTime <= this.mPath.getRuntime()) {
             PathState currState = this.mPath.sample(Timer.getFPGATimestamp() - startTime);
 
             ChassisSpeeds chassisSpeeds = Auto.getInstance().getAutoController().calculate(
@@ -37,5 +44,12 @@ public final class DrivePathAction extends Action {
         }
         
         Swerve.getInstance().setModuleStates(DriveConstants.SWERVE_KINEMATICS.toSwerveModuleStates(new ChassisSpeeds()));
+
+        if (this.willThreadRun()) {
+            try {
+                this.getThreadLock().unlock();
+            }
+            finally {}
+        }
     }
 }

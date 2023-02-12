@@ -1,13 +1,15 @@
 package frc.libs.java.actions.auto;
 
 import frc.libs.java.actions.*;
+import frc.robot.Constants.ActionConstants;
+
 import java.util.*;
 
 public final class ParallelAction extends Action {
     private final ArrayList<Action> mActions;
 
     public ParallelAction(Action... mActions) {
-        super(() -> {}, () -> {}, () -> {}, true);
+        super(() -> {}, () -> {}, () -> {}, ActionConstants.WILL_CANCEL);
 
         this.mActions = (ArrayList<Action>) Arrays.asList(mActions);
     }
@@ -22,6 +24,8 @@ public final class ParallelAction extends Action {
 
         for (Action action : this.mActions) {
             if (action.willThreadRun() && action.getState() == State.NEW) {
+                action.withSubsystem(new Subsystem());
+
                 action.start();
 
                 while (!action.getThreadLock().isLocked()) {}

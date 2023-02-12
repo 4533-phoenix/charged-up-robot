@@ -13,7 +13,6 @@ import edu.wpi.first.wpilibj.Encoder;
 import com.revrobotics.CANSparkMax.ControlType;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.controller.ArmFeedforward;
-import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
 import com.revrobotics.RelativeEncoder;
 import edu.wpi.first.wpilibj.DutyCycleEncoder;
 import edu.wpi.first.wpilibj.AnalogInput;
@@ -241,7 +240,7 @@ public final class Extension extends Subsystem {
                 Extension.getInstance().setLowerExtensionState(LowerExtensionState.OFF);
             };
 
-            return new Action(startMethod, runMethod, endMethod, false).withSubsystem(Extension.getInstance());
+            return new Action(startMethod, runMethod, endMethod, ActionConstants.WILL_NOT_CANCEL);
         }
     }
 

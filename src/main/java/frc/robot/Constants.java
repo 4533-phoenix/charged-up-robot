@@ -164,4 +164,10 @@ public final class Constants {
 		// Threshold for trigger being pressed
 		public static final double TRIGGER_THRESHOLD = 0.2;
 	}
+
+    public static final class ActionConstants {
+        public static final boolean WILL_CANCEL = true;
+
+        public static final boolean WILL_NOT_CANCEL = false;
+    }
 }
