@@ -156,11 +156,11 @@ public final class Auto extends Subsystem {
                 Swerve.getInstance().setModuleStates(DriveConstants.SWERVE_KINEMATICS.toSwerveModuleStates(new ChassisSpeeds()));
             };
 
-            return new Action(startMethod, runMethod, endMethod, true).withSubsystem(Auto.getInstance());
+            return new Action(startMethod, runMethod, endMethod, ActionConstants.WILL_CANCEL).withSubsystem(Auto.getInstance());
         }
 
         public static final Action blueBottomCubeAutonomous() {
-            Action blueBottomCubeRetrieve = new DrivePathAction("Blue Bottom Cube Retrieve").withSubsystem(Auto.getInstance());
+            Action blueBottomCubeRetrieve = new DrivePathAction("Blue Bottom Cube Retrieve");
 
             Action getBlueBottomCube = new Action(
                 () -> {}, 
@@ -182,10 +182,10 @@ public final class Auto extends Subsystem {
                     }
                 }, 
                 () -> {}, 
-                true
-            ).withSubsystem(Auto.getInstance());
+                ActionConstants.WILL_CANCEL
+            );
 
-            Action blueBottomCubeScore = new DrivePathAction("Blue Bottom Cube Score").withSubsystem(Auto.getInstance());
+            Action blueBottomCubeScore = new DrivePathAction("Blue Bottom Cube Score");
 
             Action scoreBlueBottomCube = new Action(
                 () -> {}, 
@@ -204,8 +204,8 @@ public final class Auto extends Subsystem {
                 () -> {
                     Extension.getInstance().setLowerExtensionState(LowerExtensionState.OFF);
                 }, 
-                true
-            ).withSubsystem(Auto.getInstance());
+                ActionConstants.WILL_CANCEL
+            );
 
             return new SeriesAction(
                 blueBottomCubeRetrieve,

@@ -211,7 +211,7 @@ public final class Extension extends Subsystem {
                 Extension.getInstance().setLowerExtensionState(LowerExtensionState.OFF);
             };
 
-            return new Action(startMethod, runMethod, endMethod, false).withSubsystem(Extension.getInstance());
+            return new Action(startMethod, runMethod, endMethod, ActionConstants.WILL_NOT_CANCEL).withSubsystem(Extension.getInstance());
         }
     }
 

@@ -11,7 +11,7 @@ public class Action extends Thread {
 
     private boolean willThreadRun;
 
-    private ReentrantLock threadLock;
+    private ReentrantLock threadLock = new ReentrantLock();
 
     private boolean isFinished;
 
