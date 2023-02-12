@@ -41,7 +41,7 @@ public final class Pneumatics extends Subsystem {
                 Pneumatics.getInstance().disableCompressor();
             };
 
-            return new Action(startMethod, runMethod, endMethod, ActionConstants.WILL_NOT_CANCEL).withSubsystem(Pneumatics.getInstance());
+            return new Action(startMethod, runMethod, endMethod, ActionConstants.WILL_NOT_CANCEL);
         }
     }
 

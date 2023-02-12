@@ -12,14 +12,14 @@ public class Subsystem {
         () -> { this.periodic(); },
         () -> {}, 
         ActionConstants.WILL_NOT_CANCEL
-    ).withSubsystem(this);
+    );
 
     private final Action loggingAction = new Action(
         () -> {},
         () -> { this.log(); },
         () -> {}, 
         ActionConstants.WILL_NOT_CANCEL
-    ).withSubsystem(this);
+    );
 
     public Subsystem() {}
 
