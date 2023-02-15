@@ -28,8 +28,8 @@ public final class Auto extends Subsystem {
     private static Auto mInstance;
 
     private static final Map<String, Action> autoCommands = Map.ofEntries(
-        Map.entry("Test Autonomous", AutoActions.testAutonomous())
-        // Map.entry("Blue Bottom Cube Autonomous", AutoActions.blueBottomCubeAutonomous())
+        Map.entry("Test Autonomous", AutoActions.testAutonomous()),
+        Map.entry("Blue Bottom Cube Autonomous", AutoActions.blueBottomCubeAutonomous())
     );
 
     private HolonomicDriveController autoController = new HolonomicDriveController(
@@ -162,21 +162,21 @@ public final class Auto extends Subsystem {
         public static final Action blueBottomCubeAutonomous() {
             Action blueBottomCubeRetrieve = new DrivePathAction("Blue Bottom Cube Retrieve");
 
-        //     Action getBlueBottomCube = new Action(
-        //         () -> {}, 
-        //         () -> {
-        //             if (Gripper.getInstance().isDroppingObject()) {
-        //                 Gripper.getInstance().enableGripper();
-        //             }
-        //             else {
-        //                 Gripper.getInstance().disableGripper();
+            Action getBlueBottomCube = new Action(
+                () -> {}, 
+                () -> {
+                    if (Gripper.getInstance().isDroppingObject()) {
+                        Gripper.getInstance().enableGripper();
+                    }
+                    else {
+                        Gripper.getInstance().disableGripper();
 
-        //                 try {
-        //                     Thread.sleep(250);
-        //                 }
-        //                 catch (Exception e) {
-        //                     e.printStackTrace();
-        //                 }
+                        try {
+                            Thread.sleep(250);
+                        }
+                        catch (Exception e) {
+                            e.printStackTrace();
+                        }
 
                         Gripper.getInstance().enableGripper();
                     }
@@ -187,17 +187,17 @@ public final class Auto extends Subsystem {
 
             Action blueBottomCubeScore = new DrivePathAction("Blue Bottom Cube Score");
 
-        //     Action scoreBlueBottomCube = new Action(
-        //         () -> {}, 
-        //         () -> {
-        //             Extension.getInstance().setExtensionState(ExtensionState.HIGH_ROW);
+            Action scoreBlueBottomCube = new Action(
+                () -> {}, 
+                () -> {
+                    Extension.getInstance().setExtensionState(ExtensionState.HIGH_ROW);
 
-        //             try {
-        //                 Thread.sleep(1000);
-        //             }
-        //             catch (Exception e) {
-        //                 e.printStackTrace();
-        //             }
+                    try {
+                        Thread.sleep(1000);
+                    }
+                    catch (Exception e) {
+                        e.printStackTrace();
+                    }
 
                     Gripper.getInstance().disableGripper();
                 }, 
@@ -207,13 +207,13 @@ public final class Auto extends Subsystem {
                 ActionConstants.WILL_CANCEL
             );
 
-        //     return new SeriesAction(
-        //         blueBottomCubeRetrieve,
-        //         getBlueBottomCube,
-        //         blueBottomCubeScore,
-        //         scoreBlueBottomCube
-        //     ).withSubsystem(Auto.getInstance());
-        // }
+            return new SeriesAction(
+                blueBottomCubeRetrieve,
+                getBlueBottomCube,
+                blueBottomCubeScore,
+                scoreBlueBottomCube
+            ).withSubsystem(Auto.getInstance());
+        }
     }
 
     @Override
