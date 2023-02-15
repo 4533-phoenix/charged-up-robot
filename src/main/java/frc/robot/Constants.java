@@ -129,12 +129,12 @@ public final class Constants {
 
         public static final int STRING_POTENTIOMETER_PORT = 1;
 
-        public static final double ELBOW_KP = 3.0;
-        public static final double ELBOW_KI = 0.0;
+        public static final double ELBOW_KP = 5.0;
+        public static final double ELBOW_KI = 0.5;
         public static final double ELBOW_KD = 0.5;
 
         public static final double ELBOW_KS = 0.0;
-        public static final double ELBOW_KG = 0.075;
+        public static final double ELBOW_KG = 0.13;
         public static final double ELBOW_KV = 0.0;
         public static final double ELBOW_KA = 0.0;
     }

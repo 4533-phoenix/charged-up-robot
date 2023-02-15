@@ -18,6 +18,7 @@ import edu.wpi.first.wpilibj.DutyCycleEncoder;
 import edu.wpi.first.wpilibj.AnalogInput;
 import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.wpilibj.PneumaticsModuleType;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.DoubleSolenoid.Value;
 
 public final class Extension extends Subsystem {
@@ -47,7 +48,7 @@ public final class Extension extends Subsystem {
         ZERO_INCHES, FIVE_INCHES, SEVEN_INCHES, TWELVE_INCHES, OFF
     }
 
-    public final double[] elbowSetpoints = {10.5, 23.5, 90.8, 170.6};
+    public final double[] elbowSetpoints = {12.0, 23.5, 90.8, 170.6};
 
     public static enum ExtensionState {
         GROUND_INTAKE, OFF_GROUND, MIDDLE_ROW, HIGH_ROW
@@ -98,15 +99,25 @@ public final class Extension extends Subsystem {
         elbowController.setD(ExtensionConstants.ELBOW_KD);
     }
 
-    // public void setUpperExtensionState(boolean state) {
-    //     if (state) {
-    //         elbowController.setSetpoint(elbowSetpoints[1]);
-    //     } else {
-    //         elbowController.setSetpoint(elbowSetpoints[0]);
-    //     }
-    // }
-
     public void setExtensionState(ExtensionState state) {
+        if (elbowController.getSetpoint() > 160.0 / 360.0 && state.equals(ExtensionState.GROUND_INTAKE)) {
+            double time = Timer.getFPGATimestamp();
+
+            this.setLowerExtensionState(LowerExtensionState.ZERO_INCHES);
+
+            while (Timer.getFPGATimestamp() < time + 0.6) {
+                System.out.println("waiting");
+            }
+        }
+
+        if (elbowController.getSetpoint() < 5.0 / 360.0 && state.equals(ExtensionState.HIGH_ROW)) {
+            this.elbowController.setSetpoint(elbowSetpoints[3] / 360.0);
+
+            while (this.getElbowAngle().getDegrees() < 90.0) {
+                System.out.println("waiting");
+            }
+        }
+
         switch (state) {
             case GROUND_INTAKE:
                 this.setLowerExtensionState(LowerExtensionState.ZERO_INCHES);
@@ -161,15 +172,6 @@ public final class Extension extends Subsystem {
         return stringPotentiometer.getVoltage() * 12.0 / 5.0;
     }
 
-    public void updateElbowController(double degrees) {
-        double positionRot = degrees / 360.0;
-        armSetpoint = positionRot;
-
-        double pid = elbowController.calculate(getElbowAngle().getRotations(), armSetpoint);
-        double feedForward = getElbowFeedforward();
-        elbowMotor.set(pid + feedForward);
-    }
-
     public void updateElbowController() {
         double pid = elbowController.calculate(getElbowAngle().getRotations());
         double feedForward = getElbowFeedforward();
@@ -205,18 +207,10 @@ public final class Extension extends Subsystem {
                 Extension.getInstance().initialAbsoluteEncoderPosition = Extension.getInstance().getAbsoluteEncoderAbsolutePosition() - Extension.getInstance().elbowAbsoluteEncoder.getPositionOffset();
                 Extension.getInstance().elbowRelativeEncoder.reset();
                 Extension.getInstance().configureElbowController();
-                Extension.getInstance().updateElbowController(10.0);
+                Extension.getInstance().setExtensionState(ExtensionState.GROUND_INTAKE);
             };
 
             Runnable runMethod = () -> {
-                if (Robot.driverController.getButton(Button.A)) {
-                    Extension.getInstance().updateElbowController(10.0);
-                } else if (Robot.driverController.getButton(Button.B)) {
-                    Extension.getInstance().updateElbowController(65.0);
-                } else {
-                    Extension.getInstance().updateElbowController();
-                }
-
                 if (Robot.operatorController.getButton(Button.Y)) {
                     Extension.getInstance().setExtensionState(ExtensionState.GROUND_INTAKE);
                 } else if (Robot.operatorController.getButton(Button.X)) {
@@ -227,12 +221,12 @@ public final class Extension extends Subsystem {
                     Extension.getInstance().setExtensionState(ExtensionState.HIGH_ROW);
                 }
 
-                // Extension.getInstance().updateElbowController();
+                Extension.getInstance().updateElbowController();
 
                 //  System.out.println("p error: " + Extension.getInstance().getElbowController().getPositionError());
                 // System.out.println("relative: " + Extension.getInstance().getRelativeEncoderPosition());
                 System.out.println("angle: " + Extension.getInstance().getElbowAngle().getDegrees());
-                // System.out.println("setpoint: " + Extension.getInstance().armSetpoint);
+                // System.out.println("setpoint: " + Extension.getInstance().getElbowController().getSetpoint());
                 // System.out.println("current: " + Extension.getInstance().elbowMotor.getOutputCurrent());
             };
 

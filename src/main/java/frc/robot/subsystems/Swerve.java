@@ -4,7 +4,6 @@ import frc.robot.controls.PSController.Axis;
 import frc.robot.controls.PSController.Button;
 import frc.robot.controls.PSController.Side;
 import frc.libs.java.actions.Action;
-import frc.libs.java.actions.Subsystem;
 import frc.robot.Robot;
 import frc.robot.Constants.*;
 
@@ -135,7 +134,7 @@ public final class Swerve extends Subsystem {
         ChassisSpeeds chassisSpeeds;
         if (fieldRelative) {
             chassisSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(
-                xSpeed, ySpeed, steerSpeed, PoseEstimator.getInstance().getSwerveRotation()
+                xSpeed, ySpeed, steerSpeed, getGyroRotation()
             );
         } else {
             chassisSpeeds = new ChassisSpeeds(xSpeed, ySpeed, steerSpeed);
@@ -174,7 +173,7 @@ public final class Swerve extends Subsystem {
     private static final class SwerveActions {
         public static final Action defaultDriveAction() {
             Runnable startMethod = () -> {
-                Swerve.getInstance().drive(new Translation2d(), 0.0, false, true);
+                Swerve.getInstance().drive(new Translation2d(), 0.0, true, true);
             };
 
             Runnable runMethod = () -> {
@@ -182,11 +181,11 @@ public final class Swerve extends Subsystem {
                 
                 double swerveRotation = Swerve.getInstance().getSwerveRotation();
 
-                Swerve.getInstance().drive(swerveTranslation, swerveRotation, false, true);
+                Swerve.getInstance().drive(swerveTranslation, swerveRotation, true, true);
             };
 
             Runnable endMethod = () -> {
-                Swerve.getInstance().drive(new Translation2d(), 0.0, false, true);
+                Swerve.getInstance().drive(new Translation2d(), 0.0, true, true);
             };
 
             return new Action(startMethod, runMethod, endMethod, ActionConstants.WILL_NOT_CANCEL);
