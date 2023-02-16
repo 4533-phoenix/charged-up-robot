@@ -165,6 +165,8 @@ public final class Auto extends Subsystem {
             Action getBlueBottomCube = new Action(
                 () -> {}, 
                 () -> {
+                    System.out.println("Ran");
+                    
                     if (Gripper.getInstance().isDroppingObject()) {
                         Gripper.getInstance().enableGripper();
                     }

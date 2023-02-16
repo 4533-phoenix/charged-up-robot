@@ -6,12 +6,12 @@ import frc.robot.Constants.ActionConstants;
 import java.util.*;
 
 public final class SeriesAction extends Action {
-    private final ArrayList<Action> mRemainingActions;
+    private final ArrayList<Action> mRemainingActions = new ArrayList<Action>();
 
     public SeriesAction(Action... mActions) {
         super(() -> {}, () -> {}, () -> {}, ActionConstants.WILL_CANCEL);
 
-        this.mRemainingActions = (ArrayList<Action>) Arrays.asList(mActions);
+        this.mRemainingActions.addAll(Arrays.asList(mActions));
     }
 
     @Override
@@ -28,7 +28,7 @@ public final class SeriesAction extends Action {
 
                 action.start();
 
-                while (!action.getThreadLock().isLocked() || action.isAlive()) {}
+                while (action.getState() != State.TERMINATED) {}
             }
             else {
                 action.run();

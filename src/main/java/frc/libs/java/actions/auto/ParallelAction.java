@@ -27,8 +27,6 @@ public final class ParallelAction extends Action {
                 action.withSubsystem(new Subsystem());
 
                 action.start();
-
-                while (!action.getThreadLock().isLocked()) {}
             }
             else {
                 action.run();
@@ -41,7 +39,7 @@ public final class ParallelAction extends Action {
             isFinished = true;
 
             for (Action action : this.mActions) {
-                if (action.willThreadRun() && !(action.getState() == State.TERMINATED)) {
+                if (action.willThreadRun() && action.getState() != State.TERMINATED) {
                     isFinished = false;
 
                     break;
