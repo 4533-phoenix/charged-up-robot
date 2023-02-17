@@ -28,8 +28,7 @@ public final class Auto extends Subsystem {
     private static Auto mInstance;
 
     private static final Map<String, Action> autoCommands = Map.ofEntries(
-        Map.entry("Test Autonomous", AutoActions.testAutonomous()),
-        Map.entry("Blue Bottom Cube Autonomous", AutoActions.blueBottomCubeAutonomous())
+        Map.entry("Test Autonomous", AutoActions.testAutonomous())
     );
 
     private HolonomicDriveController autoController = new HolonomicDriveController(
@@ -77,145 +76,79 @@ public final class Auto extends Subsystem {
 
     private static final class AutoActions {
         public static final Action testAutonomous() {
-            TrajectoryConfig config = new TrajectoryConfig(
-                DriveConstants.DRIVE_MAX_VELOCITY, 
-                DriveConstants.DRIVE_MAX_ACCELERATION
-            )
-            .addConstraint(
-                new MaxVelocityConstraint(
-                    DriveConstants.DRIVE_MAX_VELOCITY
-                )
-            )
-            .addConstraint(
-                new SwerveDriveKinematicsConstraint(
-                    DriveConstants.SWERVE_KINEMATICS, 
-                    DriveConstants.DRIVE_MAX_VELOCITY
-                )
-            );
-
             Pose2d startPose = PoseEstimator.getInstance().getSwervePose();
 
-            ArrayList<Translation2d> trajectoryPoints = new ArrayList<Translation2d>(
+            ArrayList<Pose2d> trajectoryPoints = new ArrayList<Pose2d>(
                 Arrays.asList(
-                    new Translation2d(startPose.getX() + 0.25, startPose.getY() + 0.25),
-                    new Translation2d(startPose.getX() + 0.50, startPose.getY() - 0.25)
+                    startPose,
+                    new Pose2d(startPose.getX() + 0.25, startPose.getY() + 0.25, Rotation2d.fromDegrees(0)),
+                    new Pose2d(startPose.getX() + 0.50, startPose.getY(), Rotation2d.fromDegrees(0)),
+                    new Pose2d(startPose.getX() + 0.25, startPose.getY() + 0.25, Rotation2d.fromDegrees(0))
                 )
             );
 
-            Pose2d endPose = new Pose2d(startPose.getX() + 0.75 , startPose.getY(), startPose.getRotation());
+            Action driveTestPathAction = new DrivePathAction(trajectoryPoints);
 
-            Trajectory testAutonomousTrajectory = TrajectoryGenerator.generateTrajectory(
-                startPose, 
-                trajectoryPoints, 
-                endPose, 
-                config
-            );
-
-            Runnable startMethod = () -> {};
-
-            Runnable runMethod = () -> {
-                Timer timer = new Timer();
-                timer.reset();
-                timer.start();
-
-                while (timer.get() <= 1.5) {               
-                    Trajectory.State trajectoryState = testAutonomousTrajectory.sample(timer.get());
-
-                    Swerve.getInstance().setModuleStates(Auto.getInstance().getSwerveModuleStates(trajectoryState));
-                }
-
-                System.out.println(testAutonomousTrajectory.getTotalTimeSeconds());
-
-                timer.stop();
-
-                Swerve.getInstance().setModuleStates(DriveConstants.SWERVE_KINEMATICS.toSwerveModuleStates(new ChassisSpeeds()));
-
-                Gripper.getInstance().enableGripper();
-
-                try {
-                    Thread.sleep(2500);
-                }
-                catch (Exception e) {
-                    e.printStackTrace();
-                }
-
-                timer.start();
-
-                while (timer.get() <= testAutonomousTrajectory.getTotalTimeSeconds()) {
-                    Trajectory.State trajectoryState = testAutonomousTrajectory.sample(timer.get());
-
-                    Swerve.getInstance().setModuleStates(Auto.getInstance().getSwerveModuleStates(trajectoryState));
-                }
-
-                if (timer.get() > testAutonomousTrajectory.getTotalTimeSeconds()) {
-                    Gripper.getInstance().disableGripper();
-                }
-            };
-
-            Runnable endMethod = () -> {
-                Swerve.getInstance().setModuleStates(DriveConstants.SWERVE_KINEMATICS.toSwerveModuleStates(new ChassisSpeeds()));
-            };
-
-            return new Action(startMethod, runMethod, endMethod, ActionConstants.WILL_CANCEL).withSubsystem(Auto.getInstance());
+            return driveTestPathAction.withSubsystem(Auto.getInstance());
         }
 
-        public static final Action blueBottomCubeAutonomous() {
-            Action blueBottomCubeRetrieve = new DrivePathAction("Blue Bottom Cube Retrieve");
+        // public static final Action blueBottomCubeAutonomous() {
+        //     Action blueBottomCubeRetrieve = new DrivePathAction("Blue Bottom Cube Retrieve");
 
-            Action getBlueBottomCube = new Action(
-                () -> {}, 
-                () -> {
-                    System.out.println("Ran");
+        //     Action getBlueBottomCube = new Action(
+        //         () -> {}, 
+        //         () -> {
+        //             System.out.println("Ran");
                     
-                    if (Gripper.getInstance().isDroppingObject()) {
-                        Gripper.getInstance().enableGripper();
-                    }
-                    else {
-                        Gripper.getInstance().disableGripper();
+        //             if (Gripper.getInstance().isDroppingObject()) {
+        //                 Gripper.getInstance().enableGripper();
+        //             }
+        //             else {
+        //                 Gripper.getInstance().disableGripper();
 
-                        try {
-                            Thread.sleep(250);
-                        }
-                        catch (Exception e) {
-                            e.printStackTrace();
-                        }
+        //                 try {
+        //                     Thread.sleep(250);
+        //                 }
+        //                 catch (Exception e) {
+        //                     e.printStackTrace();
+        //                 }
 
-                        Gripper.getInstance().enableGripper();
-                    }
-                }, 
-                () -> {}, 
-                ActionConstants.WILL_CANCEL
-            );
+        //                 Gripper.getInstance().enableGripper();
+        //             }
+        //         }, 
+        //         () -> {}, 
+        //         ActionConstants.WILL_CANCEL
+        //     );
 
-            Action blueBottomCubeScore = new DrivePathAction("Blue Bottom Cube Score");
+        //     Action blueBottomCubeScore = new DrivePathAction("Blue Bottom Cube Score");
 
-            Action scoreBlueBottomCube = new Action(
-                () -> {}, 
-                () -> {
-                    Extension.getInstance().setExtensionState(ExtensionState.HIGH_ROW);
+        //     Action scoreBlueBottomCube = new Action(
+        //         () -> {}, 
+        //         () -> {
+        //             Extension.getInstance().setExtensionState(ExtensionState.HIGH_ROW);
 
-                    try {
-                        Thread.sleep(1000);
-                    }
-                    catch (Exception e) {
-                        e.printStackTrace();
-                    }
+        //             try {
+        //                 Thread.sleep(1000);
+        //             }
+        //             catch (Exception e) {
+        //                 e.printStackTrace();
+        //             }
 
-                    Gripper.getInstance().disableGripper();
-                }, 
-                () -> {
-                    Extension.getInstance().setLowerExtensionState(LowerExtensionState.OFF);
-                }, 
-                ActionConstants.WILL_CANCEL
-            );
+        //             Gripper.getInstance().disableGripper();
+        //         }, 
+        //         () -> {
+        //             Extension.getInstance().setLowerExtensionState(LowerExtensionState.OFF);
+        //         }, 
+        //         ActionConstants.WILL_CANCEL
+        //     );
 
-            return new SeriesAction(
-                blueBottomCubeRetrieve,
-                getBlueBottomCube,
-                blueBottomCubeScore,
-                scoreBlueBottomCube
-            ).withSubsystem(Auto.getInstance());
-        }
+        //     return new SeriesAction(
+        //         blueBottomCubeRetrieve,
+        //         getBlueBottomCube,
+        //         blueBottomCubeScore,
+        //         scoreBlueBottomCube
+        //     ).withSubsystem(Auto.getInstance());
+        // }
     }
 
     @Override

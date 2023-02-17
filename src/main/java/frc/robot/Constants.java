@@ -29,6 +29,10 @@ public final class Constants {
         public static final double AUTO_OMEGA_KI = 0.0;
         public static final double AUTO_OMEGA_KD = 0.0;
 
+        // Max translational velocity, acceleration in m/s
+        public static final double AUTO_MAX_VELOCITY = Units.feetToMeters(5.0);
+        public static final double AUTO_MAX_ACCELERATION = Units.feetToMeters(3.0);
+
         // Max rotational velocity, acceleration in rad/s
         public static final TrapezoidProfile.Constraints AUTO_OMEGA_CONSTRAINTS = new TrapezoidProfile.Constraints(6.28, 3.14);
     }

@@ -4,7 +4,6 @@ import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.networktables.*;
 import frc.libs.java.actions.*;
@@ -72,7 +71,7 @@ public final class PoseEstimator extends Subsystem {
     @Override
     public void periodic() {
         PoseEstimator.getInstance().swervePoseEstimator.update(Swerve.getInstance().getGyroRotation(), Swerve.getInstance().getModulePositions());
-        PoseEstimator.getInstance().swervePoseEstimator.addVisionMeasurement(PoseEstimator.getInstance().getVisionPose2d(), Timer.getFPGATimestamp());
+        // PoseEstimator.getInstance().swervePoseEstimator.addVisionMeasurement(PoseEstimator.getInstance().getVisionPose2d(), Timer.getFPGATimestamp());
     }
 
     @Override
