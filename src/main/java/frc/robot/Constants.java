@@ -30,8 +30,8 @@ public final class Constants {
         public static final double AUTO_OMEGA_KD = 0.0;
 
         // Max translational velocity, acceleration in m/s
-        public static final double AUTO_MAX_VELOCITY = Units.feetToMeters(5.0);
-        public static final double AUTO_MAX_ACCELERATION = Units.feetToMeters(3.0);
+        public static final double AUTO_MAX_VELOCITY = Units.feetToMeters(3.0);
+        public static final double AUTO_MAX_ACCELERATION = Units.feetToMeters(1.0);
 
         // Max rotational velocity, acceleration in rad/s
         public static final TrapezoidProfile.Constraints AUTO_OMEGA_CONSTRAINTS = new TrapezoidProfile.Constraints(6.28, 3.14);
@@ -105,7 +105,7 @@ public final class Constants {
         public static final double DRIVE_MAX_PHYSICAL_VELOCITY = Units.feetToMeters(14.6);
 
         public static final double DRIVE_MAX_VELOCITY = Units.feetToMeters(5.0);
-        public static final double DRIVE_MAX_ROTATIONAL_VELOCITY = 3.5 * 2.0 * Math.PI; // rad/s
+        public static final double DRIVE_MAX_ROTATIONAL_VELOCITY = 3.0 * 2.0 * Math.PI; // rad/s
 
         public static final double DRIVE_MAX_ACCELERATION = 3.0; // 5.0; // m/s^2
         public static final double DRIVE_MAX_ROTATIONAL_ACCELERATION = 3.0; // rad/s^2

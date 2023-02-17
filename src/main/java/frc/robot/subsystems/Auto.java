@@ -76,14 +76,14 @@ public final class Auto extends Subsystem {
 
     private static final class AutoActions {
         public static final Action testAutonomous() {
-            Pose2d startPose = PoseEstimator.getInstance().getSwervePose();
+            Pose2d startPose = new Pose2d(new Translation2d(), Swerve.getInstance().getGyroRotation());
 
             ArrayList<Pose2d> trajectoryPoints = new ArrayList<Pose2d>(
                 Arrays.asList(
                     startPose,
-                    new Pose2d(startPose.getX() + 0.25, startPose.getY() + 0.25, Rotation2d.fromDegrees(0)),
-                    new Pose2d(startPose.getX() + 0.50, startPose.getY(), Rotation2d.fromDegrees(0)),
-                    new Pose2d(startPose.getX() + 0.25, startPose.getY() + 0.25, Rotation2d.fromDegrees(0))
+                    new Pose2d(startPose.getX() + 1.0, startPose.getY(), startPose.getRotation())
+                    // new Pose2d(startPose.getX() + 0.50, startPose.getY(), Rotation2d.fromDegrees(0)),
+                    // new Pose2d(startPose.getX() + 0.25, startPose.getY() + 0.25, Rotation2d.fromDegrees(0))
                 )
             );
 
