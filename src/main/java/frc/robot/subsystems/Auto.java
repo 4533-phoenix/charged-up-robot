@@ -82,8 +82,6 @@ public final class Auto extends Subsystem {
                 Arrays.asList(
                     startPose,
                     new Pose2d(startPose.getX() + 1.0, startPose.getY(), startPose.getRotation())
-                    // new Pose2d(startPose.getX() + 0.50, startPose.getY(), Rotation2d.fromDegrees(0)),
-                    // new Pose2d(startPose.getX() + 0.25, startPose.getY() + 0.25, Rotation2d.fromDegrees(0))
                 )
             );
 
@@ -92,63 +90,76 @@ public final class Auto extends Subsystem {
             return driveTestPathAction.withSubsystem(Auto.getInstance());
         }
 
-        // public static final Action blueBottomCubeAutonomous() {
-        //     Action blueBottomCubeRetrieve = new DrivePathAction("Blue Bottom Cube Retrieve");
+        public static final Action blueBottomCubeAutonomous() {
+            ArrayList<Pose2d> retrievePoints = new ArrayList<Pose2d>(
+                Arrays.asList(
+                    new Pose2d(1.92, 0.46, new Rotation2d()),
+                    new Pose2d(6.49, 0.91, new Rotation2d())
+                )
+            );
 
-        //     Action getBlueBottomCube = new Action(
-        //         () -> {}, 
-        //         () -> {
-        //             System.out.println("Ran");
-                    
-        //             if (Gripper.getInstance().isDroppingObject()) {
-        //                 Gripper.getInstance().enableGripper();
-        //             }
-        //             else {
-        //                 Gripper.getInstance().disableGripper();
+            Action cubeRetrievePath = new DrivePathAction(retrievePoints);
 
-        //                 try {
-        //                     Thread.sleep(250);
-        //                 }
-        //                 catch (Exception e) {
-        //                     e.printStackTrace();
-        //                 }
+            Action getBlueBottomCube = new Action(
+                () -> {}, 
+                () -> {
+                    if (Gripper.getInstance().isDroppingObject()) {
+                        Gripper.getInstance().enableGripper();
+                    }
+                    else {
+                        Gripper.getInstance().disableGripper();
 
-        //                 Gripper.getInstance().enableGripper();
-        //             }
-        //         }, 
-        //         () -> {}, 
-        //         ActionConstants.WILL_CANCEL
-        //     );
+                        try {
+                            Thread.sleep(250);
+                        }
+                        catch (Exception e) {
+                            e.printStackTrace();
+                        }
 
-        //     Action blueBottomCubeScore = new DrivePathAction("Blue Bottom Cube Score");
+                        Gripper.getInstance().enableGripper();
+                    }
+                }, 
+                () -> {}, 
+                ActionConstants.WILL_CANCEL
+            );
 
-        //     Action scoreBlueBottomCube = new Action(
-        //         () -> {}, 
-        //         () -> {
-        //             Extension.getInstance().setExtensionState(ExtensionState.HIGH_ROW);
+            ArrayList<Pose2d> scorePoints = new ArrayList<Pose2d>(
+                Arrays.asList(
+                    new Pose2d(6.49, 0.91, new Rotation2d()),
+                    new Pose2d(2.71, 0.91, Rotation2d.fromDegrees(180)),
+                    new Pose2d(1.80, 2.69, Rotation2d.fromDegrees(180))
+                )
+            );
 
-        //             try {
-        //                 Thread.sleep(1000);
-        //             }
-        //             catch (Exception e) {
-        //                 e.printStackTrace();
-        //             }
+            Action cubeScorePath = new DrivePathAction(scorePoints);
 
-        //             Gripper.getInstance().disableGripper();
-        //         }, 
-        //         () -> {
-        //             Extension.getInstance().setLowerExtensionState(LowerExtensionState.OFF);
-        //         }, 
-        //         ActionConstants.WILL_CANCEL
-        //     );
+            Action scoreBlueBottomCube = new Action(
+                () -> {}, 
+                () -> {
+                    Extension.getInstance().setExtensionState(ExtensionState.HIGH_ROW);
 
-        //     return new SeriesAction(
-        //         blueBottomCubeRetrieve,
-        //         getBlueBottomCube,
-        //         blueBottomCubeScore,
-        //         scoreBlueBottomCube
-        //     ).withSubsystem(Auto.getInstance());
-        // }
+                    try {
+                        Thread.sleep(1000);
+                    }
+                    catch (Exception e) {
+                        e.printStackTrace();
+                    }
+
+                    Gripper.getInstance().disableGripper();
+                }, 
+                () -> {
+                    Extension.getInstance().setLowerExtensionState(LowerExtensionState.OFF);
+                }, 
+                ActionConstants.WILL_CANCEL
+            );
+
+            return new SeriesAction(
+                cubeRetrievePath,
+                getBlueBottomCube,
+                cubeScorePath,
+                scoreBlueBottomCube
+            ).withSubsystem(Auto.getInstance());
+        }
     }
 
     @Override

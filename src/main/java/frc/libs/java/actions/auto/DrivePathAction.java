@@ -17,6 +17,8 @@ public final class DrivePathAction extends Action {
 
     private TrajectoryConfig config = new TrajectoryConfig(AutoConstants.AUTO_MAX_VELOCITY, AutoConstants.AUTO_MAX_ACCELERATION);
 
+    private Rotation2d rotation;
+
     public DrivePathAction(List<Pose2d> waypoints) {
         super(() -> {}, () -> {}, () -> {}, ActionConstants.WILL_CANCEL);
 
@@ -37,10 +39,12 @@ public final class DrivePathAction extends Action {
         while (Timer.getFPGATimestamp() - startTime <= this.mTrajectory.getTotalTimeSeconds()) {
             Trajectory.State currState = this.mTrajectory.sample(Timer.getFPGATimestamp() - startTime);
 
+            rotation = Rotation2d.fromRadians(currState.curvatureRadPerMeter * currState.velocityMetersPerSecond);
+
             ChassisSpeeds chassisSpeeds = Auto.getInstance().getAutoController().calculate(
                 PoseEstimator.getInstance().getSwervePose(),
                 currState,
-                Rotation2d.fromDegrees(0.0)
+                rotation
             );
 
             SwerveModuleState[] swerveModuleStates = DriveConstants.SWERVE_KINEMATICS.toSwerveModuleStates(chassisSpeeds);
