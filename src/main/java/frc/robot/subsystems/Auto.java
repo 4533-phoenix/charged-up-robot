@@ -10,14 +10,11 @@ import edu.wpi.first.math.geometry.*;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.trajectory.Trajectory;
-import edu.wpi.first.math.trajectory.TrajectoryConfig;
-import edu.wpi.first.math.trajectory.TrajectoryGenerator;
-import edu.wpi.first.math.trajectory.constraint.MaxVelocityConstraint;
-import edu.wpi.first.math.trajectory.constraint.SwerveDriveKinematicsConstraint;
 import edu.wpi.first.wpilibj.Timer;
 import frc.libs.java.actions.Action;
 import frc.libs.java.actions.Subsystem;
 import frc.libs.java.actions.auto.DrivePathAction;
+import frc.libs.java.actions.auto.LambdaAction;
 import frc.libs.java.actions.auto.SeriesAction;
 
 import java.util.ArrayList;
@@ -77,142 +74,48 @@ public final class Auto extends Subsystem {
 
     private static final class AutoActions {
         public static final Action testAutonomous() {
-            TrajectoryConfig config = new TrajectoryConfig(
-                DriveConstants.DRIVE_MAX_VELOCITY, 
-                DriveConstants.DRIVE_MAX_ACCELERATION
-            )
-            .addConstraint(
-                new MaxVelocityConstraint(
-                    DriveConstants.DRIVE_MAX_VELOCITY
-                )
-            )
-            .addConstraint(
-                new SwerveDriveKinematicsConstraint(
-                    DriveConstants.SWERVE_KINEMATICS, 
-                    DriveConstants.DRIVE_MAX_VELOCITY
-                )
-            );
+            Pose2d startPose = new Pose2d(new Translation2d(), Swerve.getInstance().getGyroRotation());
 
-            Pose2d startPose = PoseEstimator.getInstance().getSwervePose();
-
-            ArrayList<Translation2d> trajectoryPoints = new ArrayList<Translation2d>(
+            ArrayList<Pose2d> trajectoryPoints = new ArrayList<Pose2d>(
                 Arrays.asList(
-                    new Translation2d(startPose.getX() + 0.25, startPose.getY() + 0.25),
-                    new Translation2d(startPose.getX() + 0.50, startPose.getY() - 0.25)
+                    startPose,
+                    new Pose2d(startPose.getX() + 1.0, startPose.getY(), startPose.getRotation())
                 )
             );
 
-            Pose2d endPose = new Pose2d(startPose.getX() + 0.75 , startPose.getY(), startPose.getRotation());
+            Action driveTestPathAction = new DrivePathAction(trajectoryPoints);
 
-            Trajectory testAutonomousTrajectory = TrajectoryGenerator.generateTrajectory(
-                startPose, 
-                trajectoryPoints, 
-                endPose, 
-                config
-            );
-
-            Runnable startMethod = () -> {};
-
-            Runnable runMethod = () -> {
-                Timer timer = new Timer();
-                timer.reset();
-                timer.start();
-
-                while (timer.get() <= 1.5) {               
-                    Trajectory.State trajectoryState = testAutonomousTrajectory.sample(timer.get());
-
-                    Swerve.getInstance().setModuleStates(Auto.getInstance().getSwerveModuleStates(trajectoryState));
-                }
-
-                System.out.println(testAutonomousTrajectory.getTotalTimeSeconds());
-
-                timer.stop();
-
-                Swerve.getInstance().setModuleStates(DriveConstants.SWERVE_KINEMATICS.toSwerveModuleStates(new ChassisSpeeds()));
-
-                Gripper.getInstance().enableGripper();
-
-                try {
-                    Thread.sleep(2500);
-                }
-                catch (Exception e) {
-                    e.printStackTrace();
-                }
-
-                timer.start();
-
-                while (timer.get() <= testAutonomousTrajectory.getTotalTimeSeconds()) {
-                    Trajectory.State trajectoryState = testAutonomousTrajectory.sample(timer.get());
-
-                    Swerve.getInstance().setModuleStates(Auto.getInstance().getSwerveModuleStates(trajectoryState));
-                }
-
-                if (timer.get() > testAutonomousTrajectory.getTotalTimeSeconds()) {
-                    Gripper.getInstance().disableGripper();
-                }
-            };
-
-            Runnable endMethod = () -> {
-                Swerve.getInstance().setModuleStates(DriveConstants.SWERVE_KINEMATICS.toSwerveModuleStates(new ChassisSpeeds()));
-            };
-
-            return new Action(startMethod, runMethod, endMethod, ActionConstants.WILL_CANCEL).withSubsystem(Auto.getInstance());
+            return driveTestPathAction.withSubsystem(Auto.getInstance());
         }
 
         public static final Action blueBottomCubeAutonomous() {
-            Action blueBottomCubeRetrieve = new DrivePathAction("Blue Bottom Cube Retrieve");
-
-            Action getBlueBottomCube = new Action(
-                () -> {}, 
-                () -> {
-                    System.out.println("Ran");
-                    
-                    if (Gripper.getInstance().isDroppingObject()) {
-                        Gripper.getInstance().enableGripper();
-                    }
-                    else {
-                        Gripper.getInstance().disableGripper();
-
-                        try {
-                            Thread.sleep(250);
-                        }
-                        catch (Exception e) {
-                            e.printStackTrace();
-                        }
-
-                        Gripper.getInstance().enableGripper();
-                    }
-                }, 
-                () -> {}, 
-                ActionConstants.WILL_CANCEL
+            ArrayList<Pose2d> retrievePoints = new ArrayList<Pose2d>(
+                Arrays.asList(
+                    new Pose2d(1.92, 0.46, new Rotation2d()),
+                    new Pose2d(6.49, 0.91, new Rotation2d())
+                )
             );
 
-            Action blueBottomCubeScore = new DrivePathAction("Blue Bottom Cube Score");
+            Action cubeRetrievePath = new DrivePathAction(retrievePoints);
 
-            Action scoreBlueBottomCube = new Action(
-                () -> {}, 
-                () -> {
-                    Extension.getInstance().setExtensionState(ExtensionState.HIGH_ROW);
+            Action getBlueBottomCube = new LambdaAction(() -> Gripper.getInstance().enableGripper());
 
-                    try {
-                        Thread.sleep(1000);
-                    }
-                    catch (Exception e) {
-                        e.printStackTrace();
-                    }
-
-                    Gripper.getInstance().disableGripper();
-                }, 
-                () -> {
-                    Extension.getInstance().setLowerExtensionState(LowerExtensionState.OFF);
-                }, 
-                ActionConstants.WILL_CANCEL
+            ArrayList<Pose2d> scorePoints = new ArrayList<Pose2d>(
+                Arrays.asList(
+                    new Pose2d(6.49, 0.91, new Rotation2d()),
+                    new Pose2d(2.71, 0.91, Rotation2d.fromDegrees(180)),
+                    new Pose2d(1.80, 2.69, Rotation2d.fromDegrees(180))
+                )
             );
+
+            Action cubeScorePath = new DrivePathAction(scorePoints);
+
+            Action scoreBlueBottomCube = new LambdaAction(() -> Gripper.getInstance().dropObject(Timer.getFPGATimestamp()));
 
             return new SeriesAction(
-                blueBottomCubeRetrieve,
+                cubeRetrievePath,
                 getBlueBottomCube,
-                blueBottomCubeScore,
+                cubeScorePath,
                 scoreBlueBottomCube
             ).withSubsystem(Auto.getInstance());
         }

@@ -37,7 +37,7 @@ public final class Robot extends TimedRobot {
   @Override
   public void autonomousInit() {
     autonomousRunner.add(
-      Auto.getInstance().getAutonomous("Blue Bottom Cube Autonomous")
+      Auto.getInstance().getAutonomous("Test Autonomous")
     );
 
     autonomousRunner.enable();

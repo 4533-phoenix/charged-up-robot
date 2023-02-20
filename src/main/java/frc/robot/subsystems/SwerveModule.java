@@ -10,10 +10,10 @@ import frc.robot.Constants.ModuleConstants;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.math.geometry.Rotation2d;
 
 public final class SwerveModule {
-    // TODO: Make a Profiled PID Controller and a Feedforward Controller for the drive motor 
     private final CANSparkMax driveMotor;
 
     private final CANSparkMax steerMotor;
@@ -21,7 +21,6 @@ public final class SwerveModule {
     private final RelativeEncoder driveEncoder;
     private final RelativeEncoder steerEncoder;
 
-    // TODO: Make this a Profiled PID Controller, and add a Feedforward Controller as well
     private final PIDController steerPIDController;
 
     private final CANCoder absoluteEncoder;
@@ -55,11 +54,11 @@ public final class SwerveModule {
     }
 
     public double getDrivePosition() {
-        return this.driveEncoder.getPosition();
+        return this.driveEncoder.getPosition() * Math.PI * Units.inchesToMeters(4.0);
     }
 
     public double getSteerPosition() {
-        return this.steerEncoder.getPosition();
+        return this.steerEncoder.getPosition() * 2.0 * Math.PI;
     }
 
     public double getDriveVelocity() {
@@ -88,7 +87,7 @@ public final class SwerveModule {
     }
 
     public SwerveModulePosition getModulePosition() {
-        return new SwerveModulePosition(this.getDrivePosition(), new Rotation2d(this.getSteerPosition() * 2.0 * Math.PI));
+        return new SwerveModulePosition(this.getDrivePosition(), new Rotation2d(this.getSteerPosition()));
     }
 
     public SwerveModuleState getState() {
