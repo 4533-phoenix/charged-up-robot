@@ -27,6 +27,18 @@ public final class SwerveModule {
     private final boolean absoluteEncoderReversed;
     private final double absoluteEncoderOffsetRad;
 
+    /**
+     * Constructor for the SwerveModule class. Initializes the motor controllers, encoders, and controllers
+     * for each swerve module and sets any necessary conditions (inversions, etc.)
+     * 
+     * @param driveMotorID The CAN ID of the drive motor
+     * @param steerMotorID The CAN ID of the steer motor
+     * @param driveMotorReversed Inversion status of the drive motor controller
+     * @param steerMotorReversed Inversion status of the steer motor controller
+     * @param absoluteEncoderID The CAN ID of the absolute encoder
+     * @param absoluteEncoderOffset The offset of the absolute encoder from zero
+     * @param absoluteEncoderReversed Inversion status of the absolute encoder
+     */
     public SwerveModule(int driveMotorID, int steerMotorID, boolean driveMotorReversed, boolean steerMotorReversed,
             int absoluteEncoderID, double absoluteEncoderOffset, boolean absoluteEncoderReversed) {
         this.absoluteEncoderOffsetRad = absoluteEncoderOffset;
@@ -53,22 +65,39 @@ public final class SwerveModule {
         this.resetEncoders();
     }
 
+    /**
+     * @return Position traveled by the drive encoder in meters
+     */
     public double getDrivePosition() {
-        return this.driveEncoder.getPosition() * Math.PI * Units.inchesToMeters(4.0);
+        return this.driveEncoder.getPosition();
     }
 
+    /**
+     * @return Position traveled by the steer encoder in radians
+     */
     public double getSteerPosition() {
-        return this.steerEncoder.getPosition() * 2.0 * Math.PI;
+        return this.steerEncoder.getPosition();
     }
 
+    /**
+     * @return Velocity of the drive encoder in meters per second
+     */
     public double getDriveVelocity() {
         return this.driveEncoder.getVelocity();
     }
 
+    /**
+     * @return Velocity of the steer encoder in radians per second
+     */
     public double getSteerVelocity() {
         return this.steerEncoder.getVelocity();
     }
 
+    /**
+     * Gives the position of the steer absolute encoder in radians, on a scale of 0 to 6.28
+     * 
+     * @return Position of the absolute encoder in radians
+     */
     public double getAbsoluteEncoderRad() {
         double angle = absoluteEncoder.getAbsolutePosition();
         angle *= Math.PI / 180.0;
@@ -81,19 +110,38 @@ public final class SwerveModule {
         return angle * (this.absoluteEncoderReversed ? -1.0 : 1.0);
     }
 
+    /**
+     * Sets the drive encoder to position = 0 and the steer relative encoder to the position of the 
+     * steer absolute encoder
+     */
     public void resetEncoders() {
         this.driveEncoder.setPosition(0.0);
         this.steerEncoder.setPosition(this.getAbsoluteEncoderRad());
     }
 
+    /**
+     * Gives the position of the drive and steer motors
+     * 
+     * @return An object containing the drive and steer motor positions
+     */
     public SwerveModulePosition getModulePosition() {
         return new SwerveModulePosition(this.getDrivePosition(), new Rotation2d(this.getSteerPosition()));
     }
 
+    /**
+     * Gives the state of the swerve module (drive velocity and steer position)
+     * 
+     * @return An object containing the drive motor velocity and the steer motor position
+     */
     public SwerveModuleState getState() {
         return new SwerveModuleState(this.getDriveVelocity(), new Rotation2d(this.getSteerPosition()));
     }
 
+    /**
+     * Optimizes and sets the speeds of the drive and steer motors
+     * 
+     * @param state The state of the swerve module
+     */
     public void setDesiredState(SwerveModuleState state) {
         if (Math.abs(state.speedMetersPerSecond) < 0.001) {
             this.stop();
@@ -106,6 +154,9 @@ public final class SwerveModule {
         this.steerMotor.set(this.steerPIDController.calculate(this.getSteerPosition(), state.angle.getRadians()));
     }
 
+    /**
+     * Sets the speeds of the drive and steer motors to zero
+     */
     public void stop() {
         this.driveMotor.set(0.0);
         this.steerMotor.set(0.0);
