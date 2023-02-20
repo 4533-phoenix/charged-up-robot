@@ -2,6 +2,7 @@ package frc.robot.subsystems;
 
 import edu.wpi.first.wpilibj.PneumaticsModuleType;
 import edu.wpi.first.wpilibj.Solenoid;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.AnalogInput;
 import frc.libs.java.actions.*;
 import frc.robot.Robot;
@@ -43,6 +44,21 @@ public final class Gripper extends Subsystem {
         gripperCylinder.set(false);
     }
 
+    public void dropObject(double timestamp) {
+        double dropTime = 0;
+
+        if (objectInGripper()) {
+            Gripper.getInstance().disableGripper();
+            this.isDroppingObject = true;
+
+            while (Timer.getFPGATimestamp() - 0.25 < timestamp) {
+                System.out.println("dropping");
+            }
+
+            this.isDroppingObject = false;
+        }
+    }
+
     public boolean isDroppingObject() {
         return this.isDroppingObject;
     }
@@ -55,24 +71,6 @@ public final class Gripper extends Subsystem {
         System.out.println("Green: " + colorSensor.getGreen());
         System.out.println("Red: " + colorSensor.getRed());
         System.out.println("Blue: " + colorSensor.getBlue());
-    }
-
-    public void printColorRatiosRed() {
-        System.out.println("Green Ratio: " + (double) colorSensor.getGreen()/colorSensor.getRed());
-        System.out.println("Red Ratio (Should be 1): " + (double) colorSensor.getRed()/colorSensor.getRed());
-        System.out.println("Blue Ratio: " + (double) colorSensor.getBlue()/colorSensor.getRed());
-    }
-
-    public void printColorRatiosBlue() {
-        System.out.println("Green Ratio: " + (double) colorSensor.getGreen()/colorSensor.getBlue());
-        System.out.println("Red Ratio: " + (double) colorSensor.getRed()/colorSensor.getBlue());
-        System.out.println("Blue Ratio (Should be 1): " + (double) colorSensor.getBlue()/colorSensor.getBlue());
-    }
-
-    public void printColorRatiosGreen() {
-        System.out.println("Green Ratio (Should be 1): " + (double) colorSensor.getGreen()/colorSensor.getGreen());
-        System.out.println("Red Ratio: " + (double) colorSensor.getRed()/colorSensor.getGreen());
-        System.out.println("Blue Ratio: " + (double) colorSensor.getBlue()/colorSensor.getGreen());
     }
 
     public void printObject() {
@@ -94,22 +92,6 @@ public final class Gripper extends Subsystem {
             Runnable startMethod = () -> {};
 
             Runnable runMethod = () -> {
-                    //  double dropTime = 0;
-                    //  double timestamp = Timer.getFPGATimestamp();
-
-                    // if (Robot.driverController.getButton(Button.A)) {
-                    //     if (!Gripper.getInstance().isDroppingObject) {
-                    //         Gripper.getInstance().dropObject(timestamp);
-                    //         dropTime = timestamp;
-                    //     }
-                    // } else if (Gripper.getInstance().isDroppingObject && Timer.getFPGATimestamp() - dropTime > 0.25) {
-                    //     Gripper.getInstance().isDroppingObject = false;
-                    // } else if (!Gripper.getInstance().isDroppingObject && Gripper.getInstance().objectInGripper()) {
-                    //     Gripper.getInstance().enableGripper();
-                    // } else {
-                    //     Gripper.getInstance().disableGripper();
-                    // }
-
                     // if (Gripper.getInstance().objectInGripper() == true) {
                     //     if (Gripper.getInstance().colorSensor.getGreen()/Gripper.getInstance().colorSensor.getBlue() > 2.1) {
                     //         System.out.println("CONE GRABBED");

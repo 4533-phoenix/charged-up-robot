@@ -10,14 +10,11 @@ import edu.wpi.first.math.geometry.*;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.trajectory.Trajectory;
-import edu.wpi.first.math.trajectory.TrajectoryConfig;
-import edu.wpi.first.math.trajectory.TrajectoryGenerator;
-import edu.wpi.first.math.trajectory.constraint.MaxVelocityConstraint;
-import edu.wpi.first.math.trajectory.constraint.SwerveDriveKinematicsConstraint;
 import edu.wpi.first.wpilibj.Timer;
 import frc.libs.java.actions.Action;
 import frc.libs.java.actions.Subsystem;
 import frc.libs.java.actions.auto.DrivePathAction;
+import frc.libs.java.actions.auto.LambdaAction;
 import frc.libs.java.actions.auto.SeriesAction;
 
 import java.util.ArrayList;
@@ -28,7 +25,8 @@ public final class Auto extends Subsystem {
     private static Auto mInstance;
 
     private static final Map<String, Action> autoCommands = Map.ofEntries(
-        Map.entry("Test Autonomous", AutoActions.testAutonomous())
+        Map.entry("Test Autonomous", AutoActions.testAutonomous()),
+        Map.entry("Blue Bottom Cube Autonomous", AutoActions.blueBottomCubeAutonomous())
     );
 
     private HolonomicDriveController autoController = new HolonomicDriveController(
@@ -100,28 +98,7 @@ public final class Auto extends Subsystem {
 
             Action cubeRetrievePath = new DrivePathAction(retrievePoints);
 
-            Action getBlueBottomCube = new Action(
-                () -> {}, 
-                () -> {
-                    if (Gripper.getInstance().isDroppingObject()) {
-                        Gripper.getInstance().enableGripper();
-                    }
-                    else {
-                        Gripper.getInstance().disableGripper();
-
-                        try {
-                            Thread.sleep(250);
-                        }
-                        catch (Exception e) {
-                            e.printStackTrace();
-                        }
-
-                        Gripper.getInstance().enableGripper();
-                    }
-                }, 
-                () -> {}, 
-                ActionConstants.WILL_CANCEL
-            );
+            Action getBlueBottomCube = new LambdaAction(() -> Gripper.getInstance().enableGripper());
 
             ArrayList<Pose2d> scorePoints = new ArrayList<Pose2d>(
                 Arrays.asList(
@@ -133,25 +110,7 @@ public final class Auto extends Subsystem {
 
             Action cubeScorePath = new DrivePathAction(scorePoints);
 
-            Action scoreBlueBottomCube = new Action(
-                () -> {}, 
-                () -> {
-                    Extension.getInstance().setExtensionState(ExtensionState.HIGH_ROW);
-
-                    try {
-                        Thread.sleep(1000);
-                    }
-                    catch (Exception e) {
-                        e.printStackTrace();
-                    }
-
-                    Gripper.getInstance().disableGripper();
-                }, 
-                () -> {
-                    Extension.getInstance().setLowerExtensionState(LowerExtensionState.OFF);
-                }, 
-                ActionConstants.WILL_CANCEL
-            );
+            Action scoreBlueBottomCube = new LambdaAction(() -> Gripper.getInstance().dropObject(Timer.getFPGATimestamp()));
 
             return new SeriesAction(
                 cubeRetrievePath,
