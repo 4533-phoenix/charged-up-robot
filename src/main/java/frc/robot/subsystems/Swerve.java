@@ -95,7 +95,10 @@ public final class Swerve extends Subsystem {
     }
 
     public Rotation2d getGyroRotation() {
-        return Rotation2d.fromDegrees(-this.gyro.getAngle());
+        double degrees = -this.gyro.getYaw() + 180.0;
+        degrees %= 360.0;
+
+        return Rotation2d.fromDegrees(degrees);
     }
 
     public SwerveModulePosition[] getModulePositions() {
@@ -175,6 +178,7 @@ public final class Swerve extends Subsystem {
         public static final Action defaultDriveAction() {
             Runnable startMethod = () -> {
                 Swerve.getInstance().drive(new Translation2d(), 0.0, true, true);
+                PoseEstimator.getInstance().resetPoseEstimator(Swerve.getInstance().getGyroRotation(), Swerve.getInstance().getModulePositions());
             };
 
             Runnable runMethod = () -> {
