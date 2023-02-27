@@ -37,11 +37,16 @@ public final class PoseEstimator extends Subsystem {
     }
 
     public Pose2d getSwervePose() {
-        return this.swervePoseEstimator.getEstimatedPosition();
+        return new Pose2d(this.swervePoseEstimator.getEstimatedPosition().getX(),
+            this.swervePoseEstimator.getEstimatedPosition().getY(), this.swervePoseEstimator.getEstimatedPosition().getRotation());
+    }
+
+    public void resetSwervePose() {
+        this.swervePoseEstimator.resetPosition(getSwerveRotation(), Swerve.getInstance().getModulePositions(), new Pose2d());
     }
 
     public Rotation2d getSwerveRotation() {
-        return this.swervePoseEstimator.getEstimatedPosition().getRotation();
+        return this.getSwervePose().getRotation();
     }
 
     public Translation3d getPositionFromVision() {
@@ -70,7 +75,7 @@ public final class PoseEstimator extends Subsystem {
 
     @Override
     public void periodic() {
-        PoseEstimator.getInstance().swervePoseEstimator.update(Swerve.getInstance().getGyroRotation(), Swerve.getInstance().getModulePositions());
+        PoseEstimator.getInstance().swervePoseEstimator.update(Rotation2d.fromDegrees(Swerve.getInstance().getGyroRotation().getDegrees() - Swerve.getInstance().gyroOffset), Swerve.getInstance().getModulePositions());
         // PoseEstimator.getInstance().swervePoseEstimator.addVisionMeasurement(PoseEstimator.getInstance().getVisionPose2d(), Timer.getFPGATimestamp());
     }
 

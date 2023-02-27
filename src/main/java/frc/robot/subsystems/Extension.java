@@ -20,6 +20,7 @@ import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.wpilibj.PneumaticsModuleType;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.DoubleSolenoid.Value;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public final class Extension extends Subsystem {
     private static Extension mInstance;
@@ -48,7 +49,7 @@ public final class Extension extends Subsystem {
         ZERO_INCHES, FIVE_INCHES, SEVEN_INCHES, TWELVE_INCHES, OFF
     }
 
-    public final double[] elbowSetpoints = {12.0, 23.5, 90.8, 170.6};
+    public final double[] elbowSetpoints = {8.0, 25.5, 102.5, 187.0};
 
     public static enum ExtensionState {
         GROUND_INTAKE, OFF_GROUND, MIDDLE_ROW, HIGH_ROW
@@ -99,22 +100,43 @@ public final class Extension extends Subsystem {
         elbowController.setD(ExtensionConstants.ELBOW_KD);
     }
 
+    public void manualRaiseUpperExtension() {
+        armSetpoint += 0.003;
+
+        this.elbowController.setSetpoint(armSetpoint);
+    }
+
+    public void manualLowerUpperExtension() {
+        armSetpoint -= 0.003;
+
+        this.elbowController.setSetpoint(armSetpoint);
+    }
+
     public void setExtensionState(ExtensionState state) {
-        if (elbowController.getSetpoint() > 160.0 / 360.0 && state.equals(ExtensionState.GROUND_INTAKE)) {
+        if (elbowController.getSetpoint() > 160.0 / 360.0 && state.equals(ExtensionState.MIDDLE_ROW)) {
+            double time = Timer.getFPGATimestamp();
+
+            this.setLowerExtensionState(LowerExtensionState.FIVE_INCHES);
+
+            while (Timer.getFPGATimestamp() < time + 0.4) {
+                //System.out.println("waiting");
+            }
+        }
+
+        if (elbowController.getSetpoint() > 160.0 / 360.0 && (state.equals(ExtensionState.GROUND_INTAKE) || state.equals(ExtensionState.OFF_GROUND))) {
             double time = Timer.getFPGATimestamp();
 
             this.setLowerExtensionState(LowerExtensionState.ZERO_INCHES);
 
-            while (Timer.getFPGATimestamp() < time + 0.6) {
-                System.out.println("waiting");
+            while (Timer.getFPGATimestamp() < time + 0.8) {
+                //System.out.println("waiting");
             }
         }
 
         if (elbowController.getSetpoint() < 5.0 / 360.0 && state.equals(ExtensionState.HIGH_ROW)) {
             this.elbowController.setSetpoint(elbowSetpoints[3] / 360.0);
-
-            while (this.getElbowAngle().getDegrees() < 90.0) {
-                System.out.println("waiting");
+            while (this.getElbowAngle().getDegrees() < 120.0) {
+                //System.out.println("waiting");
             }
         }
 
@@ -176,6 +198,8 @@ public final class Extension extends Subsystem {
         double pid = elbowController.calculate(getElbowAngle().getRotations());
         double feedForward = getElbowFeedforward();
         elbowMotor.set(pid + feedForward);
+
+        armSetpoint = elbowController.getSetpoint();
     }
 
     public double getElbowFeedforward() {
@@ -221,11 +245,17 @@ public final class Extension extends Subsystem {
                     Extension.getInstance().setExtensionState(ExtensionState.HIGH_ROW);
                 }
 
+                if (Robot.operatorController.getButton(Button.RB)) {
+                    Extension.getInstance().manualRaiseUpperExtension();
+                } else if (Robot.operatorController.getButton(Button.LB)) {
+                    Extension.getInstance().manualLowerUpperExtension();
+                }
+
                 Extension.getInstance().updateElbowController();
 
-                //  System.out.println("p error: " + Extension.getInstance().getElbowController().getPositionError());
+                // System.out.println("p error: " + Extension.getInstance().getElbowController().getPositionError());
                 // System.out.println("relative: " + Extension.getInstance().getRelativeEncoderPosition());
-                System.out.println("angle: " + Extension.getInstance().getElbowAngle().getDegrees());
+                // System.out.println("angle: " + Extension.getInstance().getElbowAngle().getDegrees());
                 // System.out.println("setpoint: " + Extension.getInstance().getElbowController().getSetpoint());
                 // System.out.println("current: " + Extension.getInstance().elbowMotor.getOutputCurrent());
             };
@@ -239,7 +269,10 @@ public final class Extension extends Subsystem {
     }
 
     @Override
-    public void log() {}
+    public void log() {
+        SmartDashboard.putNumber("Upper arm angle", Extension.getInstance().getElbowAngle().getDegrees());
+        SmartDashboard.putNumber("Upper arm setpoint", Extension.getInstance().armSetpoint * 360.0);
+    }
 
     @Override
     public void periodic() {}
@@ -247,7 +280,8 @@ public final class Extension extends Subsystem {
     @Override
     public void queryInitialActions() {
         Robot.teleopRunner.add(
-            ExtensionActions.defaultExtensionAction()
+            ExtensionActions.defaultExtensionAction(),
+            this.getLoggingAction()
         );
     }
 }

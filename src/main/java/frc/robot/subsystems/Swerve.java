@@ -70,6 +70,8 @@ public final class Swerve extends Subsystem {
     private SlewRateLimiter steerLimiter = new SlewRateLimiter(DriveConstants.DRIVE_MAX_ROTATIONAL_ACCELERATION);
 
     private AHRS gyro = new AHRS(SPI.Port.kMXP);
+
+    public double gyroOffset;
     
     private Swerve() {
         this.zeroGyro();
@@ -94,8 +96,21 @@ public final class Swerve extends Subsystem {
         this.gyro.reset();
     }
 
+    public void zeroYaw() {
+        this.gyro.zeroYaw();
+    }
+
     public Rotation2d getGyroRotation() {
-        return Rotation2d.fromDegrees(-this.gyro.getAngle());
+        // double angle = -this.gyro.getYaw();
+
+        // angle *= Math.PI / 180.0;
+        // angle %= 2.0 * Math.PI;
+        // angle += gyroOffset;
+
+        // if (angle < 0.0)
+        //     angle += 2.0 * Math.PI;
+
+        return Rotation2d.fromDegrees(-this.gyro.getYaw());
     }
 
     public SwerveModulePosition[] getModulePositions() {
@@ -108,7 +123,7 @@ public final class Swerve extends Subsystem {
     }
 
     public void setModuleStates(SwerveModuleState[] desiredStates) {
-        SwerveDriveKinematics.desaturateWheelSpeeds(desiredStates, DriveConstants.DRIVE_MAX_VELOCITY);
+        SwerveDriveKinematics.desaturateWheelSpeeds(desiredStates, DriveConstants.DRIVE_MAX_PHYSICAL_VELOCITY);
 
         frontLeft.setDesiredState(desiredStates[0]);
         frontRight.setDesiredState(desiredStates[1]);
@@ -117,8 +132,8 @@ public final class Swerve extends Subsystem {
     }
 
     public void drive(Translation2d translation, double rotation, boolean fieldRelative, boolean isOpenLoop) {
-        double translationScale = DriveConstants.DRIVE_MAX_VELOCITY / DriveConstants.DRIVE_MAX_PHYSICAL_VELOCITY;
-        double rotationScale = DriveConstants.DRIVE_MAX_ROTATIONAL_VELOCITY / DriveConstants.DRIVE_MAX_PHYSICAL_VELOCITY;
+        double translationScale = DriveConstants.DRIVE_MAX_VELOCITY; // DriveConstants.DRIVE_MAX_PHYSICAL_VELOCITY;
+        double rotationScale = DriveConstants.DRIVE_MAX_ROTATIONAL_VELOCITY; // DriveConstants.DRIVE_MAX_PHYSICAL_VELOCITY;
 
         double xSpeed = translationScale * translation.getX();
         double ySpeed = translationScale * translation.getY();
@@ -147,8 +162,8 @@ public final class Swerve extends Subsystem {
     }
 
     public Translation2d getSwerveTranslation() {
-        double forwardAxis = Robot.driverController.getAxis(Side.LEFT, Axis.Y);
-        double strafeAxis = Robot.driverController.getAxis(Side.LEFT, Axis.X);
+        double forwardAxis = -Robot.driverController.getAxis(Side.LEFT, Axis.Y);
+        double strafeAxis = -Robot.driverController.getAxis(Side.LEFT, Axis.X);
 
         Translation2d tAxes = new Translation2d(forwardAxis, strafeAxis);
 
@@ -162,7 +177,7 @@ public final class Swerve extends Subsystem {
     }
 
     public double getSwerveRotation() {
-        double rotAxis = Math.pow(Robot.driverController.getAxis(Side.RIGHT, Axis.X), 3);
+        double rotAxis = -Math.pow(Robot.driverController.getAxis(Side.RIGHT, Axis.X), 3);
 
         if (Math.abs(rotAxis) < OIConstants.DRIVE_DEADBAND) {
             return 0.0;
@@ -175,6 +190,7 @@ public final class Swerve extends Subsystem {
         public static final Action defaultDriveAction() {
             Runnable startMethod = () -> {
                 Swerve.getInstance().drive(new Translation2d(), 0.0, true, true);
+                Swerve.getInstance().gyroOffset = Swerve.getInstance().getGyroRotation().getDegrees();
             };
 
             Runnable runMethod = () -> {
@@ -197,7 +213,9 @@ public final class Swerve extends Subsystem {
 
             Runnable runMethod = () -> {
                 if (Robot.driverController.getButton(Button.START)) {
-                    Swerve.getInstance().zeroGyro();
+                    Swerve.getInstance().zeroYaw();
+
+                    Swerve.getInstance().gyroOffset = Swerve.getInstance().getGyroRotation().getDegrees();
                 }
             };
 
