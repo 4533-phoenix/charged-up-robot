@@ -2,6 +2,7 @@ package frc.robot.subsystems;
 
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Translation3d;
+import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -47,6 +48,10 @@ public final class PoseEstimator extends Subsystem {
 
     public Rotation2d getSwerveRotation() {
         return this.getSwervePose().getRotation();
+    }
+
+    public void resetPoseEstimator(Rotation2d gyroAngle, SwerveModulePosition[] modulePositions) {
+        this.swervePoseEstimator.resetPosition(gyroAngle, modulePositions, this.initialPose);
     }
 
     public Translation3d getPositionFromVision() {

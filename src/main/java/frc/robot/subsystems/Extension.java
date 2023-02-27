@@ -133,6 +133,14 @@ public final class Extension extends Subsystem {
             }
         }
 
+        // if (elbowController.getSetpoint() > 160.0 / 360.0 && state.equals(ExtensionState.GROUND_INTAKE)) {
+        //     this.setLowerExtensionState(LowerExtensionState.ZERO_INCHES);
+
+        //     while (this.getLowerExtensionLength() > 6) {
+        //         System.out.println("waiting");
+        //     }
+        // }
+
         if (elbowController.getSetpoint() < 5.0 / 360.0 && state.equals(ExtensionState.HIGH_ROW)) {
             this.elbowController.setSetpoint(elbowSetpoints[3] / 360.0);
             while (this.getElbowAngle().getDegrees() < 120.0) {
