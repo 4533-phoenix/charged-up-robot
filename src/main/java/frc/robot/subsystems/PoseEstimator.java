@@ -1,6 +1,6 @@
 package frc.robot.subsystems;
 
-import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
+import frc.robot.subsystems.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -42,6 +42,10 @@ public final class PoseEstimator extends Subsystem {
             this.swervePoseEstimator.getEstimatedPosition().getY(), this.swervePoseEstimator.getEstimatedPosition().getRotation());
     }
 
+    public Pose2d getOdometrySwervePose() {
+        return this.swervePoseEstimator.getOdometry().getPoseMeters();
+    }
+
     public void resetSwervePose() {
         this.swervePoseEstimator.resetPosition(getSwerveRotation(), Swerve.getInstance().getModulePositions(), new Pose2d());
     }
@@ -75,6 +79,8 @@ public final class PoseEstimator extends Subsystem {
     public void log() {
         SmartDashboard.putNumber("Robot Pose - X", this.getSwervePose().getX());
         SmartDashboard.putNumber("Robot Pose - Y", this.getSwervePose().getY());
+        SmartDashboard.putNumber("Odometry Robot Pose - X" , this.getOdometrySwervePose().getX());
+        SmartDashboard.putNumber("Odometry Robot Pose - Y" , this.getOdometrySwervePose().getY());
         SmartDashboard.putNumber("Robot Pose - Angle", this.getSwerveRotation().getDegrees());
     }
 
