@@ -36,6 +36,10 @@ public final class PSController {
         return mController.getRawAxis((left ? 0 : 4) + (y ? 1 : 0));
     }
 
+    public int getPOV() {
+        return mController.getPOV();
+    }
+
     public boolean getTrigger(Side side) {
         return mController.getRawAxis(side == Side.LEFT ? 2 : 3) > OIConstants.TRIGGER_THRESHOLD;
     }
