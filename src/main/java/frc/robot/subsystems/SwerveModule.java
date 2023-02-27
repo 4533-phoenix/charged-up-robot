@@ -7,9 +7,10 @@ import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
 import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.ModuleConstants;
-import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.math.geometry.Rotation2d;
 
@@ -21,7 +22,7 @@ public final class SwerveModule {
     private final RelativeEncoder driveEncoder;
     private final RelativeEncoder steerEncoder;
 
-    private final PIDController steerPIDController;
+    private final ProfiledPIDController steerPIDController;
 
     private final CANCoder absoluteEncoder;
     private final boolean absoluteEncoderReversed;
@@ -59,7 +60,12 @@ public final class SwerveModule {
         this.steerEncoder.setPositionConversionFactor(ModuleConstants.STEER_ENCODER_RADIANS_PER_ROTATION);
         this.steerEncoder.setVelocityConversionFactor(ModuleConstants.STEER_ENCODER_RADIANS_PER_SECOND);
 
-        this.steerPIDController = new PIDController(ModuleConstants.STEER_KP, 0.0, 0.0);
+        this.steerPIDController = new ProfiledPIDController(
+            ModuleConstants.STEER_KP, 
+            0.0, 
+            0.0,
+            new TrapezoidProfile.Constraints(DriveConstants.DRIVE_MAX_ROTATIONAL_VELOCITY, DriveConstants.DRIVE_MAX_ROTATIONAL_ACCELERATION)
+        );
         this.steerPIDController.enableContinuousInput(-Math.PI, Math.PI);
 
         this.resetEncoders();
