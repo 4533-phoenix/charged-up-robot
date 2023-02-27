@@ -132,12 +132,9 @@ public final class Swerve extends Subsystem {
     }
 
     public void drive(Translation2d translation, double rotation, boolean fieldRelative, boolean isOpenLoop) {
-        double translationScale = DriveConstants.DRIVE_MAX_VELOCITY; // DriveConstants.DRIVE_MAX_PHYSICAL_VELOCITY;
-        double rotationScale = DriveConstants.DRIVE_MAX_ROTATIONAL_VELOCITY; // DriveConstants.DRIVE_MAX_PHYSICAL_VELOCITY;
-
-        double xSpeed = translationScale * translation.getX();
-        double ySpeed = translationScale * translation.getY();
-        double steerSpeed = rotationScale * rotation;
+        double xSpeed = DriveConstants.DRIVE_MAX_VELOCITY * translation.getX();
+        double ySpeed = DriveConstants.DRIVE_MAX_VELOCITY * translation.getY();
+        double steerSpeed = DriveConstants.DRIVE_MAX_ROTATIONAL_VELOCITY * rotation;
 
         xSpeed = Math.abs(xSpeed) > OIConstants.DRIVE_DEADBAND ? xSpeed : 0.0;
         ySpeed = Math.abs(ySpeed) > OIConstants.DRIVE_DEADBAND ? ySpeed : 0.0;
