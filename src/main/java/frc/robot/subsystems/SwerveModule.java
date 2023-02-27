@@ -150,7 +150,7 @@ public final class SwerveModule {
 
         state = SwerveModuleState.optimize(state, this.getState().angle);
 
-        this.driveMotor.set(state.speedMetersPerSecond / DriveConstants.DRIVE_MAX_VELOCITY);
+        this.driveMotor.set(state.speedMetersPerSecond / DriveConstants.DRIVE_MAX_PHYSICAL_VELOCITY);
         this.steerMotor.set(this.steerPIDController.calculate(this.getSteerPosition(), state.angle.getRadians()));
     }
 
