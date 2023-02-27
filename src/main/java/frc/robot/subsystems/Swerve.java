@@ -77,6 +77,8 @@ public final class Swerve extends Subsystem {
         new TrapezoidProfile.Constraints(DriveConstants.DRIVE_MAX_ROTATIONAL_VELOCITY, DriveConstants.DRIVE_MAX_ROTATIONAL_ACCELERATION)
     );
 
+    private double rotationSetpoint;
+
     private AHRS gyro = new AHRS(SPI.Port.kMXP);
     
     private Swerve() {
@@ -168,7 +170,7 @@ public final class Swerve extends Subsystem {
         }
     }
 
-    public double getSwerveRotation() {
+    public double getSwerveRotationSetpoint() {
         double rotAxis = Math.pow(Robot.driverController.getAxis(Side.RIGHT, Axis.X), 3);
 
         if (Math.abs(rotAxis) < OIConstants.DRIVE_DEADBAND) {

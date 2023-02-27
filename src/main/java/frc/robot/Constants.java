@@ -167,7 +167,7 @@ public final class Constants {
         public static final int DRIVER_ROT_AXIS = 4;
         
 		// Deadband for drive axes
-        public static final double DRIVE_DEADBAND = 0.05;
+        public static final double DRIVE_DEADBAND = 0.025;
 
 		// Threshold for trigger being pressed
 		public static final double TRIGGER_THRESHOLD = 0.2;
