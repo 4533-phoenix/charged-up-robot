@@ -147,7 +147,7 @@ public final class Constants {
         public static final int GRIPPER_PCM_PORT = 0;
         public static final int DISTANCE_SENSOR_PORT = 0;
 
-        public static final double DISTANCE_VOLTAGE_THRESHOLD = 1.7;
+        public static final double DISTANCE_VOLTAGE_THRESHOLD = 2.1;
     }
 
 	public static final class OIConstants {

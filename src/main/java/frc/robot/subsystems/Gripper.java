@@ -73,17 +73,17 @@ public final class Gripper extends Subsystem {
         System.out.println("Blue: " + colorSensor.getBlue());
     }
 
-    public void printObject() {
+    public String getObject() {
         if (objectInGripper() == true) {
             if (colorSensor.getGreen()/colorSensor.getBlue() > 2.1) {
-                System.out.println("Cone");
+                return "Cone";
             }
             else {
-                System.out.println("Cube");
+                return "Cube";
             }
         }
         else {
-            System.out.println("Nothing");
+            return "Nothing";
         }
     }
 
@@ -106,12 +106,17 @@ public final class Gripper extends Subsystem {
                     //     Gripper.getInstance().disableGripper();
                     // }
 
-
-                    if (Robot.driverController.getButton(Button.X)) {
-                        Gripper.getInstance().enableGripper();
-                    } else if (Robot.driverController.getButton(Button.Y)) {
+                    if (Robot.driverController.getButton(Button.Y)) {
                         Gripper.getInstance().disableGripper();
+                    } else if (Gripper.getInstance().objectInGripper()) {
+                        Gripper.getInstance().enableGripper();
                     }
+
+                    // if (Robot.driverController.getButton(Button.X)) {
+                    //     Gripper.getInstance().enableGripper();
+                    // } else if (Robot.driverController.getButton(Button.Y)) {
+                    //     Gripper.getInstance().disableGripper();
+                    // }
 
                     //System.out.println("voltage: " + Gripper.getInstance().distanceSensor.getVoltage());
                     //Gripper.getInstance().printObject();

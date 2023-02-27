@@ -71,7 +71,7 @@ public final class Swerve extends Subsystem {
 
     private AHRS gyro = new AHRS(SPI.Port.kMXP);
 
-    public double gyroOffset;
+    public double initialGyroOffset;
     
     private Swerve() {
         this.zeroGyro();
@@ -187,7 +187,7 @@ public final class Swerve extends Subsystem {
         public static final Action defaultDriveAction() {
             Runnable startMethod = () -> {
                 Swerve.getInstance().drive(new Translation2d(), 0.0, true, true);
-                Swerve.getInstance().gyroOffset = Swerve.getInstance().getGyroRotation().getDegrees();
+                Swerve.getInstance().initialGyroOffset = Swerve.getInstance().getGyroRotation().getDegrees();
             };
 
             Runnable runMethod = () -> {
@@ -211,8 +211,6 @@ public final class Swerve extends Subsystem {
             Runnable runMethod = () -> {
                 if (Robot.driverController.getButton(Button.START)) {
                     Swerve.getInstance().zeroYaw();
-
-                    Swerve.getInstance().gyroOffset = Swerve.getInstance().getGyroRotation().getDegrees();
                 }
             };
 
@@ -224,7 +222,7 @@ public final class Swerve extends Subsystem {
 
     @Override
     public void log() {
-        SmartDashboard.putNumber("Gyro Yaw", this.gyro.getYaw());
+        SmartDashboard.putNumber("Gyro Heading", this.getGyroRotation().getDegrees());
         SmartDashboard.putNumber("Gyro Pitch", this.gyro.getPitch());
         SmartDashboard.putNumber("Gyro Roll", this.gyro.getRoll());
     }

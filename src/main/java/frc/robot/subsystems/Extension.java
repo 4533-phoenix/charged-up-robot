@@ -49,10 +49,10 @@ public final class Extension extends Subsystem {
         ZERO_INCHES, FIVE_INCHES, SEVEN_INCHES, TWELVE_INCHES, OFF
     }
 
-    public final double[] elbowSetpoints = {8.0, 25.5, 102.5, 187.0};
+    public final double[] elbowSetpoints = {9.0, 12.0, 25.5, 102.5, 187.0};
 
     public static enum ExtensionState {
-        GROUND_INTAKE, OFF_GROUND, MIDDLE_ROW, HIGH_ROW
+        GROUND_LOW_INTAKE, GROUND_HIGH_INTAKE, OFF_GROUND, MIDDLE_ROW, HIGH_ROW
     }
 
     private Extension() {
@@ -113,24 +113,25 @@ public final class Extension extends Subsystem {
     }
 
     public void setExtensionState(ExtensionState state) {
+        double startTime;
+        double startSetpoint;
+
+        boolean inWaiting;
+
         if (elbowController.getSetpoint() > 160.0 / 360.0 && state.equals(ExtensionState.MIDDLE_ROW)) {
             double time = Timer.getFPGATimestamp();
 
             this.setLowerExtensionState(LowerExtensionState.FIVE_INCHES);
 
-            while (Timer.getFPGATimestamp() < time + 0.4) {
-                //System.out.println("waiting");
-            }
+            while (Timer.getFPGATimestamp() < time + 0.4) {}
         }
 
-        if (elbowController.getSetpoint() > 160.0 / 360.0 && (state.equals(ExtensionState.GROUND_INTAKE) || state.equals(ExtensionState.OFF_GROUND))) {
+        if (elbowController.getSetpoint() > 160.0 / 360.0 && (state.equals(ExtensionState.GROUND_LOW_INTAKE) || state.equals(ExtensionState.GROUND_HIGH_INTAKE) || state.equals(ExtensionState.OFF_GROUND))) {
             double time = Timer.getFPGATimestamp();
 
             this.setLowerExtensionState(LowerExtensionState.ZERO_INCHES);
 
-            while (Timer.getFPGATimestamp() < time + 0.8) {
-                //System.out.println("waiting");
-            }
+            while (Timer.getFPGATimestamp() < time + 0.8) {}
         }
 
         // if (elbowController.getSetpoint() > 160.0 / 360.0 && state.equals(ExtensionState.GROUND_INTAKE)) {
@@ -149,21 +150,25 @@ public final class Extension extends Subsystem {
         }
 
         switch (state) {
-            case GROUND_INTAKE:
+            case GROUND_LOW_INTAKE:
                 this.setLowerExtensionState(LowerExtensionState.ZERO_INCHES);
                 this.elbowController.setSetpoint(elbowSetpoints[0] / 360.0);
                 break;
-            case OFF_GROUND:
+            case GROUND_HIGH_INTAKE:
                 this.setLowerExtensionState(LowerExtensionState.ZERO_INCHES);
                 this.elbowController.setSetpoint(elbowSetpoints[1] / 360.0);
                 break;
+            case OFF_GROUND:
+                this.setLowerExtensionState(LowerExtensionState.ZERO_INCHES);
+                this.elbowController.setSetpoint(elbowSetpoints[2] / 360.0);
+                break;
             case MIDDLE_ROW:
                 this.setLowerExtensionState(LowerExtensionState.FIVE_INCHES);
-                this.elbowController.setSetpoint(elbowSetpoints[2] / 360.0);
+                this.elbowController.setSetpoint(elbowSetpoints[3] / 360.0);
                 break;
             case HIGH_ROW:
                 this.setLowerExtensionState(LowerExtensionState.TWELVE_INCHES);
-                this.elbowController.setSetpoint(elbowSetpoints[3] / 360.0);
+                this.elbowController.setSetpoint(elbowSetpoints[4] / 360.0);
                 break;
         }
     }
@@ -239,12 +244,14 @@ public final class Extension extends Subsystem {
                 Extension.getInstance().initialAbsoluteEncoderPosition = Extension.getInstance().getAbsoluteEncoderAbsolutePosition() - Extension.getInstance().elbowAbsoluteEncoder.getPositionOffset();
                 Extension.getInstance().elbowRelativeEncoder.reset();
                 Extension.getInstance().configureElbowController();
-                Extension.getInstance().setExtensionState(ExtensionState.GROUND_INTAKE);
+                Extension.getInstance().setExtensionState(ExtensionState.GROUND_LOW_INTAKE);
             };
 
             Runnable runMethod = () -> {
                 if (Robot.operatorController.getButton(Button.Y)) {
-                    Extension.getInstance().setExtensionState(ExtensionState.GROUND_INTAKE);
+                    Extension.getInstance().setExtensionState(ExtensionState.GROUND_LOW_INTAKE);
+                } else if (Robot.operatorController.getButton(Button.LB)) {
+                    Extension.getInstance().setExtensionState(ExtensionState.GROUND_HIGH_INTAKE);
                 } else if (Robot.operatorController.getButton(Button.X)) {
                     Extension.getInstance().setExtensionState(ExtensionState.OFF_GROUND);
                 } else if (Robot.operatorController.getButton(Button.B)) {
