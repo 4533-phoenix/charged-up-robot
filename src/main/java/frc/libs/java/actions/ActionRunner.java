@@ -1,6 +1,5 @@
 package frc.libs.java.actions;
 
-import java.lang.Thread.State;
 import java.util.ArrayList;
 
 public final class ActionRunner {
@@ -26,16 +25,24 @@ public final class ActionRunner {
         for (int i = 0; i < this.actions.size(); i++) {
             Action action = this.actions.get(i);
 
-            if (action.willThreadRun() && action.getState() == State.NEW) {
+            if (action.willThreadRun() && !action.hasStarted()) {
+                System.out.println("Starting action!!!");
+
+                action.setStarted();
+
                 action.start();
 
                 while (!action.getThreadLock().isLocked()) {}
             }
-            else {
+            else if (!action.willThreadRun()) {
+                System.out.println("Running action!!!");
+
                 action.run();
             }
 
-            if (action.willThreadRun() && action.getState() == State.TERMINATED) {
+            if (action.willThreadRun() && action.isFinished()) {
+                System.out.println("Terminating action!!!");
+
                 action.runEnd();
 
                 this.actions.remove(i);

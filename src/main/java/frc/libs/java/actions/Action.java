@@ -15,6 +15,8 @@ public class Action extends Thread {
 
     private boolean isFinished;
 
+    private boolean hasStarted = false;
+
     public Action(Runnable startMethod, Runnable runMethod, Runnable endMethod, boolean willCancel) {
         super(runMethod);
 
@@ -47,6 +49,8 @@ public class Action extends Thread {
 
         runMethod.run();
 
+        this.isFinished = true;
+
         if (this.willThreadRun()) {
             try {
                 this.getThreadLock().unlock();
@@ -57,8 +61,6 @@ public class Action extends Thread {
 
     public void runEnd() {
         this.endMethod.run();
-
-        this.isFinished = true;
     }
 
     public boolean willThreadRun() {
@@ -67,6 +69,14 @@ public class Action extends Thread {
 
     public boolean isFinished() {
         return this.isFinished;
+    }
+
+    public boolean hasStarted() {
+        return this.hasStarted;
+    }
+
+    public void setStarted() {
+        this.hasStarted = true;
     }
 
     public ReentrantLock getThreadLock() {

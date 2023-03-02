@@ -250,7 +250,7 @@ public final class Extension extends Subsystem {
             Runnable runMethod = () -> {
                 if (Robot.operatorController.getButton(Button.Y)) {
                     Extension.getInstance().setExtensionState(ExtensionState.GROUND_LOW_INTAKE);
-                } else if (Robot.operatorController.getButton(Button.LB)) {
+                } else if (Robot.operatorController.getButton(Button.BACK)) {
                     Extension.getInstance().setExtensionState(ExtensionState.GROUND_HIGH_INTAKE);
                 } else if (Robot.operatorController.getButton(Button.X)) {
                     Extension.getInstance().setExtensionState(ExtensionState.OFF_GROUND);
