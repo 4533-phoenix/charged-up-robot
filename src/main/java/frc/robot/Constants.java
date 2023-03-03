@@ -104,8 +104,11 @@ public final class Constants {
 
         public static final double DRIVE_MAX_PHYSICAL_VELOCITY = Units.feetToMeters(14.6);
 
-        public static final double DRIVE_MAX_VELOCITY = Units.feetToMeters(5.0);
-        public static final double DRIVE_MAX_ROTATIONAL_VELOCITY = 0.5 * 2.0 * Math.PI; // rad/s
+        public static final double DRIVE_MAX_VELOCITY = Units.feetToMeters(7.0);
+        public static final double DRIVE_MAX_ROTATIONAL_VELOCITY = 1.0 * 2.0 * Math.PI; // rad/s
+
+        public static final double DRIVE_MAX_VELOCITY_SLOW = Units.feetToMeters(3.0);
+        public static final double DRIVE_MAX_ROTATIONAL_VELOCITY_SLOW = 0.4  * 2.0 * Math.PI; // rad/s
 
         public static final double DRIVE_MAX_ACCELERATION = 10.0; // m/s^2
         public static final double DRIVE_MAX_ROTATIONAL_ACCELERATION = 7.0; // rad/s^2
@@ -148,7 +151,7 @@ public final class Constants {
         public static final int DISTANCE_SENSOR_PORT = 0;
 
         public static final double DISTANCE_VOLTAGE_THRESHOLD_CUBE = 2.3;
-        public static final double DISTANCE_VOLTAGE_THRESHOLD_CONE = 2.5;
+        public static final double DISTANCE_VOLTAGE_THRESHOLD_CONE = 2.3;
     }
 
 	public static final class OIConstants {

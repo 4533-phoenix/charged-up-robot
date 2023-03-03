@@ -71,6 +71,8 @@ public final class Swerve extends Subsystem {
 
     private AHRS gyro = new AHRS(SPI.Port.kMXP);
 
+    public boolean slowMode;
+
     public double initialGyroOffset;
     
     private Swerve() {
@@ -132,9 +134,17 @@ public final class Swerve extends Subsystem {
     }
 
     public void drive(Translation2d translation, double rotation, boolean fieldRelative, boolean isOpenLoop) {
-        double xSpeed = DriveConstants.DRIVE_MAX_VELOCITY * translation.getX();
-        double ySpeed = DriveConstants.DRIVE_MAX_VELOCITY * translation.getY();
-        double steerSpeed = DriveConstants.DRIVE_MAX_ROTATIONAL_VELOCITY * rotation;
+        double xSpeed, ySpeed, steerSpeed;
+
+        if (slowMode) {
+            xSpeed = DriveConstants.DRIVE_MAX_VELOCITY_SLOW * translation.getX();
+            ySpeed = DriveConstants.DRIVE_MAX_VELOCITY_SLOW * translation.getY();
+            steerSpeed = DriveConstants.DRIVE_MAX_ROTATIONAL_VELOCITY_SLOW * rotation;
+        } else {
+            xSpeed = DriveConstants.DRIVE_MAX_VELOCITY * translation.getX();
+            ySpeed = DriveConstants.DRIVE_MAX_VELOCITY * translation.getY();
+            steerSpeed = DriveConstants.DRIVE_MAX_ROTATIONAL_VELOCITY * rotation;
+        }
 
         xSpeed = Math.abs(xSpeed) > OIConstants.DRIVE_DEADBAND ? xSpeed : 0.0;
         ySpeed = Math.abs(ySpeed) > OIConstants.DRIVE_DEADBAND ? ySpeed : 0.0;
@@ -191,11 +201,21 @@ public final class Swerve extends Subsystem {
             };
 
             Runnable runMethod = () -> {
+                if (Robot.driverController.getButton(Button.RB)) {
+                    Swerve.getInstance().slowMode = true;
+                } else {
+                    Swerve.getInstance().slowMode = false;
+                }
+
                 Translation2d swerveTranslation = Swerve.getInstance().getSwerveTranslation();
                 
                 double swerveRotation = Swerve.getInstance().getSwerveRotation();
 
-                Swerve.getInstance().drive(swerveTranslation, swerveRotation, true, true);
+                if (Robot.driverController.getButton(Button.LB)) {
+                    Swerve.getInstance().drive(swerveTranslation, swerveRotation, false, true);
+                } else {
+                    Swerve.getInstance().drive(swerveTranslation, swerveRotation, true, true);
+                }
             };
 
             Runnable endMethod = () -> {

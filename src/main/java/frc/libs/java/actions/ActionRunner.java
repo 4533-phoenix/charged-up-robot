@@ -26,8 +26,6 @@ public final class ActionRunner {
             Action action = this.actions.get(i);
 
             if (action.willThreadRun() && !action.hasStarted()) {
-                System.out.println("Starting action!!!");
-
                 action.setStarted();
 
                 action.start();
@@ -35,14 +33,10 @@ public final class ActionRunner {
                 while (!action.getThreadLock().isLocked()) {}
             }
             else if (!action.willThreadRun()) {
-                System.out.println("Running action!!!");
-
                 action.run();
             }
 
             if (action.willThreadRun() && action.isFinished()) {
-                System.out.println("Terminating action!!!");
-
                 action.runEnd();
 
                 this.actions.remove(i);

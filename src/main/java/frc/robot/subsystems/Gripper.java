@@ -63,6 +63,10 @@ public final class Gripper extends Subsystem {
         return this.isDroppingObject;
     }
 
+    public boolean objectInGripper() {
+        return distanceSensor.getVoltage() > GripperConstants.DISTANCE_VOLTAGE_THRESHOLD_CUBE;
+    }
+
     public boolean cubeInGripper() {
         return distanceSensor.getVoltage() > GripperConstants.DISTANCE_VOLTAGE_THRESHOLD_CUBE && this.getObject().equals("Cube");
     }
@@ -107,9 +111,7 @@ public final class Gripper extends Subsystem {
 
                     if (Robot.driverController.getButton(Button.Y)) {
                         Gripper.getInstance().disableGripper();
-                    } else if (Gripper.getInstance().cubeInGripper()) {
-                        Gripper.getInstance().enableGripper();
-                    } else if (Gripper.getInstance().coneInGripper()) {
+                    } else if (Gripper.getInstance().objectInGripper()) {
                         Gripper.getInstance().enableGripper();
                     }
 
@@ -119,7 +121,7 @@ public final class Gripper extends Subsystem {
                     //     Gripper.getInstance().disableGripper();
                     // }
 
-                    //System.out.println("voltage: " + Gripper.getInstance().distanceSensor.getVoltage());
+                    System.out.println("voltage: " + Gripper.getInstance().distanceSensor.getVoltage());
                     //Gripper.getInstance().printObject();
             };
 
