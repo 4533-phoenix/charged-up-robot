@@ -79,11 +79,16 @@ public final class Auto extends Subsystem {
             ArrayList<Pose2d> trajectoryPoints = new ArrayList<Pose2d>(
                 Arrays.asList(
                     startPose,
-                    new Pose2d(startPose.getX() + 2.0, startPose.getY(), startPose.getRotation())
+                    new Pose2d(startPose.getX() + 2.0, startPose.getY() - 1.0, startPose.getRotation()),
+                    new Pose2d(startPose.getX() + 4.0, startPose.getY(), startPose.getRotation())
                 )
             );
 
             Action driveTestPathAction = new DrivePathAction(trajectoryPoints);
+
+            Action armToMidAction = new LambdaAction(() -> Extension.getInstance().setExtensionState(ExtensionState.MIDDLE_ROW));
+
+            Action testAuto = new SeriesAction(driveTestPathAction, armToMidAction);
 
             return driveTestPathAction.withSubsystem(Auto.getInstance());
         }
