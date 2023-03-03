@@ -84,6 +84,8 @@ public final class Swerve extends Subsystem {
     private Swerve() {
         this.zeroGyro();
 
+        this.rotationController.enableContinuousInput(-Math.PI, Math.PI);
+
         this.swerveMods = new SwerveModule[] {
            frontLeft,
            frontRight,
@@ -171,12 +173,15 @@ public final class Swerve extends Subsystem {
     }
 
     public double getSwerveRotationSetpoint() {
+        int rotPOV = Robot.driverController.getPOV();
         double rotAxis = Math.pow(Robot.driverController.getAxis(Side.RIGHT, Axis.X), 3);
 
-        if (Math.abs(rotAxis) < OIConstants.DRIVE_DEADBAND) {
-            return 0.0;
-        } else {
-            return rotAxis;
+        if (rotPOV != -1) {
+            this.rotationSetpoint = (double) rotPOV * Math.PI / 180.0;
+
+            return (double) rotPOV * Math.PI / 180.0;
+        } else if (Math.abs(rotAxis) > OIConstants.DRIVE_DEADBAND) {
+            
         }
     }
 
