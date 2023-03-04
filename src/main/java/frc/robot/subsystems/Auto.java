@@ -1,8 +1,6 @@
 package frc.robot.subsystems;
 
 import frc.robot.Constants.*;
-import frc.robot.subsystems.Extension.ExtensionState;
-import frc.robot.subsystems.Extension.LowerExtensionState;
 import frc.robot.Robot;
 
 import edu.wpi.first.math.controller.*;
@@ -79,7 +77,7 @@ public final class Auto extends Subsystem {
             ArrayList<Pose2d> trajectoryPoints = new ArrayList<Pose2d>(
                 Arrays.asList(
                     startPose,
-                    new Pose2d(startPose.getX() + 1.0, startPose.getY(), startPose.getRotation())
+                    new Pose2d(startPose.getX() + 1.0, startPose.getY() + 1.0, startPose.getRotation())
                 )
             );
 
@@ -103,8 +101,8 @@ public final class Auto extends Subsystem {
             ArrayList<Pose2d> scorePoints = new ArrayList<Pose2d>(
                 Arrays.asList(
                     new Pose2d(6.49, 0.91, new Rotation2d()),
-                    new Pose2d(2.71, 0.91, Rotation2d.fromDegrees(180)),
-                    new Pose2d(1.80, 2.69, Rotation2d.fromDegrees(180))
+                    new Pose2d(2.71, 0.91, Rotation2d.fromDegrees(180.0)),
+                    new Pose2d(1.80, 2.69, Rotation2d.fromDegrees(180.0))
                 )
             );
 

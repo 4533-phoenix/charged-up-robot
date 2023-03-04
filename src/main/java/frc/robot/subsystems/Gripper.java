@@ -45,8 +45,6 @@ public final class Gripper extends Subsystem {
     }
 
     public void dropObject(double timestamp) {
-        double dropTime = 0;
-
         if (objectInGripper()) {
             Gripper.getInstance().disableGripper();
             this.isDroppingObject = true;

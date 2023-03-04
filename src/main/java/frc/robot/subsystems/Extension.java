@@ -7,13 +7,10 @@ import frc.robot.controls.PSController.Button;
 
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
-import com.revrobotics.SparkMaxAbsoluteEncoder.Type;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.wpilibj.Encoder;
-import com.revrobotics.CANSparkMax.ControlType;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.controller.ArmFeedforward;
-import com.revrobotics.RelativeEncoder;
 import edu.wpi.first.wpilibj.DutyCycleEncoder;
 import edu.wpi.first.wpilibj.AnalogInput;
 import edu.wpi.first.wpilibj.DoubleSolenoid;
@@ -113,11 +110,6 @@ public final class Extension extends Subsystem {
     }
 
     public void setExtensionState(ExtensionState state) {
-        double startTime;
-        double startSetpoint;
-
-        boolean inWaiting;
-
         if (elbowController.getSetpoint() > 160.0 / 360.0 && state.equals(ExtensionState.MIDDLE_ROW)) {
             double time = Timer.getFPGATimestamp();
 

@@ -2,7 +2,6 @@ package frc.libs.java.actions.auto;
 
 import frc.libs.java.actions.*;
 import edu.wpi.first.math.trajectory.*;
-import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import frc.robot.Constants.*;

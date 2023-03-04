@@ -3,5 +3,5 @@
   "robotLength": 0.6223,
   "holonomicMode": true,
   "generateJSON": false,
-  "generateCSV": true
+  "generateCSV": false
 }
