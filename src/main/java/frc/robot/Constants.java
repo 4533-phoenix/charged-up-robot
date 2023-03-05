@@ -110,6 +110,10 @@ public final class Constants {
         public static final double DRIVE_MAX_VELOCITY_SLOW = Units.feetToMeters(3.0);
         public static final double DRIVE_MAX_ROTATIONAL_VELOCITY_SLOW = 0.4  * 2.0 * Math.PI; // rad/s
 
+        public static final double DRIVE_ROTATION_KP = 0.1;
+        public static final double DRIVE_ROTATION_KI = 0.0;
+        public static final double DRIVE_ROTATION_KD = 0.0;
+
         public static final double DRIVE_MAX_ACCELERATION = 10.0; // m/s^2
         public static final double DRIVE_MAX_ROTATIONAL_ACCELERATION = 7.0; // rad/s^2
     }
@@ -167,7 +171,7 @@ public final class Constants {
         public static final int DRIVER_ROT_AXIS = 4;
         
 		// Deadband for drive axes
-        public static final double DRIVE_DEADBAND = 0.05;
+        public static final double DRIVE_DEADBAND = 0.025;
 
 		// Threshold for trigger being pressed
 		public static final double TRIGGER_THRESHOLD = 0.2;

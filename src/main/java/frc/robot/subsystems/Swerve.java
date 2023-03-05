@@ -17,6 +17,9 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.math.trajectory.TrapezoidProfile;
+import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
@@ -67,7 +70,14 @@ public final class Swerve extends Subsystem {
 
     private SlewRateLimiter xLimiter = new SlewRateLimiter(DriveConstants.DRIVE_MAX_ACCELERATION);
     private SlewRateLimiter yLimiter = new SlewRateLimiter(DriveConstants.DRIVE_MAX_ACCELERATION);
-    private SlewRateLimiter steerLimiter = new SlewRateLimiter(DriveConstants.DRIVE_MAX_ROTATIONAL_ACCELERATION);
+    
+    private ProfiledPIDController rotationController = new ProfiledPIDController(DriveConstants.DRIVE_ROTATION_KP,
+        DriveConstants.DRIVE_ROTATION_KI, 
+        DriveConstants.DRIVE_ROTATION_KD, 
+        new TrapezoidProfile.Constraints(DriveConstants.DRIVE_MAX_ROTATIONAL_VELOCITY, DriveConstants.DRIVE_MAX_ROTATIONAL_ACCELERATION)
+    );
+
+    private double rotationSetpoint;
 
     private AHRS gyro = new AHRS(SPI.Port.kMXP);
 
@@ -77,6 +87,8 @@ public final class Swerve extends Subsystem {
     
     private Swerve() {
         this.zeroGyro();
+
+        this.rotationController.enableContinuousInput(-Math.PI, Math.PI);
 
         this.swerveMods = new SwerveModule[] {
            frontLeft,
@@ -152,7 +164,6 @@ public final class Swerve extends Subsystem {
 
         xSpeed = xLimiter.calculate(xSpeed);
         ySpeed = yLimiter.calculate(ySpeed);
-        steerSpeed = steerLimiter.calculate(steerSpeed);
 
         ChassisSpeeds chassisSpeeds;
         if (fieldRelative) {
@@ -183,14 +194,17 @@ public final class Swerve extends Subsystem {
         }
     }
 
-    public double getSwerveRotation() {
-        double rotAxis = -Math.pow(Robot.driverController.getAxis(Side.RIGHT, Axis.X), 3);
+    public double getSwerveRotationSetpoint() {
+        int rotPOV = Robot.driverController.getPOV();
+        double rotAxis = Math.pow(Robot.driverController.getAxis(Side.RIGHT, Axis.X), 3);
 
-        if (Math.abs(rotAxis) < OIConstants.DRIVE_DEADBAND) {
-            return 0.0;
-        } else {
-            return rotAxis;
+        if (rotPOV != -1) {
+            this.rotationSetpoint = (double) rotPOV * Math.PI / 180.0;;
+        } else if (Math.abs(rotAxis) > OIConstants.DRIVE_DEADBAND) {
+            this.rotationSetpoint += DriveConstants.DRIVE_MAX_VELOCITY * GlobalConstants.LOOPER_TIME * rotAxis;
         }
+
+        return this.rotationSetpoint;
     }
 
     private static final class SwerveActions {
@@ -209,7 +223,7 @@ public final class Swerve extends Subsystem {
 
                 Translation2d swerveTranslation = Swerve.getInstance().getSwerveTranslation();
                 
-                double swerveRotation = Swerve.getInstance().getSwerveRotation();
+                double swerveRotation = Swerve.getInstance().getGyroRotation().getRadians();
 
                 if (Robot.driverController.getButton(Button.LB)) {
                     Swerve.getInstance().drive(swerveTranslation, swerveRotation, false, true);
