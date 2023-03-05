@@ -177,12 +177,12 @@ public final class Swerve extends Subsystem {
         double rotAxis = Math.pow(Robot.driverController.getAxis(Side.RIGHT, Axis.X), 3);
 
         if (rotPOV != -1) {
-            this.rotationSetpoint = (double) rotPOV * Math.PI / 180.0;
-
-            return (double) rotPOV * Math.PI / 180.0;
+            this.rotationSetpoint = (double) rotPOV * Math.PI / 180.0;;
         } else if (Math.abs(rotAxis) > OIConstants.DRIVE_DEADBAND) {
-            
+            this.rotationSetpoint += DriveConstants.DRIVE_MAX_VELOCITY * GlobalConstants.LOOPER_TIME * rotAxis;
         }
+
+        return this.rotationSetpoint;
     }
 
     private static final class SwerveActions {
@@ -195,7 +195,7 @@ public final class Swerve extends Subsystem {
             Runnable runMethod = () -> {
                 Translation2d swerveTranslation = Swerve.getInstance().getSwerveTranslation();
                 
-                double swerveRotation = Swerve.getInstance().getSwerveRotation();
+                double swerveRotation = Swerve.getInstance().getGyroRotation().getRadians();
 
                 Swerve.getInstance().drive(swerveTranslation, swerveRotation, true, true);
             };
