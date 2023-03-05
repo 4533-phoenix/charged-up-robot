@@ -45,7 +45,7 @@ public final class Extension extends Subsystem {
 
     private double armSetpoint;
 
-    private ExtensionState prevState;
+    private ExtensionState prevState = ExtensionState.OFF_GROUND;
     private double startSetpoint;
     private double currTime, startTime, waitTime;
     private boolean armInWaiting = false;
@@ -54,7 +54,7 @@ public final class Extension extends Subsystem {
         ZERO_INCHES, FIVE_INCHES, SEVEN_INCHES, TWELVE_INCHES, OFF
     }
 
-    public final double[] elbowSetpoints = {9.0, 13.5, 37.5, 102.5, 187.0};
+    public final double[] elbowSetpoints = {9.0, 13.5, 37.5, 98.5, 187.0};
 
     public static enum ExtensionState {
         GROUND_LOW_INTAKE, GROUND_HIGH_INTAKE, OFF_GROUND, MIDDLE_ROW, HIGH_ROW, LOWER, HIGHER
@@ -118,7 +118,9 @@ public final class Extension extends Subsystem {
     }
 
     public void updateExtensionState() {
-        updateExtensionState(prevState);
+        if (armInWaiting) {
+            updateExtensionState(prevState);
+        }
     }
 
     public void updateExtensionState(ExtensionState state) {
@@ -163,10 +165,12 @@ public final class Extension extends Subsystem {
                         this.elbowController.setSetpoint(elbowSetpoints[4] / 360.0);
                         break;
                     case HIGHER:
-                        this.elbowController.setSetpoint(armSetpoint += 0.003);
+                        this.armSetpoint += 0.003;
+                        this.elbowController.setSetpoint(armSetpoint);
                         break;
                     case LOWER:
-                        this.elbowController.setSetpoint(armSetpoint -= 0.003);
+                        this.armSetpoint -= 0.003;
+                        this.elbowController.setSetpoint(armSetpoint);
                         break;
                 }
             }
