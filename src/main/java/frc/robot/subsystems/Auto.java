@@ -86,7 +86,7 @@ public final class Auto extends Subsystem {
 
             Action driveTestPathAction = new DrivePathAction(trajectoryPoints);
 
-            Action armToMidAction = new LambdaAction(() -> Extension.getInstance().setExtensionState(ExtensionState.MIDDLE_ROW));
+            Action armToMidAction = new LambdaAction(() -> Extension.getInstance().updateExtensionState(ExtensionState.MIDDLE_ROW));
 
             Action testAuto = new SeriesAction(driveTestPathAction, armToMidAction);
 
@@ -130,7 +130,10 @@ public final class Auto extends Subsystem {
     public void log() {}
 
     @Override
-    public void periodic() {}
+    public void periodic() {
+        Extension.getInstance().updateExtensionState();
+        Extension.getInstance().updateElbowController();
+    }
 
     @Override
     public void queryInitialActions() {

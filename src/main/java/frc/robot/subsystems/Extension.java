@@ -45,14 +45,19 @@ public final class Extension extends Subsystem {
 
     private double armSetpoint;
 
+    private ExtensionState prevState;
+    private double startSetpoint;
+    private double currTime, startTime, waitTime;
+    private boolean armInWaiting = false;
+
     enum LowerExtensionState {
         ZERO_INCHES, FIVE_INCHES, SEVEN_INCHES, TWELVE_INCHES, OFF
     }
 
-    public final double[] elbowSetpoints = {9.0, 13.5, 25.5, 102.5, 187.0};
+    public final double[] elbowSetpoints = {9.0, 13.5, 37.5, 102.5, 187.0};
 
     public static enum ExtensionState {
-        GROUND_LOW_INTAKE, GROUND_HIGH_INTAKE, OFF_GROUND, MIDDLE_ROW, HIGH_ROW
+        GROUND_LOW_INTAKE, GROUND_HIGH_INTAKE, OFF_GROUND, MIDDLE_ROW, HIGH_ROW, LOWER, HIGHER
     }
 
     private Extension() {
@@ -112,59 +117,63 @@ public final class Extension extends Subsystem {
         this.elbowController.setSetpoint(armSetpoint);
     }
 
-    public void setExtensionState(ExtensionState state) {
-        // double time, startTime;
-        // double setpoint, startSetpoint;
+    public void updateExtensionState() {
+        updateExtensionState(prevState);
+    }
 
-        // startTime = Timer.getFPGATimestamp();
-        // startSetpoint = elbowController.getSetpoint();
+    public void updateExtensionState(ExtensionState state) {
+        this.currTime = Timer.getFPGATimestamp();
+        this.startSetpoint = elbowController.getSetpoint();
 
-        // boolean inWaiting = true;
+        if (armInWaiting && currTime - startTime > waitTime) {
+            armInWaiting = false;
+        }
 
-        // if (Timer.getFPGATimestamp() < startTime + 0.4 && startSetpoint > 160.0 / 360.0 && state.equals(ExtensionState.MIDDLE_ROW)) {
-        //     this.setLowerExtensionState(LowerExtensionState.FIVE_INCHES);
-        // } else if (Timer.getFPGATimestamp() < startTime + 0.8 && elbowController.getSetpoint() > 160.0 / 360.0 && (state.equals(ExtensionState.GROUND_LOW_INTAKE) || state.equals(ExtensionState.GROUND_HIGH_INTAKE) || state.equals(ExtensionState.OFF_GROUND))) {
-        //     this.setLowerExtensionState(LowerExtensionState.ZERO_INCHES);
-        // } else {
-        //     inWaiting = false;
-        // }
-
-        // if (elbowController.getSetpoint() > 160.0 / 360.0 && state.equals(ExtensionState.GROUND_INTAKE)) {
-        //     this.setLowerExtensionState(LowerExtensionState.ZERO_INCHES);
-
-        //     while (this.getLowerExtensionLength() > 6) {
-        //         System.out.println("waiting");
-        //     }
-        // }
-
-        // if (elbowController.getSetpoint() < 5.0 / 360.0 && state.equals(ExtensionState.HIGH_ROW)) {
-        //     this.elbowController.setSetpoint(elbowSetpoints[3] / 360.0);
-        //     while (this.getElbowAngle().getDegrees() < 120.0) {
-        //         //System.out.println("waiting");
-        //     }
-        // }
-
-        switch (state) {
-            case GROUND_LOW_INTAKE:
-                this.setLowerExtensionState(LowerExtensionState.ZERO_INCHES);
-                this.elbowController.setSetpoint(elbowSetpoints[0] / 360.0);
-                break;
-            case GROUND_HIGH_INTAKE:
-                this.setLowerExtensionState(LowerExtensionState.ZERO_INCHES);
-                this.elbowController.setSetpoint(elbowSetpoints[1] / 360.0);
-                break;
-            case OFF_GROUND:
-                this.setLowerExtensionState(LowerExtensionState.ZERO_INCHES);
-                this.elbowController.setSetpoint(elbowSetpoints[2] / 360.0);
-                break;
-            case MIDDLE_ROW:
+        if (!armInWaiting) {
+            if (prevState.equals(ExtensionState.HIGH_ROW) && state.equals(ExtensionState.MIDDLE_ROW)) {
                 this.setLowerExtensionState(LowerExtensionState.FIVE_INCHES);
-                this.elbowController.setSetpoint(elbowSetpoints[3] / 360.0);
-                break;
-            case HIGH_ROW:
-                this.setLowerExtensionState(LowerExtensionState.TWELVE_INCHES);
-                this.elbowController.setSetpoint(elbowSetpoints[4] / 360.0);
-                break;
+                this.startTime = currTime;
+                this.waitTime = 0.4;
+                this.armInWaiting = true;
+            } else if (prevState.equals(ExtensionState.HIGH_ROW) && (state.equals(ExtensionState.GROUND_LOW_INTAKE) || state.equals(ExtensionState.GROUND_HIGH_INTAKE) || state.equals(ExtensionState.OFF_GROUND))) {
+                this.setLowerExtensionState(LowerExtensionState.ZERO_INCHES);
+                this.startTime = currTime;
+                this.waitTime = 0.8;
+                this.armInWaiting = true;
+            } else {
+                switch (state) {
+                    case GROUND_LOW_INTAKE:
+                        this.setLowerExtensionState(LowerExtensionState.ZERO_INCHES);
+                        this.elbowController.setSetpoint(elbowSetpoints[0] / 360.0);
+                        break;
+                    case GROUND_HIGH_INTAKE:
+                        this.setLowerExtensionState(LowerExtensionState.ZERO_INCHES);
+                        this.elbowController.setSetpoint(elbowSetpoints[1] / 360.0);
+                        break;
+                    case OFF_GROUND:
+                        this.setLowerExtensionState(LowerExtensionState.ZERO_INCHES);
+                        this.elbowController.setSetpoint(elbowSetpoints[2] / 360.0);
+                        break;
+                    case MIDDLE_ROW:
+                        this.setLowerExtensionState(LowerExtensionState.FIVE_INCHES);
+                        this.elbowController.setSetpoint(elbowSetpoints[3] / 360.0);
+                        break;
+                    case HIGH_ROW:
+                        this.setLowerExtensionState(LowerExtensionState.TWELVE_INCHES);
+                        this.elbowController.setSetpoint(elbowSetpoints[4] / 360.0);
+                        break;
+                    case HIGHER:
+                        this.elbowController.setSetpoint(armSetpoint += 0.003);
+                        break;
+                    case LOWER:
+                        this.elbowController.setSetpoint(armSetpoint -= 0.003);
+                        break;
+                }
+            }
+        }
+
+        if (!state.equals(ExtensionState.HIGHER) && ! state.equals(ExtensionState.LOWER)) {
+            this.prevState = state;
         }
     }
 
@@ -215,14 +224,6 @@ public final class Extension extends Subsystem {
         return feedForward;
     }
 
-    public void upperExtensionUp() {
-        elbowMotor.set(-0.25);
-    }
-
-    public void upperExtensionDown() {
-        elbowMotor.set(0.25);
-    }
-
     public void upperExtensionStop() {
         elbowMotor.stopMotor();
     }
@@ -239,26 +240,26 @@ public final class Extension extends Subsystem {
                 Extension.getInstance().initialAbsoluteEncoderPosition = Extension.getInstance().getAbsoluteEncoderAbsolutePosition() - Extension.getInstance().elbowAbsoluteEncoder.getPositionOffset();
                 Extension.getInstance().elbowRelativeEncoder.reset();
                 Extension.getInstance().configureElbowController();
-                Extension.getInstance().setExtensionState(ExtensionState.GROUND_LOW_INTAKE);
+                Extension.getInstance().updateExtensionState(ExtensionState.GROUND_LOW_INTAKE);
             };
 
             Runnable runMethod = () -> {
                 if (Robot.operatorController.getButton(Button.Y)) {
-                    Extension.getInstance().setExtensionState(ExtensionState.GROUND_LOW_INTAKE);
+                    Extension.getInstance().updateExtensionState(ExtensionState.GROUND_LOW_INTAKE);
                 } else if (Robot.operatorController.getButton(Button.BACK)) {
-                    Extension.getInstance().setExtensionState(ExtensionState.GROUND_HIGH_INTAKE);
+                    Extension.getInstance().updateExtensionState(ExtensionState.GROUND_HIGH_INTAKE);
                 } else if (Robot.operatorController.getButton(Button.X)) {
-                    Extension.getInstance().setExtensionState(ExtensionState.OFF_GROUND);
+                    Extension.getInstance().updateExtensionState(ExtensionState.OFF_GROUND);
                 } else if (Robot.operatorController.getButton(Button.B)) {
-                    Extension.getInstance().setExtensionState(ExtensionState.MIDDLE_ROW);
+                    Extension.getInstance().updateExtensionState(ExtensionState.MIDDLE_ROW);
                 } else if (Robot.operatorController.getButton(Button.A)) {
-                    Extension.getInstance().setExtensionState(ExtensionState.HIGH_ROW);
-                }
-
-                if (Robot.operatorController.getButton(Button.RB)) {
-                    Extension.getInstance().manualRaiseUpperExtension();
+                    Extension.getInstance().updateExtensionState(ExtensionState.HIGH_ROW);
+                } else if (Robot.operatorController.getButton(Button.RB)) {
+                    Extension.getInstance().updateExtensionState(ExtensionState.HIGHER);
                 } else if (Robot.operatorController.getButton(Button.LB)) {
-                    Extension.getInstance().manualLowerUpperExtension();
+                    Extension.getInstance().updateExtensionState(ExtensionState.LOWER);
+                } else {
+                    Extension.getInstance().updateExtensionState();
                 }
 
                 Extension.getInstance().updateElbowController();
