@@ -79,11 +79,16 @@ public final class Auto extends Subsystem {
             ArrayList<Pose2d> trajectoryPoints = new ArrayList<Pose2d>(
                 Arrays.asList(
                     startPose,
-                    new Pose2d(startPose.getX() + 1.0, startPose.getY(), startPose.getRotation())
+                    new Pose2d(startPose.getX() + 2.0, startPose.getY() - 1.0, startPose.getRotation()),
+                    new Pose2d(startPose.getX() + 4.0, startPose.getY(), startPose.getRotation())
                 )
             );
 
             Action driveTestPathAction = new DrivePathAction(trajectoryPoints);
+
+            Action armToMidAction = new LambdaAction(() -> Extension.getInstance().updateExtensionState(ExtensionState.MIDDLE_ROW));
+
+            Action testAuto = new SeriesAction(driveTestPathAction, armToMidAction);
 
             return driveTestPathAction.withSubsystem(Auto.getInstance());
         }
@@ -110,13 +115,13 @@ public final class Auto extends Subsystem {
 
             Action cubeScorePath = new DrivePathAction(scorePoints);
 
-            Action scoreBlueBottomCube = new LambdaAction(() -> Gripper.getInstance().dropObject(Timer.getFPGATimestamp()));
+            // Action scoreBlueBottomCube = new LambdaAction(() -> Gripper.getInstance().dropObject(Timer.getFPGATimestamp()));
 
             return new SeriesAction(
                 cubeRetrievePath,
                 getBlueBottomCube,
-                cubeScorePath,
-                scoreBlueBottomCube
+                cubeScorePath
+                // scoreBlueBottomCube
             ).withSubsystem(Auto.getInstance());
         }
     }
@@ -125,7 +130,10 @@ public final class Auto extends Subsystem {
     public void log() {}
 
     @Override
-    public void periodic() {}
+    public void periodic() {
+        Extension.getInstance().updateExtensionState();
+        Extension.getInstance().updateElbowController();
+    }
 
     @Override
     public void queryInitialActions() {

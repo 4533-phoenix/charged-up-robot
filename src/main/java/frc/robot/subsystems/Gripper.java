@@ -44,27 +44,35 @@ public final class Gripper extends Subsystem {
         gripperCylinder.set(false);
     }
 
-    public void dropObject(double timestamp) {
-        double dropTime = 0;
+    // public void dropObject(double timestamp) {
+    //     double dropTime = 0;
 
-        if (objectInGripper()) {
-            Gripper.getInstance().disableGripper();
-            this.isDroppingObject = true;
+    //     if (objectInGripper()) {
+    //         Gripper.getInstance().disableGripper();
+    //         this.isDroppingObject = true;
 
-            while (Timer.getFPGATimestamp() - 0.25 < timestamp) {
-                System.out.println("dropping");
-            }
+    //         while (Timer.getFPGATimestamp() - 0.25 < timestamp) {
+    //             System.out.println("dropping");
+    //         }
 
-            this.isDroppingObject = false;
-        }
-    }
+    //         this.isDroppingObject = false;
+    //     }
+    // }
 
     public boolean isDroppingObject() {
         return this.isDroppingObject;
     }
 
     public boolean objectInGripper() {
-        return distanceSensor.getVoltage() > GripperConstants.DISTANCE_VOLTAGE_THRESHOLD;
+        return distanceSensor.getVoltage() > GripperConstants.DISTANCE_VOLTAGE_THRESHOLD_CUBE;
+    }
+
+    public boolean cubeInGripper() {
+        return distanceSensor.getVoltage() > GripperConstants.DISTANCE_VOLTAGE_THRESHOLD_CUBE && this.getObject().equals("Cube");
+    }
+
+    public boolean coneInGripper() {
+        return distanceSensor.getVoltage() > GripperConstants.DISTANCE_VOLTAGE_THRESHOLD_CONE && this.getObject().equals("Cone");
     }
 
     public void printColor() {
@@ -73,17 +81,12 @@ public final class Gripper extends Subsystem {
         System.out.println("Blue: " + colorSensor.getBlue());
     }
 
-    public void printObject() {
-        if (objectInGripper() == true) {
-            if (colorSensor.getGreen()/colorSensor.getBlue() > 2.1) {
-                System.out.println("Cone");
-            }
-            else {
-                System.out.println("Cube");
-            }
+    public String getObject() {
+        if (colorSensor.getGreen()/colorSensor.getBlue() > 2.1) {
+            return "Cone";
         }
         else {
-            System.out.println("Nothing");
+            return "Cube";
         }
     }
 
@@ -106,14 +109,19 @@ public final class Gripper extends Subsystem {
                     //     Gripper.getInstance().disableGripper();
                     // }
 
-
-                    if (Robot.driverController.getButton(Button.X)) {
-                        Gripper.getInstance().enableGripper();
-                    } else if (Robot.driverController.getButton(Button.Y)) {
+                    if (Robot.driverController.getButton(Button.Y)) {
                         Gripper.getInstance().disableGripper();
+                    } else if (Gripper.getInstance().objectInGripper()) {
+                        Gripper.getInstance().enableGripper();
                     }
 
-                    //System.out.println("voltage: " + Gripper.getInstance().distanceSensor.getVoltage());
+                    // if (Robot.driverController.getButton(Button.X)) {
+                    //     Gripper.getInstance().enableGripper();
+                    // } else if (Robot.driverController.getButton(Button.Y)) {
+                    //     Gripper.getInstance().disableGripper();
+                    // }
+
+                    System.out.println("voltage: " + Gripper.getInstance().distanceSensor.getVoltage());
                     //Gripper.getInstance().printObject();
             };
 

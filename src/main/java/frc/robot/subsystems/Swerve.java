@@ -80,6 +80,10 @@ public final class Swerve extends Subsystem {
     private double rotationSetpoint;
 
     private AHRS gyro = new AHRS(SPI.Port.kMXP);
+
+    public boolean slowMode;
+
+    public double initialGyroOffset;
     
     private Swerve() {
         this.zeroGyro();
@@ -106,11 +110,21 @@ public final class Swerve extends Subsystem {
         this.gyro.reset();
     }
 
-    public Rotation2d getGyroRotation() {
-        double degrees = -this.gyro.getYaw() + 180.0;
-        degrees %= 360.0;
+    public void zeroYaw() {
+        this.gyro.zeroYaw();
+    }
 
-        return Rotation2d.fromDegrees(degrees);
+    public Rotation2d getGyroRotation() {
+        // double angle = -this.gyro.getYaw();
+
+        // angle *= Math.PI / 180.0;
+        // angle %= 2.0 * Math.PI;
+        // angle += gyroOffset;
+
+        // if (angle < 0.0)
+        //     angle += 2.0 * Math.PI;
+
+        return Rotation2d.fromDegrees(-this.gyro.getYaw());
     }
 
     public SwerveModulePosition[] getModulePositions() {
@@ -123,7 +137,7 @@ public final class Swerve extends Subsystem {
     }
 
     public void setModuleStates(SwerveModuleState[] desiredStates) {
-        SwerveDriveKinematics.desaturateWheelSpeeds(desiredStates, DriveConstants.DRIVE_MAX_VELOCITY);
+        SwerveDriveKinematics.desaturateWheelSpeeds(desiredStates, DriveConstants.DRIVE_MAX_PHYSICAL_VELOCITY);
 
         frontLeft.setDesiredState(desiredStates[0]);
         frontRight.setDesiredState(desiredStates[1]);
@@ -132,9 +146,17 @@ public final class Swerve extends Subsystem {
     }
 
     public void drive(Translation2d translation, double rotation, boolean fieldRelative, boolean isOpenLoop) {
-        double xSpeed = DriveConstants.DRIVE_MAX_VELOCITY * translation.getX();
-        double ySpeed = DriveConstants.DRIVE_MAX_VELOCITY * translation.getY();
-        double steerSpeed = DriveConstants.DRIVE_MAX_ROTATIONAL_VELOCITY * rotation;
+        double xSpeed, ySpeed, steerSpeed;
+
+        if (slowMode) {
+            xSpeed = DriveConstants.DRIVE_MAX_VELOCITY_SLOW * translation.getX();
+            ySpeed = DriveConstants.DRIVE_MAX_VELOCITY_SLOW * translation.getY();
+            steerSpeed = DriveConstants.DRIVE_MAX_ROTATIONAL_VELOCITY_SLOW * rotation;
+        } else {
+            xSpeed = DriveConstants.DRIVE_MAX_VELOCITY * translation.getX();
+            ySpeed = DriveConstants.DRIVE_MAX_VELOCITY * translation.getY();
+            steerSpeed = DriveConstants.DRIVE_MAX_ROTATIONAL_VELOCITY * rotation;
+        }
 
         xSpeed = Math.abs(xSpeed) > OIConstants.DRIVE_DEADBAND ? xSpeed : 0.0;
         ySpeed = Math.abs(ySpeed) > OIConstants.DRIVE_DEADBAND ? ySpeed : 0.0;
@@ -158,8 +180,8 @@ public final class Swerve extends Subsystem {
     }
 
     public Translation2d getSwerveTranslation() {
-        double forwardAxis = Robot.driverController.getAxis(Side.LEFT, Axis.Y);
-        double strafeAxis = Robot.driverController.getAxis(Side.LEFT, Axis.X);
+        double forwardAxis = -Robot.driverController.getAxis(Side.LEFT, Axis.Y);
+        double strafeAxis = -Robot.driverController.getAxis(Side.LEFT, Axis.X);
 
         Translation2d tAxes = new Translation2d(forwardAxis, strafeAxis);
 
@@ -189,15 +211,25 @@ public final class Swerve extends Subsystem {
         public static final Action defaultDriveAction() {
             Runnable startMethod = () -> {
                 Swerve.getInstance().drive(new Translation2d(), 0.0, true, true);
-                PoseEstimator.getInstance().resetPoseEstimator(Swerve.getInstance().getGyroRotation(), Swerve.getInstance().getModulePositions());
+                Swerve.getInstance().initialGyroOffset = Swerve.getInstance().getGyroRotation().getDegrees();
             };
 
             Runnable runMethod = () -> {
+                if (Robot.driverController.getButton(Button.RB)) {
+                    Swerve.getInstance().slowMode = true;
+                } else {
+                    Swerve.getInstance().slowMode = false;
+                }
+
                 Translation2d swerveTranslation = Swerve.getInstance().getSwerveTranslation();
                 
                 double swerveRotation = Swerve.getInstance().getGyroRotation().getRadians();
 
-                Swerve.getInstance().drive(swerveTranslation, swerveRotation, true, true);
+                if (Robot.driverController.getButton(Button.LB)) {
+                    Swerve.getInstance().drive(swerveTranslation, swerveRotation, false, true);
+                } else {
+                    Swerve.getInstance().drive(swerveTranslation, swerveRotation, true, true);
+                }
             };
 
             Runnable endMethod = () -> {
@@ -212,7 +244,7 @@ public final class Swerve extends Subsystem {
 
             Runnable runMethod = () -> {
                 if (Robot.driverController.getButton(Button.START)) {
-                    Swerve.getInstance().zeroGyro();
+                    Swerve.getInstance().zeroYaw();
                 }
             };
 
@@ -224,7 +256,7 @@ public final class Swerve extends Subsystem {
 
     @Override
     public void log() {
-        SmartDashboard.putNumber("Gyro Yaw", this.gyro.getYaw());
+        SmartDashboard.putNumber("Gyro Heading", this.getGyroRotation().getDegrees());
         SmartDashboard.putNumber("Gyro Pitch", this.gyro.getPitch());
         SmartDashboard.putNumber("Gyro Roll", this.gyro.getRoll());
     }
