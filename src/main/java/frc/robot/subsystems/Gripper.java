@@ -111,7 +111,7 @@ public final class Gripper extends Subsystem {
 
                     if (Robot.driverController.getButton(Button.Y)) {
                         Gripper.getInstance().disableGripper();
-                    } else if (Gripper.getInstance().objectInGripper()) {
+                    } else if (Robot.driverController.getButton(Button.X)) {
                         Gripper.getInstance().enableGripper();
                     }
 
@@ -121,7 +121,7 @@ public final class Gripper extends Subsystem {
                     //     Gripper.getInstance().disableGripper();
                     // }
 
-                    System.out.println("voltage: " + Gripper.getInstance().distanceSensor.getVoltage());
+                    // System.out.println("voltage: " + Gripper.getInstance().distanceSensor.getVoltage());
                     //Gripper.getInstance().printObject();
             };
 
