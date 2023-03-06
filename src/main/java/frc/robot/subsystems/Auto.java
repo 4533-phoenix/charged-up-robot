@@ -8,7 +8,6 @@ import edu.wpi.first.math.geometry.*;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.trajectory.Trajectory;
-import edu.wpi.first.wpilibj.Timer;
 import frc.libs.java.actions.Action;
 import frc.libs.java.actions.Subsystem;
 import frc.libs.java.actions.auto.DrivePathAction;

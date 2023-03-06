@@ -8,7 +8,7 @@ public class LambdaAction extends Action {
         void f();
     }
 
-    VoidInterface mF;
+    private VoidInterface mF;
 
     public LambdaAction(VoidInterface f) {
         super(() -> {}, () -> {}, () -> {}, ActionConstants.WILL_CANCEL);

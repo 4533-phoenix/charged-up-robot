@@ -23,12 +23,14 @@ public final class SeriesAction extends Action {
         this.mRemainingActions.forEach(Action::runStart);
 
         for (Action action : mRemainingActions) {
-            if (action.willThreadRun() && action.getState() == State.NEW) {
+            if (action.willThreadRun() && !action.hasStarted()) {
                 action.withSubsystem(new Subsystem());
+
+                action.setStarted();
 
                 action.start();
 
-                while (action.getState() != State.TERMINATED) {}
+                while (!action.isFinished()) {}
             }
             else {
                 action.run();
