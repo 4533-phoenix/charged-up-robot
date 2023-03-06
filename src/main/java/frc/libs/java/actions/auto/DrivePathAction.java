@@ -18,6 +18,8 @@ public final class DrivePathAction extends Action {
 
     private Rotation2d rotation;
 
+    private double startTime;
+
     public DrivePathAction(List<Pose2d> waypoints) {
         super(() -> {}, () -> {}, () -> {}, ActionConstants.WILL_CANCEL);
 
@@ -33,7 +35,7 @@ public final class DrivePathAction extends Action {
             finally {}
         }
 
-        double startTime = Timer.getFPGATimestamp();
+        this.startTime = Timer.getFPGATimestamp();
 
         while (Timer.getFPGATimestamp() - startTime <= this.mTrajectory.getTotalTimeSeconds()) {
             Trajectory.State currState = this.mTrajectory.sample(Timer.getFPGATimestamp() - startTime);

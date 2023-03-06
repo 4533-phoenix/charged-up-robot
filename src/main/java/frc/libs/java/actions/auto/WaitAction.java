@@ -7,6 +7,8 @@ import edu.wpi.first.wpilibj.Timer;
 public final class WaitAction extends Action {
     private final double mTime;
 
+    private double startTime;
+
     public WaitAction(double time) {
         super(() -> {}, () -> {}, () -> {}, ActionConstants.WILL_CANCEL);
 
@@ -22,9 +24,11 @@ public final class WaitAction extends Action {
             finally {}
         }
 
-        double startTime = Timer.getFPGATimestamp();
+        this.startTime = Timer.getFPGATimestamp();
 
         while (Timer.getFPGATimestamp() - startTime <= this.mTime) {}
+
+        this.isFinished = true;
 
         if (this.willThreadRun()) {
             try {

@@ -13,6 +13,7 @@ import frc.libs.java.actions.Subsystem;
 import frc.libs.java.actions.auto.DrivePathAction;
 import frc.libs.java.actions.auto.LambdaAction;
 import frc.libs.java.actions.auto.SeriesAction;
+import frc.libs.java.actions.auto.WaitAction;
 import frc.robot.subsystems.Extension.ExtensionState;
 
 import java.util.ArrayList;
@@ -77,18 +78,24 @@ public final class Auto extends Subsystem {
             ArrayList<Pose2d> trajectoryPoints = new ArrayList<Pose2d>(
                 Arrays.asList(
                     startPose,
-                    new Pose2d(startPose.getX() + 2.0, startPose.getY() - 1.0, startPose.getRotation()),
-                    new Pose2d(startPose.getX() + 4.0, startPose.getY(), startPose.getRotation())
+                    new Pose2d(startPose.getX() + 1.0, startPose.getY(), startPose.getRotation())
                 )
             );
 
             Action driveTestPathAction = new DrivePathAction(trajectoryPoints);
 
-            Action armToMidAction = new LambdaAction(() -> Extension.getInstance().updateExtensionState(ExtensionState.MIDDLE_ROW));
+            Action testAuto = new SeriesAction(
+                new LambdaAction(() -> Extension.getInstance().updateExtensionState(ExtensionState.HIGH_ROW)),
+                new LambdaAction(() -> Gripper.getInstance().enableGripper()),
+                new LambdaAction(() -> Swerve.getInstance().setModuleStates(DriveConstants.SWERVE_KINEMATICS.toSwerveModuleStates(new ChassisSpeeds()))),
+                new WaitAction(4.0),
+                new LambdaAction(() -> Gripper.getInstance().disableGripper()),
+                new WaitAction(0.5),
+                new LambdaAction(() -> Extension.getInstance().updateExtensionState(ExtensionState.OFF_GROUND)),
+                driveTestPathAction
+            );
 
-            Action testAuto = new SeriesAction(driveTestPathAction, armToMidAction);
-
-            return driveTestPathAction.withSubsystem(Auto.getInstance());
+            return testAuto.withSubsystem(Auto.getInstance());
         }
 
         public static final Action blueBottomCubeAutonomous() {

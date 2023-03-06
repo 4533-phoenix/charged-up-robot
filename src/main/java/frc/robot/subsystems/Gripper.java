@@ -34,13 +34,13 @@ public final class Gripper extends Subsystem {
     public void enableGripper() {
         this.isDroppingObject = false;
 
-        gripperCylinder.set(true);
+        gripperCylinder.set(false);
     }
 
     public void disableGripper() {
         this.isDroppingObject = true;
 
-        gripperCylinder.set(false);
+        gripperCylinder.set(true);
     }
 
     // public void dropObject(double timestamp) {

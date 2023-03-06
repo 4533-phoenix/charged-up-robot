@@ -13,7 +13,7 @@ public class Action extends Thread {
 
     private ReentrantLock threadLock = new ReentrantLock();
 
-    private boolean isFinished;
+    public boolean isFinished;
 
     private boolean hasStarted = false;
 
@@ -29,8 +29,10 @@ public class Action extends Thread {
         this.willThreadRun = willCancel;
     }
 
-    public Action withSubsystem(Subsystem subsystem) {
-        this.threadLock = subsystem.getSubsystemThreadLock();
+    public Action withSubsystem(Subsystem... subsystems) {
+        for (Subsystem s : subsystems) {
+            this.threadLock = s.getSubsystemThreadLock();
+        }
 
         return this;
     }

@@ -27,6 +27,8 @@ public class LambdaAction extends Action {
 
         this.mF.f();
 
+        this.isFinished = true;
+
         if (this.willThreadRun()) {
             try {
                 this.getThreadLock().unlock();
