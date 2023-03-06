@@ -44,25 +44,35 @@ public final class Gripper extends Subsystem {
         gripperCylinder.set(false);
     }
 
-    public void dropObject(double timestamp) {
-        if (objectInGripper()) {
-            Gripper.getInstance().disableGripper();
-            this.isDroppingObject = true;
+    // public void dropObject(double timestamp) {
+    //     double dropTime = 0;
 
-            while (Timer.getFPGATimestamp() - 0.25 < timestamp) {
-                System.out.println("dropping");
-            }
+    //     if (objectInGripper()) {
+    //         Gripper.getInstance().disableGripper();
+    //         this.isDroppingObject = true;
 
-            this.isDroppingObject = false;
-        }
-    }
+    //         while (Timer.getFPGATimestamp() - 0.25 < timestamp) {
+    //             System.out.println("dropping");
+    //         }
+
+    //         this.isDroppingObject = false;
+    //     }
+    // }
 
     public boolean isDroppingObject() {
         return this.isDroppingObject;
     }
 
     public boolean objectInGripper() {
-        return distanceSensor.getVoltage() > GripperConstants.DISTANCE_VOLTAGE_THRESHOLD;
+        return distanceSensor.getVoltage() > GripperConstants.DISTANCE_VOLTAGE_THRESHOLD_CUBE;
+    }
+
+    public boolean cubeInGripper() {
+        return distanceSensor.getVoltage() > GripperConstants.DISTANCE_VOLTAGE_THRESHOLD_CUBE && this.getObject().equals("Cube");
+    }
+
+    public boolean coneInGripper() {
+        return distanceSensor.getVoltage() > GripperConstants.DISTANCE_VOLTAGE_THRESHOLD_CONE && this.getObject().equals("Cone");
     }
 
     public void printColor() {
@@ -72,16 +82,11 @@ public final class Gripper extends Subsystem {
     }
 
     public String getObject() {
-        if (objectInGripper() == true) {
-            if (colorSensor.getGreen()/colorSensor.getBlue() > 2.1) {
-                return "Cone";
-            }
-            else {
-                return "Cube";
-            }
+        if (colorSensor.getGreen()/colorSensor.getBlue() > 2.1) {
+            return "Cone";
         }
         else {
-            return "Nothing";
+            return "Cube";
         }
     }
 
@@ -116,7 +121,7 @@ public final class Gripper extends Subsystem {
                     //     Gripper.getInstance().disableGripper();
                     // }
 
-                    //System.out.println("voltage: " + Gripper.getInstance().distanceSensor.getVoltage());
+                    System.out.println("voltage: " + Gripper.getInstance().distanceSensor.getVoltage());
                     //Gripper.getInstance().printObject();
             };
 

@@ -35,21 +35,31 @@ public final class DrivePathAction extends Action {
 
         double startTime = Timer.getFPGATimestamp();
 
+        boolean autoDone = false;
+
+        System.out.println("total time: " + this.mTrajectory.getTotalTimeSeconds());
+
         while (Timer.getFPGATimestamp() - startTime <= this.mTrajectory.getTotalTimeSeconds()) {
             Trajectory.State currState = this.mTrajectory.sample(Timer.getFPGATimestamp() - startTime);
 
             rotation = Rotation2d.fromRadians(currState.curvatureRadPerMeter * currState.velocityMetersPerSecond);
 
-            ChassisSpeeds chassisSpeeds = Auto.getInstance().getAutoController().calculate(
-                PoseEstimator.getInstance().getSwervePose(),
-                currState,
-                rotation
-            );
+            if (!autoDone) {
+                ChassisSpeeds chassisSpeeds = Auto.getInstance().getAutoController().calculate(
+                    PoseEstimator.getInstance().getSwervePose(),
+                    currState,
+                    rotation
+                );
 
-            SwerveModuleState[] swerveModuleStates = DriveConstants.SWERVE_KINEMATICS.toSwerveModuleStates(chassisSpeeds);
+                SwerveModuleState[] swerveModuleStates = DriveConstants.SWERVE_KINEMATICS.toSwerveModuleStates(chassisSpeeds);
 
-            Swerve.getInstance().setModuleStates(swerveModuleStates);
+                Swerve.getInstance().setModuleStates(swerveModuleStates);
+            }
         }
+
+        autoDone = true;
+
+        System.out.println("done. time: " + (Timer.getFPGATimestamp() - startTime));
         
         Swerve.getInstance().setModuleStates(DriveConstants.SWERVE_KINEMATICS.toSwerveModuleStates(new ChassisSpeeds()));
 
