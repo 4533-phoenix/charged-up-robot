@@ -108,9 +108,9 @@ public final class Gripper extends Subsystem {
                     //     Gripper.getInstance().disableGripper();
                     // }
 
-                    if (Robot.driverController.getButton(Button.Y)) {
+                    if (Robot.operatorController.getTrigger(Side.LEFT)) {
                         Gripper.getInstance().disableGripper();
-                    } else if (Robot.driverController.getButton(Button.X)) {
+                    } else if (Robot.operatorController.getTrigger(Side.RIGHT)) {
                         Gripper.getInstance().enableGripper();
                     }
 

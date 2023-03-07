@@ -11,6 +11,7 @@ import frc.robot.Constants.*;
 import com.kauailabs.navx.frc.AHRS;
 
 import edu.wpi.first.wpilibj.SPI;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
@@ -69,6 +70,7 @@ public final class Swerve extends Subsystem {
 
     private SlewRateLimiter xLimiter = new SlewRateLimiter(DriveConstants.DRIVE_MAX_ACCELERATION);
     private SlewRateLimiter yLimiter = new SlewRateLimiter(DriveConstants.DRIVE_MAX_ACCELERATION);
+    private SlewRateLimiter steerLimiter = new SlewRateLimiter(DriveConstants.DRIVE_MAX_ROTATIONAL_ACCELERATION);
     
     private ProfiledPIDController rotationController = new ProfiledPIDController(
         DriveConstants.DRIVE_ROTATION_KP,
@@ -77,9 +79,13 @@ public final class Swerve extends Subsystem {
         new TrapezoidProfile.Constraints(DriveConstants.DRIVE_MAX_ROTATIONAL_VELOCITY, DriveConstants.DRIVE_MAX_ROTATIONAL_ACCELERATION)
     );
 
-    private double rotationSetpoint = 0.0;
-
     private AHRS gyro = new AHRS(SPI.Port.kMXP);
+
+    private boolean isSnapping = false;
+
+    private double snapSetpoint;
+
+    private double snapStartTime;
 
     public boolean slowMode;
 
@@ -145,24 +151,26 @@ public final class Swerve extends Subsystem {
         backRight.setDesiredState(desiredStates[3]);
     }
 
-    public void drive(Translation2d translation, double rotationSetpoint, boolean fieldRelative, boolean isOpenLoop) {
+    public void drive(Translation2d translation, double rotation, boolean fieldRelative, boolean isOpenLoop) {
         double xSpeed, ySpeed, steerSpeed;
 
         if (slowMode) {
             xSpeed = DriveConstants.DRIVE_MAX_VELOCITY_SLOW * translation.getX();
             ySpeed = DriveConstants.DRIVE_MAX_VELOCITY_SLOW * translation.getY();
+            steerSpeed = DriveConstants.DRIVE_MAX_ROTATIONAL_VELOCITY_SLOW * rotation;
         } else {
             xSpeed = DriveConstants.DRIVE_MAX_VELOCITY * translation.getX();
             ySpeed = DriveConstants.DRIVE_MAX_VELOCITY * translation.getY();
+            steerSpeed = DriveConstants.DRIVE_MAX_ROTATIONAL_VELOCITY * rotation;
         }
 
         xSpeed = Math.abs(xSpeed) > OIConstants.DRIVE_DEADBAND ? xSpeed : 0.0;
         ySpeed = Math.abs(ySpeed) > OIConstants.DRIVE_DEADBAND ? ySpeed : 0.0;
+        steerSpeed = Math.abs(steerSpeed) > OIConstants.DRIVE_DEADBAND ? steerSpeed : 0.0;
 
         xSpeed = xLimiter.calculate(xSpeed);
         ySpeed = yLimiter.calculate(ySpeed);
-
-        steerSpeed = rotationController.calculate(PoseEstimator.getInstance().getSwerveRotation().getRadians(), rotationSetpoint);
+        steerSpeed = steerLimiter.calculate(steerSpeed);
 
         ChassisSpeeds chassisSpeeds;
         if (fieldRelative) {
@@ -176,6 +184,43 @@ public final class Swerve extends Subsystem {
         SwerveModuleState[] moduleStates = DriveConstants.SWERVE_KINEMATICS.toSwerveModuleStates(chassisSpeeds);
 
         this.setModuleStates(moduleStates);
+    }
+
+    public void snapToDirection(Translation2d translation, double rotationSetpoint, boolean fieldRelative, boolean isOpenLoop) {
+        if (Math.abs(PoseEstimator.getInstance().getSwerveRotation().getRadians() - this.snapSetpoint) > 0.05 && Timer.getFPGATimestamp() - this.snapStartTime < 3.0) {
+            double xSpeed, ySpeed, steerSpeed;
+
+            if (slowMode) {
+                xSpeed = DriveConstants.DRIVE_MAX_VELOCITY_SLOW * translation.getX();
+                ySpeed = DriveConstants.DRIVE_MAX_VELOCITY_SLOW * translation.getY();
+            } else {
+                xSpeed = DriveConstants.DRIVE_MAX_VELOCITY * translation.getX();
+                ySpeed = DriveConstants.DRIVE_MAX_VELOCITY * translation.getY();
+            }
+
+            xSpeed = Math.abs(xSpeed) > OIConstants.DRIVE_DEADBAND ? xSpeed : 0.0;
+            ySpeed = Math.abs(ySpeed) > OIConstants.DRIVE_DEADBAND ? ySpeed : 0.0;
+
+            xSpeed = xLimiter.calculate(xSpeed);
+            ySpeed = yLimiter.calculate(ySpeed);
+
+            steerSpeed = rotationController.calculate(PoseEstimator.getInstance().getSwerveRotation().getRadians() % 2.0 * Math.PI, this.snapSetpoint);
+
+            ChassisSpeeds chassisSpeeds;
+            if (fieldRelative) {
+                chassisSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(
+                    xSpeed, ySpeed, steerSpeed, getGyroRotation()
+                );
+            } else {
+                chassisSpeeds = new ChassisSpeeds(xSpeed, ySpeed, steerSpeed);
+            }
+
+        SwerveModuleState[] moduleStates = DriveConstants.SWERVE_KINEMATICS.toSwerveModuleStates(chassisSpeeds);
+
+        this.setModuleStates(moduleStates);
+        } else {
+            this.isSnapping = false;
+        }
     }
 
     public Translation2d getSwerveTranslation() {
@@ -193,30 +238,29 @@ public final class Swerve extends Subsystem {
         }
     }
 
-    public double getSwerveRotationSetpoint() {
-        int rotPOV = Robot.driverController.getPOV();
+    public double getSwerveRotation() {
         double rotAxis = -Math.pow(Robot.driverController.getAxis(Side.RIGHT, Axis.X), 3);
-        double setpointRev;
 
-        if (rotPOV != -1) {
-            setpointRev = (double) rotPOV * Math.PI / 180.0;
-            this.rotationSetpoint  = Math.abs(2.0 * Math.PI - setpointRev);
-        } else if (Math.abs(rotAxis) > OIConstants.DRIVE_DEADBAND) {
-            this.rotationSetpoint = this.rotationSetpoint + DriveConstants.DRIVE_MAX_ROTATIONAL_VELOCITY * GlobalConstants.LOOPER_TIME * rotAxis;
-            //this.rotationSetpoint = Math.abs(2.0 * Math.PI - setpointRev);
+        if (Math.abs(rotAxis) < OIConstants.DRIVE_DEADBAND) {
+            return 0.0;
+        } else {
+            return rotAxis;
         }
-
-        if (this.rotationSetpoint > 2.0 * Math.PI) {
-            this.rotationSetpoint -= 2.0 * Math.PI;
-        }
-
-        System.out.println(this.rotationSetpoint * 180.0 / Math.PI);
-
-        return this.rotationSetpoint;
     }
 
-    public void setSwerveRotationSetpoint(double setpoint) {
-        this.rotationSetpoint = setpoint;
+    public void setSnapSetpoint(double setpoint) {
+        this.snapSetpoint = setpoint;
+        this.snapStartTime = Timer.getFPGATimestamp();
+
+        // this.isSnapping = true;
+    }
+
+    public double getSnapSetpoint() {
+        return snapSetpoint;
+    }
+
+    public boolean isSnapping() {
+        return isSnapping;
     }
 
     private static final class SwerveActions {
@@ -224,6 +268,7 @@ public final class Swerve extends Subsystem {
             Runnable startMethod = () -> {
                 Swerve.getInstance().drive(new Translation2d(), 0.0, true, true);
                 Swerve.getInstance().initialGyroOffset = Swerve.getInstance().getGyroRotation().getDegrees();
+                Swerve.getInstance().zeroGyro();
             };
 
             Runnable runMethod = () -> {
@@ -233,11 +278,31 @@ public final class Swerve extends Subsystem {
                     Swerve.getInstance().slowMode = false;
                 }
 
+                // if (Robot.driverController.getButton(Button.Y)) {
+                //     return 0.0;
+                // } else if (Robot.driverController.getButton(Button.X)) {
+                //     return 0.5 * Math.PI;
+                // } else if (Robot.driverController.getButton(Button.A)) {
+                //     return Math.PI;
+                // } else {
+                //     return 1.5 * Math.PI;
+                // }
+
                 Translation2d swerveTranslation = Swerve.getInstance().getSwerveTranslation();
                 
-                double swerveRotation = Swerve.getInstance().getSwerveRotationSetpoint();
+                double swerveRotation = Swerve.getInstance().getSwerveRotation();
 
-                if (Robot.driverController.getButton(Button.LB)) {
+                if (Swerve.getInstance().isSnapping()) {
+                    Swerve.getInstance().snapToDirection(swerveTranslation, Swerve.getInstance().snapSetpoint, true, true);
+                } else if (Robot.driverController.getButton(Button.Y)) {
+                    Swerve.getInstance().setSnapSetpoint(0);
+                } else if (Robot.driverController.getButton(Button.X)) {
+                    Swerve.getInstance().setSnapSetpoint(0.5 * Math.PI);
+                } else if (Robot.driverController.getButton(Button.A)) {
+                    Swerve.getInstance().setSnapSetpoint(Math.PI);
+                } else if (Robot.driverController.getButton(Button.B)) {
+                    Swerve.getInstance().setSnapSetpoint(1.5 * Math.PI);
+                } else if (Robot.driverController.getButton(Button.LB)) {
                     Swerve.getInstance().drive(swerveTranslation, swerveRotation, false, true);
                 } else {
                     Swerve.getInstance().drive(swerveTranslation, swerveRotation, true, true);
@@ -257,7 +322,6 @@ public final class Swerve extends Subsystem {
             Runnable runMethod = () -> {
                 if (Robot.driverController.getButton(Button.START)) {
                     Swerve.getInstance().zeroYaw();
-                    Swerve.getInstance().setSwerveRotationSetpoint(0);
                 }
             };
 
