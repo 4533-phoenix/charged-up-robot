@@ -32,7 +32,8 @@ public final class Robot extends TimedRobot {
 
   @Override
   public void robotInit() {
-    chooser.setDefaultOption("Score and Leave", "Score and Leave");
+    chooser.setDefaultOption("Do Nothing", "Do Nothing");
+    chooser.addOption("Score and Leave", "Score and Leave");
     SmartDashboard.putData("Select Auto", chooser);
     
     UsbCamera gripperCamera = CameraServer.startAutomaticCapture();
