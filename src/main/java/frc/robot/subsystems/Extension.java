@@ -166,8 +166,10 @@ public final class Extension extends Subsystem {
                         this.elbowController.setSetpoint(armSetpoint);
                         break;
                     case LOWER:
-                        this.armSetpoint -= 0.003;
-                        this.elbowController.setSetpoint(armSetpoint);
+                        if (!prevState.equals(ExtensionState.HIGH_ROW) || this.getElbowAngle().getDegrees() > 135.0) {
+                            this.armSetpoint -= 0.003;
+                            this.elbowController.setSetpoint(armSetpoint);
+                        }
                         break;
                 }
             }
