@@ -10,6 +10,8 @@ import frc.robot.controls.PSController;
 import frc.robot.subsystems.Auto;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
+import edu.wpi.first.cameraserver.CameraServer;
+import edu.wpi.first.cscore.UsbCamera;
 
 /**
  * The VM is configured to automatically run this class, and to call the functions corresponding to
@@ -28,6 +30,9 @@ public final class Robot extends TimedRobot {
 
   @Override
   public void robotInit() {
+    UsbCamera gripperCamera = CameraServer.startAutomaticCapture();
+    gripperCamera.setResolution(640, 480);
+
     RobotContainer.queryInitialActions();
   }
 
