@@ -23,6 +23,8 @@ public final class DrivePathAction extends Action {
     public DrivePathAction(List<Pose2d> waypoints) {
         super(() -> {}, () -> {}, () -> {}, ActionConstants.WILL_CANCEL);
 
+        this.config.setReversed(true);
+
         this.mTrajectory = TrajectoryGenerator.generateTrajectory(waypoints, config);
     }
 

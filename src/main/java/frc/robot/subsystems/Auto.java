@@ -83,7 +83,7 @@ public final class Auto extends Subsystem {
             ArrayList<Pose2d> trajectoryPoints = new ArrayList<Pose2d>(
                 Arrays.asList(
                     startPose,
-                    new Pose2d(startPose.getX() + 5.0, startPose.getY(), PoseEstimator.getInstance().getSwerveRotation())
+                    new Pose2d(startPose.getX() + 5.0, startPose.getY(), new Rotation2d())
                 )
             );
 

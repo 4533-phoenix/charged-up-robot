@@ -9,6 +9,9 @@ import frc.robot.Constants.*;
 import frc.robot.controls.PSController.*;
 import com.revrobotics.ColorSensorV3;
 import edu.wpi.first.wpilibj.I2C.Port;
+import edu.wpi.first.cameraserver.CameraServer;
+import edu.wpi.first.cscore.UsbCamera;
+
 
 public final class Gripper extends Subsystem {
     private static Gripper mInstance;
@@ -16,8 +19,6 @@ public final class Gripper extends Subsystem {
     private final Solenoid gripperCylinder = new Solenoid(PneumaticsModuleType.CTREPCM, GripperConstants.GRIPPER_PCM_PORT);
 
     private final AnalogInput distanceSensor = new AnalogInput(GripperConstants.DISTANCE_SENSOR_PORT);
-
-    private final ColorSensorV3 colorSensor = new ColorSensorV3(Port.kOnboard);
 
     private boolean isDroppingObject = true;
 
@@ -66,28 +67,22 @@ public final class Gripper extends Subsystem {
         return distanceSensor.getVoltage() > GripperConstants.DISTANCE_VOLTAGE_THRESHOLD_CUBE;
     }
 
-    public boolean cubeInGripper() {
-        return distanceSensor.getVoltage() > GripperConstants.DISTANCE_VOLTAGE_THRESHOLD_CUBE && this.getObject().equals("Cube");
-    }
+    // public boolean cubeInGripper() {
+    //     return distanceSensor.getVoltage() > GripperConstants.DISTANCE_VOLTAGE_THRESHOLD_CUBE && this.getObject().equals("Cube");
+    // }
 
-    public boolean coneInGripper() {
-        return distanceSensor.getVoltage() > GripperConstants.DISTANCE_VOLTAGE_THRESHOLD_CONE && this.getObject().equals("Cone");
-    }
+    // public boolean coneInGripper() {
+    //     return distanceSensor.getVoltage() > GripperConstants.DISTANCE_VOLTAGE_THRESHOLD_CONE && this.getObject().equals("Cone");
+    // }
 
-    public void printColor() {
-        System.out.println("Green: " + colorSensor.getGreen());
-        System.out.println("Red: " + colorSensor.getRed());
-        System.out.println("Blue: " + colorSensor.getBlue());
-    }
-
-    public String getObject() {
-        if (colorSensor.getGreen()/colorSensor.getBlue() > 2.1) {
-            return "Cone";
-        }
-        else {
-            return "Cube";
-        }
-    }
+    // public String getObject() {
+    //     if (colorSensor.getGreen()/colorSensor.getBlue() > 2.1) {
+    //         return "Cone";
+    //     }
+    //     else {
+    //         return "Cube";
+    //     }
+    // }
 
     private static final class GripperActions {
         public static final Action defaultGripperAction() {
