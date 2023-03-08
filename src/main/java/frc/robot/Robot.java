@@ -11,6 +11,8 @@ import frc.robot.subsystems.Auto;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.cameraserver.CameraServer;
+import edu.wpi.first.cscore.UsbCamera;
 
 /**
  * The VM is configured to automatically run this class, and to call the functions corresponding to
@@ -32,6 +34,9 @@ public final class Robot extends TimedRobot {
   public void robotInit() {
     chooser.setDefaultOption("Score and Leave", "Score and Leave");
     SmartDashboard.putData("Select Auto", chooser);
+    
+    UsbCamera gripperCamera = CameraServer.startAutomaticCapture();
+    gripperCamera.setResolution(640, 480);
 
     RobotContainer.queryInitialActions();
   }
