@@ -13,8 +13,8 @@ import frc.robot.Constants.*;
 public final class PoseEstimator extends Subsystem {
     private static PoseEstimator mInstance;
 
-    Pose2d initialPose = new Pose2d();
-
+    Pose2d initialPose = this.getVisionPose2d();
+    
     NetworkTable table = NetworkTableInstance.getDefault().getTable("apriltag");
     NetworkTableEntry position = table.getEntry("position");
     NetworkTableEntry rotation = table.getEntry("rotation");

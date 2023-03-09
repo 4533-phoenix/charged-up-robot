@@ -24,7 +24,8 @@ public final class Auto extends Subsystem {
     private static Auto mInstance;
 
     private static final Map<String, Action> autoCommands = Map.ofEntries(
-        Map.entry("Score and Leave", AutoActions.scoreAndLeave()),
+        Map.entry("Test Autonomous", AutoActions.testAutonomous()),
+        Map.entry("Do Nothing", AutoActions.doNothing()),
         Map.entry("Blue Bottom Cube Autonomous", AutoActions.blueBottomCubeAutonomous())
     );
 
@@ -72,7 +73,11 @@ public final class Auto extends Subsystem {
     }
 
     private static final class AutoActions {
-        public static final Action scoreAndLeave() {
+        public static final Action doNothing() {
+            return new Action(() -> {}, () -> {}, () -> {}, ActionConstants.WILL_CANCEL);
+        }
+
+        public static final Action testAutonomous() {
             Pose2d startPose = new Pose2d(new Translation2d(), PoseEstimator.getInstance().getSwerveRotation());
   
             ArrayList<Pose2d> trajectoryPoints = new ArrayList<Pose2d>(
