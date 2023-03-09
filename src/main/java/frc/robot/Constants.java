@@ -76,10 +76,10 @@ public final class Constants {
         public static final int BACK_LEFT_STEER_MOTOR_ID = 5;
         public static final int BACK_RIGHT_STEER_MOTOR_ID = 7;
 
-        public static final boolean FRONT_LEFT_DRIVE_ENCODER_REVERSED = true;
-        public static final boolean FRONT_RIGHT_DRIVE_ENCODER_REVERSED = true;
-        public static final boolean BACK_LEFT_DRIVE_ENCODER_REVERSED = true;
-        public static final boolean BACK_RIGHT_DRIVE_ENCODER_REVERSED = true;
+        public static final boolean FRONT_LEFT_DRIVE_ENCODER_REVERSED = false;
+        public static final boolean FRONT_RIGHT_DRIVE_ENCODER_REVERSED = false;
+        public static final boolean BACK_LEFT_DRIVE_ENCODER_REVERSED = false;
+        public static final boolean BACK_RIGHT_DRIVE_ENCODER_REVERSED = false;
 
         public static final boolean FRONT_LEFT_STEER_ENCODER_REVERSED = false;
         public static final boolean FRONT_RIGHT_STEER_ENCODER_REVERSED = false;
@@ -97,10 +97,10 @@ public final class Constants {
         public static final boolean BACK_RIGHT_STEER_ABSOLUTE_ENCODER_REVERSED = false;
 
 		// Offsets for swerve modules. Should be equal to absolute encoder reading when wheel is facing straight forward
-        public static final double FRONT_LEFT_STEER_ABSOLUTE_ENCODER_OFFSET = 0.6105;
-        public static final double FRONT_RIGHT_STEER_ABSOLUTE_ENCODER_OFFSET = 4.3657;
-        public static final double BACK_LEFT_STEER_ABSOLUTE_ENCODER_OFFSET = 6.1605;
-        public static final double BACK_RIGHT_STEER_ABSOLUTE_ENCODER_OFFSET = 2.9207;
+        public static final double FRONT_LEFT_STEER_ABSOLUTE_ENCODER_OFFSET = 3.5450;
+        public static final double FRONT_RIGHT_STEER_ABSOLUTE_ENCODER_OFFSET = 2.5142;
+        public static final double BACK_LEFT_STEER_ABSOLUTE_ENCODER_OFFSET = 6.0700;
+        public static final double BACK_RIGHT_STEER_ABSOLUTE_ENCODER_OFFSET = 1.6843;
 
         public static final double DRIVE_MAX_PHYSICAL_VELOCITY = Units.feetToMeters(14.6);
 
@@ -133,7 +133,7 @@ public final class Constants {
         public static final double ELBOW_MAX_ACCELERATION = 1.0;
 
         public static final int ELBOW_ABSOLUTE_ENCODER_PORT = 0;
-        public static final double ELBOW_ABSOLUTE_ENCODER_OFFSET = 0.3753;
+        public static final double ELBOW_ABSOLUTE_ENCODER_OFFSET = 0.4483;
 
         public static final int ELBOW_ENCODER_PORT_A = 1;
         public static final int ELBOW_ENCODER_PORT_B = 2;

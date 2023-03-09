@@ -238,6 +238,13 @@ public final class Swerve extends Subsystem {
         }
     }
 
+    public void printModuleOffsets() {
+        System.out.println("Front left: " + frontLeft.getAbsoluteEncoderRad());
+        System.out.println("Front right: " + frontRight.getAbsoluteEncoderRad());
+        System.out.println("Back left: " + backLeft.getAbsoluteEncoderRad());
+        System.out.println("Back right: " + backRight.getAbsoluteEncoderRad());
+    }
+
     public double getSwerveRotation() {
         double rotAxis = -Math.pow(Robot.driverController.getAxis(Side.RIGHT, Axis.X), 3);
 
