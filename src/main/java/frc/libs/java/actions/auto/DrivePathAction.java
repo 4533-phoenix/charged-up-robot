@@ -45,9 +45,9 @@ public final class DrivePathAction extends Action {
             rotation = Rotation2d.fromRadians(currState.curvatureRadPerMeter * currState.velocityMetersPerSecond);
 
             ChassisSpeeds chassisSpeeds = Auto.getInstance().getAutoController().calculate(
-                PoseEstimator.getInstance().getSwervePose(),
+                new Pose2d(PoseEstimator.getInstance().getSwervePose().getTranslation(), Rotation2d.fromDegrees(180)),
                 currState,
-                rotation
+                new Rotation2d(180)
             );
 
             SwerveModuleState[] swerveModuleStates = DriveConstants.SWERVE_KINEMATICS.toSwerveModuleStates(chassisSpeeds);

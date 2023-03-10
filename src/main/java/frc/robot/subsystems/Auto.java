@@ -78,12 +78,12 @@ public final class Auto extends Subsystem {
         }
 
         public static final Action testAutonomous() {
-            Pose2d startPose = new Pose2d(new Translation2d(), PoseEstimator.getInstance().getSwerveRotation());
+            // Pose2d startPose = new Pose2d(new Translation2d(1, 1), Rotation2d.fromDegrees(180));
   
             ArrayList<Pose2d> trajectoryPoints = new ArrayList<Pose2d>(
                 Arrays.asList(
-                    startPose,
-                    new Pose2d(startPose.getX() + 5.0, startPose.getY(), new Rotation2d())
+                    new Pose2d(new Translation2d(0, 1), Rotation2d.fromDegrees(180)),
+                    new Pose2d(new Translation2d(5, 1), Rotation2d.fromDegrees(180))
                 )
             );
 
@@ -93,7 +93,7 @@ public final class Auto extends Subsystem {
                 new LambdaAction(() -> Extension.getInstance().updateExtensionState(ExtensionState.HIGH_ROW)),
                 new LambdaAction(() -> Gripper.getInstance().enableGripper()),
                 new LambdaAction(() -> Swerve.getInstance().setModuleStates(DriveConstants.SWERVE_KINEMATICS.toSwerveModuleStates(new ChassisSpeeds()))),
-                new WaitAction(4.0),
+                new WaitAction(2.0),
                 new LambdaAction(() -> Gripper.getInstance().disableGripper()),
                 new WaitAction(0.5),
                 new LambdaAction(() -> Extension.getInstance().updateExtensionState(ExtensionState.OFF_GROUND)),
