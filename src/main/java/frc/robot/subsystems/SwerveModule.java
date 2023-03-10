@@ -3,6 +3,7 @@ package frc.robot.subsystems;
 import com.ctre.phoenix.sensors.CANCoder;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.RelativeEncoder;
+import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
 import frc.robot.Constants.DriveConstants;
@@ -50,6 +51,8 @@ public final class SwerveModule {
 
         this.driveMotor.setInverted(driveMotorReversed);
         this.steerMotor.setInverted(steerMotorReversed);
+
+        this.driveMotor.setIdleMode(IdleMode.kBrake);
 
         this.driveEncoder = this.driveMotor.getEncoder();
         this.steerEncoder = this.steerMotor.getEncoder();
