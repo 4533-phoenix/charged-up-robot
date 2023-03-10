@@ -15,5 +15,7 @@ public final class RobotContainer {
         Gripper.getInstance().queryInitialActions();
 
         Extension.getInstance().queryInitialActions();
+
+        LED.getInstance().queryInitialActions();
     }
 }

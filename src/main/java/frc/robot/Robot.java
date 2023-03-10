@@ -6,6 +6,7 @@ package frc.robot;
 
 import frc.libs.java.actions.ActionRunner;
 import frc.robot.Constants.*;
+import frc.robot.subsystems.*;
 import frc.robot.controls.PSController;
 import frc.robot.subsystems.Auto;
 import edu.wpi.first.wpilibj.TimedRobot;
@@ -33,13 +34,23 @@ public final class Robot extends TimedRobot {
   @Override
   public void robotInit() {
     chooser.setDefaultOption("Do Nothing", "Do Nothing");
-    chooser.addOption("Score and Leave", "Score and Leave");
+    chooser.addOption("Right/Left Score and Leave", "Right/Left Score and Leave");
+    chooser.addOption("Charge Station Score and Enable", "Charge Station Score and Enable");
     SmartDashboard.putData("Select Auto", chooser);
     
     UsbCamera gripperCamera = CameraServer.startAutomaticCapture();
     gripperCamera.setResolution(640, 480);
 
+    LED.getInstance().configureLEDs();
+
     RobotContainer.queryInitialActions();
+
+    for (int i = 1; i < LED.getInstance().ledBuffer.getLength(); i += 2) {
+      LED.getInstance().ledBuffer.setRGB(i - 1, 66, 247, 245);
+      LED.getInstance().ledBuffer.setRGB(i, 171, 173, 33);
+    }
+
+    LED.getInstance().ledStrip.setData(LED.getInstance().ledBuffer);
   }
 
   @Override

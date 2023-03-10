@@ -177,6 +177,10 @@ public final class Constants {
 		public static final double TRIGGER_THRESHOLD = 0.2;
 	}
 
+    public static final class LEDConstants {
+        public static final int LED_PWM_PORT = 0;
+    }
+
     public static final class ActionConstants {
         public static final boolean WILL_CANCEL = true;
 

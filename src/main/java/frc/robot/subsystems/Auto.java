@@ -24,9 +24,9 @@ public final class Auto extends Subsystem {
     private static Auto mInstance;
 
     private static final Map<String, Action> autoCommands = Map.ofEntries(
-        Map.entry("Test Autonomous", AutoActions.testAutonomous()),
-        Map.entry("Do Nothing", AutoActions.doNothing()),
-        Map.entry("Blue Bottom Cube Autonomous", AutoActions.blueBottomCubeAutonomous())
+        Map.entry("Right/Left Score and Leave", AutoActions.rightLeftScoreAndLeave()),
+        Map.entry("Charge Station Score and Enable", AutoActions.chargeStationScoreAndEnable()),
+        Map.entry("Do Nothing", AutoActions.doNothing())
     );
 
     private HolonomicDriveController autoController = new HolonomicDriveController(
@@ -77,13 +77,39 @@ public final class Auto extends Subsystem {
             return new Action(() -> {}, () -> {}, () -> {}, ActionConstants.WILL_CANCEL);
         }
 
-        public static final Action testAutonomous() {
+        public static final Action rightLeftScoreAndLeave() {
             Pose2d startPose = new Pose2d(new Translation2d(), PoseEstimator.getInstance().getSwerveRotation());
   
             ArrayList<Pose2d> trajectoryPoints = new ArrayList<Pose2d>(
                 Arrays.asList(
                     startPose,
                     new Pose2d(startPose.getX() + 5.0, startPose.getY(), new Rotation2d())
+                )
+            );
+
+            Action driveTestPathAction = new DrivePathAction(trajectoryPoints);
+
+            Action testAuto = new SeriesAction(
+                new LambdaAction(() -> Extension.getInstance().updateExtensionState(ExtensionState.HIGH_ROW)),
+                new LambdaAction(() -> Gripper.getInstance().enableGripper()),
+                new LambdaAction(() -> Swerve.getInstance().setModuleStates(DriveConstants.SWERVE_KINEMATICS.toSwerveModuleStates(new ChassisSpeeds()))),
+                new WaitAction(4.0),
+                new LambdaAction(() -> Gripper.getInstance().disableGripper()),
+                new WaitAction(0.5),
+                new LambdaAction(() -> Extension.getInstance().updateExtensionState(ExtensionState.OFF_GROUND)),
+                driveTestPathAction
+            );
+
+            return testAuto.withSubsystem(Auto.getInstance());
+        }
+
+        public static final Action chargeStationScoreAndEnable() {
+            Pose2d startPose = new Pose2d(new Translation2d(), PoseEstimator.getInstance().getSwerveRotation());
+  
+            ArrayList<Pose2d> trajectoryPoints = new ArrayList<Pose2d>(
+                Arrays.asList(
+                    startPose,
+                    new Pose2d(startPose.getX() + 3.0, startPose.getY(), new Rotation2d())
                 )
             );
 
