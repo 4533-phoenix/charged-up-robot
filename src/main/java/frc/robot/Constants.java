@@ -77,9 +77,9 @@ public final class Constants {
         public static final int BACK_RIGHT_STEER_MOTOR_ID = 7;
 
         public static final boolean FRONT_LEFT_DRIVE_ENCODER_REVERSED = false;
-        public static final boolean FRONT_RIGHT_DRIVE_ENCODER_REVERSED = false;
+        public static final boolean FRONT_RIGHT_DRIVE_ENCODER_REVERSED = true;
         public static final boolean BACK_LEFT_DRIVE_ENCODER_REVERSED = false;
-        public static final boolean BACK_RIGHT_DRIVE_ENCODER_REVERSED = false;
+        public static final boolean BACK_RIGHT_DRIVE_ENCODER_REVERSED = true;
 
         public static final boolean FRONT_LEFT_STEER_ENCODER_REVERSED = false;
         public static final boolean FRONT_RIGHT_STEER_ENCODER_REVERSED = false;
@@ -98,13 +98,13 @@ public final class Constants {
 
 		// Offsets for swerve modules. Should be equal to absolute encoder reading when wheel is facing straight forward
         public static final double FRONT_LEFT_STEER_ABSOLUTE_ENCODER_OFFSET = 3.5450;
-        public static final double FRONT_RIGHT_STEER_ABSOLUTE_ENCODER_OFFSET = 2.5142;
+        public static final double FRONT_RIGHT_STEER_ABSOLUTE_ENCODER_OFFSET = 1.6874;
         public static final double BACK_LEFT_STEER_ABSOLUTE_ENCODER_OFFSET = 6.0700;
-        public static final double BACK_RIGHT_STEER_ABSOLUTE_ENCODER_OFFSET = 1.6843;
+        public static final double BACK_RIGHT_STEER_ABSOLUTE_ENCODER_OFFSET = 4.7645;
 
         public static final double DRIVE_MAX_PHYSICAL_VELOCITY = Units.feetToMeters(14.6);
 
-        public static final double DRIVE_MAX_VELOCITY = Units.feetToMeters(7.0);
+        public static final double DRIVE_MAX_VELOCITY = Units.feetToMeters(12.0);
         public static final double DRIVE_MAX_ROTATIONAL_VELOCITY = 1.0 * 2.0 * Math.PI; // rad/s
 
         public static final double DRIVE_MAX_VELOCITY_SLOW = Units.feetToMeters(3.0);
@@ -153,6 +153,7 @@ public final class Constants {
     public static final class GripperConstants{
         public static final int GRIPPER_PCM_PORT = 0;
         public static final int DISTANCE_SENSOR_PORT = 0;
+        public static final int LIMIT_SWITCH_PORT = 3;
 
         public static final double DISTANCE_VOLTAGE_THRESHOLD_CUBE = 2.3;
         public static final double DISTANCE_VOLTAGE_THRESHOLD_CONE = 2.3;

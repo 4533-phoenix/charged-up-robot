@@ -34,8 +34,8 @@ public final class Extension extends Subsystem {
     private final ArmFeedforward elbowFeedforward = new ArmFeedforward(ExtensionConstants.ELBOW_KS, 
         ExtensionConstants.ELBOW_KG, ExtensionConstants.ELBOW_KV, ExtensionConstants.ELBOW_KA);
 
-    private final DutyCycleEncoder elbowAbsoluteEncoder = new DutyCycleEncoder(ExtensionConstants.ELBOW_ABSOLUTE_ENCODER_PORT);
-    private final Encoder elbowRelativeEncoder = new Encoder(ExtensionConstants.ELBOW_ENCODER_PORT_A, ExtensionConstants.ELBOW_ENCODER_PORT_B);
+    public final DutyCycleEncoder elbowAbsoluteEncoder = new DutyCycleEncoder(ExtensionConstants.ELBOW_ABSOLUTE_ENCODER_PORT);
+    public final Encoder elbowRelativeEncoder = new Encoder(ExtensionConstants.ELBOW_ENCODER_PORT_A, ExtensionConstants.ELBOW_ENCODER_PORT_B);
     private final AnalogInput stringPotentiometer = new AnalogInput(ExtensionConstants.STRING_POTENTIOMETER_PORT);
 
     public double initialAbsoluteEncoderPosition;
@@ -238,12 +238,7 @@ public final class Extension extends Subsystem {
     private static final class ExtensionActions {
         public static final Action defaultExtensionAction() {
             Runnable startMethod = () -> {
-                Extension.getInstance().elbowAbsoluteEncoder.setDutyCycleRange(1.0 / 1024.0, 1023.0 / 1024.0);
-                Extension.getInstance().elbowAbsoluteEncoder.setPositionOffset(ExtensionConstants.ELBOW_ABSOLUTE_ENCODER_OFFSET);
-                Extension.getInstance().initialAbsoluteEncoderPosition = Extension.getInstance().getAbsoluteEncoderAbsolutePosition() - Extension.getInstance().elbowAbsoluteEncoder.getPositionOffset();
-                Extension.getInstance().elbowRelativeEncoder.reset();
                 Extension.getInstance().configureElbowController();
-                Extension.getInstance().updateExtensionState(ExtensionState.GROUND_LOW_INTAKE);
             };
 
             Runnable runMethod = () -> {

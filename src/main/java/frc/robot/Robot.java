@@ -33,13 +33,21 @@ public final class Robot extends TimedRobot {
 
   @Override
   public void robotInit() {
-    chooser.setDefaultOption("Do Nothing", "Do Nothing");
-    chooser.addOption("Right/Left Score and Leave", "Right/Left Score and Leave");
+    chooser.setDefaultOption("Right/Left Score and Leave", "Right/Left Score and Leave");
+    chooser.addOption("Do Nothing", "Do Nothing");
     chooser.addOption("Charge Station Score and Enable", "Charge Station Score and Enable");
     SmartDashboard.putData("Select Auto", chooser);
     
     UsbCamera gripperCamera = CameraServer.startAutomaticCapture();
     gripperCamera.setResolution(640, 480);
+
+    Swerve.getInstance().initialGyroOffset = Swerve.getInstance().getGyroRotation().getDegrees();
+    Swerve.getInstance().zeroGyro();
+
+    Extension.getInstance().elbowAbsoluteEncoder.setDutyCycleRange(1.0 / 1024.0, 1023.0 / 1024.0);
+    Extension.getInstance().elbowAbsoluteEncoder.setPositionOffset(ExtensionConstants.ELBOW_ABSOLUTE_ENCODER_OFFSET);
+    Extension.getInstance().initialAbsoluteEncoderPosition = 1.0 + Extension.getInstance().getAbsoluteEncoderAbsolutePosition() - Extension.getInstance().elbowAbsoluteEncoder.getPositionOffset();
+    Extension.getInstance().elbowRelativeEncoder.reset();
 
     LED.getInstance().configureLEDs();
 

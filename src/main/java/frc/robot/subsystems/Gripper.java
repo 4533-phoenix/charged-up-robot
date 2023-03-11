@@ -2,7 +2,7 @@ package frc.robot.subsystems;
 
 import edu.wpi.first.wpilibj.PneumaticsModuleType;
 import edu.wpi.first.wpilibj.Solenoid;
-import edu.wpi.first.wpilibj.AnalogInput;
+import edu.wpi.first.wpilibj.DigitalInput;
 import frc.libs.java.actions.*;
 import frc.robot.Robot;
 import frc.robot.Constants.*;
@@ -14,9 +14,7 @@ public final class Gripper extends Subsystem {
 
     private final Solenoid gripperCylinder = new Solenoid(PneumaticsModuleType.CTREPCM, GripperConstants.GRIPPER_PCM_PORT);
 
-    private final AnalogInput distanceSensor = new AnalogInput(GripperConstants.DISTANCE_SENSOR_PORT);
-
-    private boolean isDroppingObject = true;
+    private final DigitalInput gripperLimitSwitch = new DigitalInput(GripperConstants.LIMIT_SWITCH_PORT);
 
     private Gripper() {}
 
@@ -29,90 +27,29 @@ public final class Gripper extends Subsystem {
     }
 
     public void enableGripper() {
-        this.isDroppingObject = false;
-
         gripperCylinder.set(false);
     }
 
     public void disableGripper() {
-        this.isDroppingObject = true;
-
         gripperCylinder.set(true);
     }
 
-    // public void dropObject(double timestamp) {
-    //     double dropTime = 0;
-
-    //     if (objectInGripper()) {
-    //         Gripper.getInstance().disableGripper();
-    //         this.isDroppingObject = true;
-
-    //         while (Timer.getFPGATimestamp() - 0.25 < timestamp) {
-    //             System.out.println("dropping");
-    //         }
-
-    //         this.isDroppingObject = false;
-    //     }
-    // }
-
-    public boolean isDroppingObject() {
-        return this.isDroppingObject;
-    }
-
     public boolean objectInGripper() {
-        return distanceSensor.getVoltage() > GripperConstants.DISTANCE_VOLTAGE_THRESHOLD_CUBE;
+        return gripperLimitSwitch.get();
     }
-
-    // public boolean cubeInGripper() {
-    //     return distanceSensor.getVoltage() > GripperConstants.DISTANCE_VOLTAGE_THRESHOLD_CUBE && this.getObject().equals("Cube");
-    // }
-
-    // public boolean coneInGripper() {
-    //     return distanceSensor.getVoltage() > GripperConstants.DISTANCE_VOLTAGE_THRESHOLD_CONE && this.getObject().equals("Cone");
-    // }
-
-    // public String getObject() {
-    //     if (colorSensor.getGreen()/colorSensor.getBlue() > 2.1) {
-    //         return "Cone";
-    //     }
-    //     else {
-    //         return "Cube";
-    //     }
-    // }
 
     private static final class GripperActions {
         public static final Action defaultGripperAction() {
             Runnable startMethod = () -> {};
 
             Runnable runMethod = () -> {
-                    // if (Gripper.getInstance().objectInGripper() == true) {
-                    //     if (Gripper.getInstance().colorSensor.getGreen()/Gripper.getInstance().colorSensor.getBlue() > 2.1) {
-                    //         System.out.println("CONE GRABBED");
-                    //         Gripper.getInstance().enableGripper();
-                    //     }
-                    //     else {
-                    //         System.out.println("CUBE GRABBED");
-                    //         Gripper.getInstance().enableGripper();
-                    //     }
-                    // }
-                    // else {
-                    //     Gripper.getInstance().disableGripper();
-                    // }
-
-                    if (Robot.operatorController.getTrigger(Side.LEFT)) {
+                    if (Robot.driverController.getTrigger(Side.LEFT) || Robot.operatorController.getTrigger(Side.LEFT)) {
                         Gripper.getInstance().disableGripper();
-                    } else if (Robot.operatorController.getTrigger(Side.RIGHT)) {
+                    } else if (Robot.driverController.getTrigger(Side.RIGHT) || Robot.operatorController.getTrigger(Side.RIGHT)) {
+                        Gripper.getInstance().enableGripper();
+                    } else if (Gripper.getInstance().objectInGripper()) {
                         Gripper.getInstance().enableGripper();
                     }
-
-                    // if (Robot.driverController.getButton(Button.X)) {
-                    //     Gripper.getInstance().enableGripper();
-                    // } else if (Robot.driverController.getButton(Button.Y)) {
-                    //     Gripper.getInstance().disableGripper();
-                    // }
-
-                    // System.out.println("voltage: " + Gripper.getInstance().distanceSensor.getVoltage());
-                    //Gripper.getInstance().printObject();
             };
 
             Runnable endMethod = () -> {

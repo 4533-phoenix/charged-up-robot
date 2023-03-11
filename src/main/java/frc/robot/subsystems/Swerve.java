@@ -274,8 +274,6 @@ public final class Swerve extends Subsystem {
         public static final Action defaultDriveAction() {
             Runnable startMethod = () -> {
                 Swerve.getInstance().drive(new Translation2d(), 0.0, true, true);
-                Swerve.getInstance().initialGyroOffset = Swerve.getInstance().getGyroRotation().getDegrees();
-                Swerve.getInstance().zeroGyro();
             };
 
             Runnable runMethod = () -> {
@@ -314,6 +312,8 @@ public final class Swerve extends Subsystem {
                 } else {
                     Swerve.getInstance().drive(swerveTranslation, swerveRotation, true, true);
                 }
+
+                Swerve.getInstance().printModuleOffsets();
             };
 
             Runnable endMethod = () -> {
