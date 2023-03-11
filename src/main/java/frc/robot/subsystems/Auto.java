@@ -10,10 +10,7 @@ import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.trajectory.Trajectory;
 import frc.libs.java.actions.Action;
 import frc.libs.java.actions.Subsystem;
-import frc.libs.java.actions.auto.DrivePathAction;
-import frc.libs.java.actions.auto.LambdaAction;
-import frc.libs.java.actions.auto.SeriesAction;
-import frc.libs.java.actions.auto.WaitAction;
+import frc.libs.java.actions.auto.*;
 import frc.robot.subsystems.Extension.ExtensionState;
 
 import java.util.ArrayList;
@@ -87,6 +84,8 @@ public final class Auto extends Subsystem {
 
             Action driveTestPathAction = new DrivePathAction(trajectoryPoints);
 
+            Action driveBackAction = new DriveDistanceAction(-5.0);
+
             Action testAuto = new SeriesAction(
                 new LambdaAction(() -> Extension.getInstance().updateExtensionState(ExtensionState.HIGH_ROW)),
                 new LambdaAction(() -> Gripper.getInstance().enableGripper()),
@@ -95,10 +94,10 @@ public final class Auto extends Subsystem {
                 new LambdaAction(() -> Gripper.getInstance().disableGripper()),
                 new WaitAction(0.5),                
                 new LambdaAction(() -> Extension.getInstance().updateExtensionState(ExtensionState.OFF_GROUND)),
-                driveTestPathAction
+                driveBackAction
             );
 
-            return driveTestPathAction.withSubsystem(Auto.getInstance());
+            return testAuto.withSubsystem(Auto.getInstance());
         }
 
         public static final Action chargeStationScoreAndEnable() {
@@ -113,51 +112,20 @@ public final class Auto extends Subsystem {
 
             Action driveTestPathAction = new DrivePathAction(trajectoryPoints);
 
+            Action driveBackAction = new DriveDistanceAction(-2.16);
+
             Action testAuto = new SeriesAction(
                 new LambdaAction(() -> Extension.getInstance().updateExtensionState(ExtensionState.HIGH_ROW)),
                 new LambdaAction(() -> Gripper.getInstance().enableGripper()),
-                new LambdaAction(() 
-                -> Swerve.getInstance().setModuleStates(DriveConstants.SWERVE_KINEMATICS.toSwerveModuleStates(new ChassisSpeeds()))),
+                new LambdaAction(() -> Swerve.getInstance().setModuleStates(DriveConstants.SWERVE_KINEMATICS.toSwerveModuleStates(new ChassisSpeeds()))),
                 new WaitAction(4.0),
                 new LambdaAction(() -> Gripper.getInstance().disableGripper()),
                 new WaitAction(0.5),
                 new LambdaAction(() -> Extension.getInstance().updateExtensionState(ExtensionState.OFF_GROUND)),
-                driveTestPathAction
+                driveBackAction
             );
 
             return testAuto.withSubsystem(Auto.getInstance());
-        }
-
-        public static final Action blueBottomCubeAutonomous() {
-            ArrayList<Pose2d> retrievePoints = new ArrayList<Pose2d>(
-                Arrays.asList(
-                    new Pose2d(1.92, 0.46, new Rotation2d()),
-                    new Pose2d(6.49, 0.91, new Rotation2d())
-                )
-            );
-
-            Action cubeRetrievePath = new DrivePathAction(retrievePoints);
-
-            Action getBlueBottomCube = new LambdaAction(() -> Gripper.getInstance().enableGripper());
-
-            ArrayList<Pose2d> scorePoints = new ArrayList<Pose2d>(
-                Arrays.asList(
-                    new Pose2d(6.49, 0.91, new Rotation2d()),
-                    new Pose2d(2.71, 0.91, Rotation2d.fromDegrees(180.0)),
-                    new Pose2d(1.80, 2.69, Rotation2d.fromDegrees(180.0))
-                )
-            );
-
-            Action cubeScorePath = new DrivePathAction(scorePoints);
-
-            // Action scoreBlueBottomCube = new LambdaAction(() -> Gripper.getInstance().dropObject(Timer.getFPGATimestamp()));
-
-            return new SeriesAction(
-                cubeRetrievePath,
-                getBlueBottomCube,
-                cubeScorePath
-                // scoreBlueBottomCube
-            ).withSubsystem(Auto.getInstance());
         }
     }
 

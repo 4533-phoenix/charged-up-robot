@@ -270,6 +270,12 @@ public final class Swerve extends Subsystem {
         return isSnapping;
     }
 
+    public void setAllModuleStates(SwerveModuleState state) {
+        for (SwerveModule s : swerveMods) {
+            s.setDesiredState(state);
+        }
+    }
+
     private static final class SwerveActions {
         public static final Action defaultDriveAction() {
             Runnable startMethod = () -> {
@@ -312,8 +318,6 @@ public final class Swerve extends Subsystem {
                 } else {
                     Swerve.getInstance().drive(swerveTranslation, swerveRotation, true, true);
                 }
-
-                Swerve.getInstance().printModuleOffsets();
             };
 
             Runnable endMethod = () -> {
