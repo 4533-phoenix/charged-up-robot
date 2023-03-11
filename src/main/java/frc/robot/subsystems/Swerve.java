@@ -120,16 +120,11 @@ public final class Swerve extends Subsystem {
         this.gyro.zeroYaw();
     }
 
+    public double getPitch() {
+        return this.gyro.getPitch();
+    }
+
     public Rotation2d getGyroRotation() {
-        // double angle = -this.gyro.getYaw();
-
-        // angle *= Math.PI / 180.0;
-        // angle %= 2.0 * Math.PI;
-        // angle += gyroOffset;
-
-        // if (angle < 0.0)
-        //     angle += 2.0 * Math.PI;
-
         return Rotation2d.fromDegrees(-this.gyro.getYaw());
     }
 
