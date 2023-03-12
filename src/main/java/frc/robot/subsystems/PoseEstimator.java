@@ -13,17 +13,23 @@ import frc.robot.Constants.*;
 public final class PoseEstimator extends Subsystem {
     private static PoseEstimator mInstance;
 
-    Pose2d initialPose = new Pose2d();
+    Pose2d defaultPose = new Pose2d();
     
-    NetworkTable table = NetworkTableInstance.getDefault().getTable("apriltag");
-    NetworkTableEntry position = table.getEntry("position");
-    NetworkTableEntry rotation = table.getEntry("rotation");
+    NetworkTable table = NetworkTableInstance.getDefault().getTable("limelight");
+    NetworkTableEntry pipeline = table.getEntry("getPipe");
+
+    NetworkTableEntry apriltagBotPose = table.getEntry("botpose");
+    NetworkTableEntry targetDetected = table.getEntry("tv");
+
+    if (pipeline.getDouble() == 0) {
+        // apriltag pipeline
+    }
 
     private SwerveDrivePoseEstimator swervePoseEstimator = new SwerveDrivePoseEstimator(
         DriveConstants.SWERVE_KINEMATICS, 
         Swerve.getInstance().getGyroRotation(),
         Swerve.getInstance().getModulePositions(),
-        initialPose
+        this.defaultPose
     );
 
     private PoseEstimator() {}
@@ -46,7 +52,16 @@ public final class PoseEstimator extends Subsystem {
     }
 
     public void resetSwervePose() {
-        this.swervePoseEstimator.resetPosition(getSwerveRotation(), Swerve.getInstance().getModulePositions(), new Pose2d());
+        this.swervePoseEstimator.resetPosition(getSwerveRotation(), Swerve.getInstance().getModulePositions(), this.defaultPose);
+    }
+
+    public void addApriltagPose() {
+        // if the apriltag is detected, add the apriltag pose to the swerve pose using addVisionMeasurement
+        // botpose: Robot transform in field-space. Translation (X,Y,Z) Rotation(Roll,Pitch,Yaw), total latency (cl+tl)
+        if (targetDetected.getDouble() == 1) {
+            double[] botpose = apriltagBotPose.getDoubleArray(new double[7]);
+            this.swervePoseEstimator.addVisionMeasurement(new Pose2d(botpose[0], botpose[1], Rotation2d.fromDegrees(botpose[5])), Timer.getFPGATimestamp() - botpose[6]);
+        }
     }
 
     public Rotation2d getSwerveRotation() {
@@ -54,24 +69,7 @@ public final class PoseEstimator extends Subsystem {
     }
 
     public void resetPoseEstimator(Rotation2d gyroAngle, SwerveModulePosition[] modulePositions) {
-        this.swervePoseEstimator.resetPosition(gyroAngle, modulePositions, this.initialPose);
-    }
-
-    public Translation3d getPositionFromVision() {
-        double[] defaultArray = {0,0,0};
-        double[] positionArray = position.getDoubleArray(defaultArray);
-
-        return new Translation3d(positionArray[0], positionArray[1], positionArray[2]);
-    }
-
-    public Rotation2d getRotationFromVision() {
-        double rotationFromTable = rotation.getDouble(0);
-
-        return new Rotation2d(rotationFromTable);
-    }
-
-    public Pose2d getVisionPose2d() {
-        return new Pose2d(this.getPositionFromVision().getX(), this.getPositionFromVision().getY(), getRotationFromVision());
+        this.swervePoseEstimator.resetPosition(gyroAngle, modulePositions, this.defaultPose);
     }
 
     @Override
@@ -86,7 +84,7 @@ public final class PoseEstimator extends Subsystem {
     @Override
     public void periodic() {
         PoseEstimator.getInstance().swervePoseEstimator.update(Rotation2d.fromDegrees(Swerve.getInstance().getGyroRotation().getDegrees() + Swerve.getInstance().initialGyroOffset), Swerve.getInstance().getModulePositions());
-        // PoseEstimator.getInstance().swervePoseEstimator.addVisionMeasurement(PoseEstimator.getInstance().getVisionPose2d(), Timer.getFPGATimestamp());
+        PoseEstimator.getInstance().addApriltagPose();
     }
 
     @Override
