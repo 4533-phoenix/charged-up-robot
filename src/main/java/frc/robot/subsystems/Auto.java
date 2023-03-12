@@ -105,22 +105,10 @@ public final class Auto extends Subsystem {
     }
 
     public void adjustChargeStation() {
-        ChassisSpeeds driveSpeeds;
-       
-        if (Swerve.getInstance().getPitch() <= 0) {
-            driveSpeeds =  new ChassisSpeeds(Units.feetToMeters(-2.0), 0, 0);
-        } else {
-            driveSpeeds = new ChassisSpeeds(Units.feetToMeters(2.0), 0, 0);
-        }
+        while (Math.abs(Swerve.getInstance().getPitch()) > DriveConstants.CHARGE_STATION_PITCH_DEADBAND) {
+            ChassisSpeeds driveSpeeds = Swerve.getInstance().getPitch() < 0.0 ? new ChassisSpeeds(-0.5, 0.0, 0.0) : new ChassisSpeeds(0.5, 0.0, 0.0);
 
-        SwerveModuleState[] moduleStates = DriveConstants.SWERVE_KINEMATICS.toSwerveModuleStates(driveSpeeds);
-
-        Swerve.getInstance().setModuleStates(moduleStates);
-
-        while (Math.abs(Swerve.getInstance().getPitch()) > 0.75) {
-            moduleStates = DriveConstants.SWERVE_KINEMATICS.toSwerveModuleStates(driveSpeeds);
-
-            Swerve.getInstance().setModuleStates(moduleStates);
+            Swerve.getInstance().setModuleStates(DriveConstants.SWERVE_KINEMATICS.toSwerveModuleStates(driveSpeeds));
         }
 
         Swerve.getInstance().setModuleStates(DriveConstants.SWERVE_KINEMATICS.toSwerveModuleStates(new ChassisSpeeds()));
