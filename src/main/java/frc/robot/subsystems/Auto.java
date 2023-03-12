@@ -8,6 +8,7 @@ import edu.wpi.first.math.geometry.*;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.trajectory.Trajectory;
+import edu.wpi.first.math.util.Units;
 import frc.libs.java.actions.Action;
 import frc.libs.java.actions.Subsystem;
 import frc.libs.java.actions.auto.*;
@@ -70,26 +71,42 @@ public final class Auto extends Subsystem {
     }
 
     public void enableChargeStation(boolean direction) {
-        SwerveModuleState everyState;
-
+        ChassisSpeeds driveSpeeds;
+       
         if (direction) {
-            everyState = new SwerveModuleState(AutoConstants.AUTO_MAX_VELOCITY, new Rotation2d());
+            driveSpeeds =  new ChassisSpeeds(Units.feetToMeters(5.0), 0, 0);
         } else {
-            everyState = new SwerveModuleState(AutoConstants.AUTO_MAX_VELOCITY, Rotation2d.fromDegrees(180));
+            driveSpeeds = new ChassisSpeeds(Units.feetToMeters(-5.0), 0, 0);
         }
 
-        Swerve.getInstance().setAllModuleStates(everyState);
+        SwerveModuleState[] moduleStates = DriveConstants.SWERVE_KINEMATICS.toSwerveModuleStates(driveSpeeds);
 
-        while (Math.abs(Swerve.getInstance().getPitch()) < 8.0) {}
+        Swerve.getInstance().setModuleStates(moduleStates);
 
-        while (Math.abs(Swerve.getInstance().getPitch()) > 2.0) {}
+        while (Math.abs(Swerve.getInstance().getPitch()) < 8.0) {
+            moduleStates = DriveConstants.SWERVE_KINEMATICS.toSwerveModuleStates(driveSpeeds);
+
+            Swerve.getInstance().setModuleStates(moduleStates);
+        }
+
+        if (direction) {
+            driveSpeeds =  new ChassisSpeeds(Units.feetToMeters(2.0), 0, 0);
+        } else {
+            driveSpeeds = new ChassisSpeeds(Units.feetToMeters(-2.0), 0, 0);
+        }
+
+        while (Math.abs(Swerve.getInstance().getPitch()) > 2.0) {
+            moduleStates = DriveConstants.SWERVE_KINEMATICS.toSwerveModuleStates(driveSpeeds);
+
+            Swerve.getInstance().setModuleStates(moduleStates);
+        }
         
         Swerve.getInstance().setModuleStates(DriveConstants.SWERVE_KINEMATICS.toSwerveModuleStates(new ChassisSpeeds()));
     }
 
     private static final class AutoActions {
         public static final Action doNothing() {
-            return new Action(() -> {}, () -> {}, () -> {}, ActionConstants.WILL_CANCEL);
+            return new SeriesAction();
         }
 
         public static final Action rightLeftScoreAndLeave() {
@@ -100,7 +117,7 @@ public final class Auto extends Subsystem {
                 )
             );
 
-            Action driveTestPathAction = new DrivePathAction(trajectoryPoints);
+            // Action driveTestPathAction = new DrivePathAction(trajectoryPoints);
 
             Action driveBackAction = new DriveDistanceAction(-5.0);
 
@@ -110,9 +127,9 @@ public final class Auto extends Subsystem {
                 new LambdaAction(() -> Swerve.getInstance().setModuleStates(DriveConstants.SWERVE_KINEMATICS.toSwerveModuleStates(new ChassisSpeeds()))),
                 new WaitAction(4.0),
                 new LambdaAction(() -> Gripper.getInstance().disableGripper()),
-                new WaitAction(0.5),                
-                new LambdaAction(() -> Extension.getInstance().updateExtensionState(ExtensionState.OFF_GROUND)),
-                driveBackAction
+                new WaitAction(0.5),
+                driveBackAction,
+                new LambdaAction(() -> Extension.getInstance().updateExtensionState(ExtensionState.OFF_GROUND))
             );
 
             return testAuto.withSubsystem(Auto.getInstance());
@@ -128,7 +145,7 @@ public final class Auto extends Subsystem {
                 )
             );
 
-            Action driveTestPathAction = new DrivePathAction(trajectoryPoints);
+            // Action driveTestPathAction = new DrivePathAction(trajectoryPoints);
 
             Action driveBackAction = new DriveDistanceAction(-2.16);
 
@@ -140,10 +157,10 @@ public final class Auto extends Subsystem {
                 new LambdaAction(() -> Gripper.getInstance().disableGripper()),
                 new WaitAction(0.5),
                 new LambdaAction(() -> Extension.getInstance().updateExtensionState(ExtensionState.OFF_GROUND)),
-                driveBackAction
+                new LambdaAction(() -> Auto.getInstance().enableChargeStation(false))
             );
 
-            return testAuto.withSubsystem(Auto.getInstance());
+            return new LambdaAction(() -> Auto.getInstance().enableChargeStation(false));
         }
     }
 

@@ -30,7 +30,7 @@ public final class Constants {
         public static final double AUTO_OMEGA_KD = 0.0;
 
         // Max translational velocity, acceleration in m/s
-        public static final double AUTO_MAX_VELOCITY = Units.feetToMeters(3.0);
+        public static final double AUTO_MAX_VELOCITY = Units.feetToMeters(2.5);
         public static final double AUTO_MAX_ACCELERATION = Units.feetToMeters(1.0);
 
         // Max rotational velocity, acceleration in rad/s
@@ -49,7 +49,8 @@ public final class Constants {
         public static final double DRIVE_ENCODER_METERS_PER_SECOND = DRIVE_ENCODER_METERS_PER_ROTATION / 60.0;
         public static final double STEER_ENCODER_RADIANS_PER_SECOND = STEER_ENCODER_RADIANS_PER_ROTATION / 60.0;
         
-        public static final double STEER_KP = 0.5;
+        public static final double STEER_KP = 0.7;
+        public static final double STEER_KD = 0.25;
     }
 
     public static final class DriveConstants {
@@ -100,7 +101,7 @@ public final class Constants {
         public static final double FRONT_LEFT_STEER_ABSOLUTE_ENCODER_OFFSET = 3.5450;
         public static final double FRONT_RIGHT_STEER_ABSOLUTE_ENCODER_OFFSET = 1.6874;
         public static final double BACK_LEFT_STEER_ABSOLUTE_ENCODER_OFFSET = 6.0700;
-        public static final double BACK_RIGHT_STEER_ABSOLUTE_ENCODER_OFFSET = 4.7645;
+        public static final double BACK_RIGHT_STEER_ABSOLUTE_ENCODER_OFFSET = 0.9894;
 
         public static final double DRIVE_MAX_PHYSICAL_VELOCITY = Units.feetToMeters(14.6);
 

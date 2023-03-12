@@ -10,6 +10,7 @@ import edu.wpi.first.wpilibj.Timer;
 import java.util.*;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
 
 public final class DriveDistanceAction extends Action {
     private double startTime;
@@ -33,21 +34,31 @@ public final class DriveDistanceAction extends Action {
 
         this.startTime = Timer.getFPGATimestamp();
 
-        this.totalTime = this.distanceMeters / AutoConstants.AUTO_MAX_VELOCITY;
+        this.totalTime = Math.abs(this.distanceMeters) / AutoConstants.AUTO_MAX_VELOCITY;
 
-        SwerveModuleState everyState;
+        System.out.println("driving distance");
 
+        ChassisSpeeds driveSpeeds;
+       
         if (this.distanceMeters >= 0) {
-            everyState = new SwerveModuleState(AutoConstants.AUTO_MAX_VELOCITY, new Rotation2d());
+            driveSpeeds =  new ChassisSpeeds(AutoConstants.AUTO_MAX_VELOCITY, 0, 0);
         } else {
-            everyState = new SwerveModuleState(AutoConstants.AUTO_MAX_VELOCITY, Rotation2d.fromDegrees(180));
+            driveSpeeds = new ChassisSpeeds(-AutoConstants.AUTO_MAX_VELOCITY, 0, 0);
         }
 
-        Swerve.getInstance().setAllModuleStates(everyState);
+        SwerveModuleState[] moduleStates = DriveConstants.SWERVE_KINEMATICS.toSwerveModuleStates(driveSpeeds);
 
-        while (Timer.getFPGATimestamp() - startTime <= this.totalTime) {}
+        Swerve.getInstance().setModuleStates(moduleStates);
+
+        while (Timer.getFPGATimestamp() - startTime <= this.totalTime) {
+            moduleStates = DriveConstants.SWERVE_KINEMATICS.toSwerveModuleStates(driveSpeeds);
+
+            Swerve.getInstance().setModuleStates(moduleStates);
+        }
         
         Swerve.getInstance().setModuleStates(DriveConstants.SWERVE_KINEMATICS.toSwerveModuleStates(new ChassisSpeeds()));
+
+        this.isFinished = true;
 
         if (this.willThreadRun()) {
             try {

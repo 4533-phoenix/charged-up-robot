@@ -125,7 +125,7 @@ public final class Swerve extends Subsystem {
     }
 
     public Rotation2d getGyroRotation() {
-        return Rotation2d.fromDegrees(-this.gyro.getYaw());
+        return Rotation2d.fromDegrees(-this.gyro.getYaw() + 180.0);
     }
 
     public SwerveModulePosition[] getModulePositions() {
@@ -265,12 +265,6 @@ public final class Swerve extends Subsystem {
         return isSnapping;
     }
 
-    public void setAllModuleStates(SwerveModuleState state) {
-        for (SwerveModule s : swerveMods) {
-            s.setDesiredState(state);
-        }
-    }
-
     private static final class SwerveActions {
         public static final Action defaultDriveAction() {
             Runnable startMethod = () -> {
@@ -313,6 +307,8 @@ public final class Swerve extends Subsystem {
                 } else {
                     Swerve.getInstance().drive(swerveTranslation, swerveRotation, true, true);
                 }
+
+                Swerve.getInstance().printModuleOffsets();
             };
 
             Runnable endMethod = () -> {
