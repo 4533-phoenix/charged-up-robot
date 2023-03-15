@@ -1,53 +1,40 @@
 package frc.libs.java.actions.auto;
 
+import edu.wpi.first.math.trajectory.Trajectory.State;
 import frc.libs.java.actions.*;
-import edu.wpi.first.math.trajectory.*;
+import com.pathplanner.lib.PathPlanner;
+import com.pathplanner.lib.PathPlannerTrajectory;
+import com.pathplanner.lib.PathPoint;
+import edu.wpi.first.math.trajectory.Trajectory;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import frc.robot.Constants.*;
 import frc.robot.subsystems.*;
 import edu.wpi.first.wpilibj.Timer;
-import java.util.*;
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
 
-public final class DrivePathAction extends Action {
-    private final Trajectory mTrajectory;
+public class DrivePathAction extends Action {
+    private final PathPlannerTrajectory mPath;
 
-    private TrajectoryConfig config = new TrajectoryConfig(AutoConstants.AUTO_MAX_VELOCITY, AutoConstants.AUTO_MAX_ACCELERATION);
+    public DrivePathAction(String path, double maxVelocity, double maxAccel, boolean isReversed) {
+        super(() -> {}, () -> {}, () -> {}, true);
 
-    private Rotation2d rotation;
-
-    private double startTime;
-
-    public DrivePathAction(List<Pose2d> waypoints) {
-        super(() -> {}, () -> {}, () -> {}, ActionConstants.WILL_CANCEL);
-
-        this.config.setReversed(false);
-
-        this.mTrajectory = TrajectoryGenerator.generateTrajectory(waypoints, config);
+        this.mPath = PathPlanner.loadPath(path, maxVelocity, maxAccel, isReversed);
     }
 
     @Override
     public void run() {
-        if (this.willThreadRun()) {
-            try {
-                this.getThreadLock().lock();
-            }
-            finally {}
-        }
+        double startTime = Timer.getFPGATimestamp();
 
-        this.startTime = Timer.getFPGATimestamp();
+        System.out.println(this.mPath.getEndState().timeSeconds);
 
-        while (Timer.getFPGATimestamp() - startTime <= this.mTrajectory.getTotalTimeSeconds()) {
-            Trajectory.State currState = this.mTrajectory.sample(Timer.getFPGATimestamp() - startTime);
-
-            rotation = Rotation2d.fromRadians(currState.curvatureRadPerMeter * currState.velocityMetersPerSecond);
+        while (Timer.getFPGATimestamp() <= this.mPath.getEndState().timeSeconds) {
+            Trajectory.State currState = this.mPath.sample(Timer.getFPGATimestamp() - startTime);
 
             ChassisSpeeds chassisSpeeds = Auto.getInstance().getAutoController().calculate(
-                new Pose2d(PoseEstimator.getInstance().getSwervePose().getTranslation(), Rotation2d.fromDegrees(180)),
+                PoseEstimator.getInstance().getSwervePose(),
                 currState,
-                new Rotation2d(180)
+                new Rotation2d()
             );
 
             SwerveModuleState[] swerveModuleStates = DriveConstants.SWERVE_KINEMATICS.toSwerveModuleStates(chassisSpeeds);
@@ -56,12 +43,5 @@ public final class DrivePathAction extends Action {
         }
         
         Swerve.getInstance().setModuleStates(DriveConstants.SWERVE_KINEMATICS.toSwerveModuleStates(new ChassisSpeeds()));
-
-        if (this.willThreadRun()) {
-            try {
-                this.getThreadLock().unlock();
-            }
-            finally {}
-        }
     }
 }

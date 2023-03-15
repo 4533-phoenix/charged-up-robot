@@ -29,10 +29,8 @@ public class Action extends Thread {
         this.willThreadRun = willCancel;
     }
 
-    public Action withSubsystem(Subsystem... subsystems) {
-        for (Subsystem s : subsystems) {
-            this.threadLock = s.getSubsystemThreadLock();
-        }
+    public Action withSubsystem(Subsystem subsystem) {
+        this.threadLock = subsystem.getSubsystemThreadLock();
 
         return this;
     }

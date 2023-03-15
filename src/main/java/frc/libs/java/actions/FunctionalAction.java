@@ -14,10 +14,8 @@ public final class FunctionalAction extends Action {
     }
 
     @Override
-    public FunctionalAction withSubsystem(Subsystem... subsystems) {
-        for (Subsystem s : subsystems) {
-            super.withSubsystem(s);
-        }
+    public FunctionalAction withSubsystem(Subsystem subsystem) {
+        super.withSubsystem(subsystem);
 
         return this;
     }

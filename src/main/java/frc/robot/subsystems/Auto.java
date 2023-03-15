@@ -22,6 +22,7 @@ public final class Auto extends Subsystem {
     private static Auto mInstance;
 
     private static final Map<String, Action> autoCommands = Map.ofEntries(
+        Map.entry("PathPlanner Test", AutoActions.pathPlannerTest()),
         Map.entry("Right/Left Score and Leave", AutoActions.rightLeftScoreAndLeave()),
         Map.entry("Charge Station Score and Enable", AutoActions.chargeStationScoreAndEnable()),
         Map.entry("Do Nothing", AutoActions.doNothing())
@@ -117,6 +118,10 @@ public final class Auto extends Subsystem {
     private static final class AutoActions {
         public static final Action doNothing() {
             return new SeriesAction();
+        }
+
+        public static final Action pathPlannerTest() {
+            return new DrivePathAction("PathPlanner Test", 5.0, 3.0, false);
         }
 
         public static final Action rightLeftScoreAndLeave() {
