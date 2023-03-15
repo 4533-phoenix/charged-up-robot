@@ -74,9 +74,9 @@ public final class Auto extends Subsystem {
         ChassisSpeeds driveSpeeds;
        
         if (direction) {
-            driveSpeeds =  new ChassisSpeeds(Units.feetToMeters(5.0), 0, 0);
+            driveSpeeds =  new ChassisSpeeds(Units.feetToMeters(6.5), 0, 0);
         } else {
-            driveSpeeds = new ChassisSpeeds(Units.feetToMeters(-5.0), 0, 0);
+            driveSpeeds = new ChassisSpeeds(Units.feetToMeters(-6.5), 0, 0);
         }
 
         SwerveModuleState[] moduleStates = DriveConstants.SWERVE_KINEMATICS.toSwerveModuleStates(driveSpeeds);
@@ -108,16 +108,16 @@ public final class Auto extends Subsystem {
         ChassisSpeeds driveSpeeds;
        
         if (Swerve.getInstance().getPitch() <= 0) {
-            driveSpeeds =  new ChassisSpeeds(Units.feetToMeters(-2.0), 0, 0);
+            driveSpeeds =  new ChassisSpeeds(Units.feetToMeters(-0.75), 0, 0);
         } else {
-            driveSpeeds = new ChassisSpeeds(Units.feetToMeters(2.0), 0, 0);
+            driveSpeeds = new ChassisSpeeds(Units.feetToMeters(0.75), 0, 0);
         }
 
         SwerveModuleState[] moduleStates = DriveConstants.SWERVE_KINEMATICS.toSwerveModuleStates(driveSpeeds);
 
         Swerve.getInstance().setModuleStates(moduleStates);
 
-        while (Math.abs(Swerve.getInstance().getPitch()) > 0.75) {
+        while (Math.abs(Swerve.getInstance().getPitch()) > 1.25) {
             moduleStates = DriveConstants.SWERVE_KINEMATICS.toSwerveModuleStates(driveSpeeds);
 
             Swerve.getInstance().setModuleStates(moduleStates);
@@ -150,8 +150,9 @@ public final class Auto extends Subsystem {
                 new WaitAction(3.0),
                 new LambdaAction(() -> Gripper.getInstance().disableGripper()),
                 new WaitAction(0.5),
-                driveBackAction,
-                new LambdaAction(() -> Extension.getInstance().updateExtensionState(ExtensionState.OFF_GROUND))
+                new DriveDistanceAction(-1.0),
+                new LambdaAction(() -> Extension.getInstance().updateExtensionState(ExtensionState.OFF_GROUND)),
+                new DriveDistanceAction(-4.0)
             );
 
             return testAuto.withSubsystem(Auto.getInstance());
@@ -170,8 +171,8 @@ public final class Auto extends Subsystem {
             Action driveBackAction = new DriveDistanceAction(-2.16);
 
             Action testAuto = new SeriesAction(
-                new LambdaAction(() -> Extension.getInstance().updateExtensionState(ExtensionState.MIDDLE_ROW)),
                 new LambdaAction(() -> Gripper.getInstance().enableGripper()),
+                new LambdaAction(() -> Extension.getInstance().updateExtensionState(ExtensionState.MIDDLE_ROW)),
                 new LambdaAction(() -> Swerve.getInstance().setModuleStates(DriveConstants.SWERVE_KINEMATICS.toSwerveModuleStates(new ChassisSpeeds()))),
                 new WaitAction(4.0),
                 new LambdaAction(() -> Gripper.getInstance().disableGripper()),

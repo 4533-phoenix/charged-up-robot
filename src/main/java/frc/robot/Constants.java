@@ -134,7 +134,7 @@ public final class Constants {
         public static final double ELBOW_MAX_ACCELERATION = 1.0;
 
         public static final int ELBOW_ABSOLUTE_ENCODER_PORT = 0;
-        public static final double ELBOW_ABSOLUTE_ENCODER_OFFSET = 0.4483;
+        public static final double ELBOW_ABSOLUTE_ENCODER_OFFSET = 0.8514;
 
         public static final int ELBOW_ENCODER_PORT_A = 1;
         public static final int ELBOW_ENCODER_PORT_B = 2;
