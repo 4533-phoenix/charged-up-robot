@@ -117,6 +117,8 @@ public final class Constants {
 
         public static final double DRIVE_MAX_ACCELERATION = 10.0; // m/s^2
         public static final double DRIVE_MAX_ROTATIONAL_ACCELERATION = 7.0; // rad/s^2
+
+        public static final double CHARGE_STATION_PITCH_DEADBAND = 0.75; // degrees
     }
 
     public static final class ExtensionConstants {
