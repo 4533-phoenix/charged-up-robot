@@ -26,9 +26,9 @@ public class DrivePathAction extends Action {
     public void run() {
         double startTime = Timer.getFPGATimestamp();
 
-        System.out.println(this.mPath.getEndState().timeSeconds);
+        while (Timer.getFPGATimestamp() <= this.mPath.getEndState().timeSeconds + startTime) {
+            System.out.println("running path");
 
-        while (Timer.getFPGATimestamp() <= this.mPath.getEndState().timeSeconds) {
             Trajectory.State currState = this.mPath.sample(Timer.getFPGATimestamp() - startTime);
 
             ChassisSpeeds chassisSpeeds = Auto.getInstance().getAutoController().calculate(
