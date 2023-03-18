@@ -43,5 +43,7 @@ public class DrivePathAction extends Action {
         }
         
         Swerve.getInstance().setModuleStates(DriveConstants.SWERVE_KINEMATICS.toSwerveModuleStates(new ChassisSpeeds()));
+
+        this.isFinished = true;
     }
 }
