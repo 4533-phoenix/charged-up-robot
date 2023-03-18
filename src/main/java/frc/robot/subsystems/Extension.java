@@ -12,7 +12,6 @@ import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.wpilibj.DutyCycleEncoder;
-import edu.wpi.first.wpilibj.AnalogInput;
 import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.wpilibj.PneumaticsModuleType;
 import edu.wpi.first.wpilibj.Timer;
@@ -36,7 +35,6 @@ public final class Extension extends Subsystem {
 
     public final DutyCycleEncoder elbowAbsoluteEncoder = new DutyCycleEncoder(ExtensionConstants.ELBOW_ABSOLUTE_ENCODER_PORT);
     public final Encoder elbowRelativeEncoder = new Encoder(ExtensionConstants.ELBOW_ENCODER_PORT_A, ExtensionConstants.ELBOW_ENCODER_PORT_B);
-    private final AnalogInput stringPotentiometer = new AnalogInput(ExtensionConstants.STRING_POTENTIOMETER_PORT);
 
     public double initialAbsoluteEncoderPosition;
 
@@ -94,24 +92,6 @@ public final class Extension extends Subsystem {
                 upperExtensionCylinder.set(Value.kOff);
                 break;
         }
-    }
-
-    public void configureElbowController() {
-        elbowController.setP(ExtensionConstants.ELBOW_KP);
-        elbowController.setI(ExtensionConstants.ELBOW_KI);
-        elbowController.setD(ExtensionConstants.ELBOW_KD);
-    }
-
-    public void manualRaiseUpperExtension() {
-        armSetpoint += 0.003;
-
-        this.elbowController.setSetpoint(armSetpoint);
-    }
-
-    public void manualLowerUpperExtension() {
-        armSetpoint -= 0.003;
-
-        this.elbowController.setSetpoint(armSetpoint);
     }
 
     public void updateExtensionState() {
@@ -180,10 +160,6 @@ public final class Extension extends Subsystem {
         }
     }
 
-    public double getAbsoluteEncoderPosition() {
-        return elbowAbsoluteEncoder.get();
-    }
-
     public double getAbsoluteEncoderAbsolutePosition() {
         return elbowAbsoluteEncoder.getAbsolutePosition();
     }
@@ -194,24 +170,6 @@ public final class Extension extends Subsystem {
 
     public Rotation2d getElbowAngle() {
         return new Rotation2d(getRelativeEncoderPosition() * 2.0 * Math.PI * ExtensionConstants.ELBOW_CHAIN_GEAR_RATIO);
-    }
-
-    public Rotation2d getGroundToLowerArmAngle() {
-        double length = getLowerExtensionLength();
-        double angle = Math.acos((697.5 - Math.pow(length, 2)) / 425.0) + 19.0;
-        
-        return new Rotation2d(angle + 34.4);
-    }
-
-    public Rotation2d getGroundToUpperArmAngle() {
-        double length = getLowerExtensionLength();
-        double angle = Math.acos((697.5 - Math.pow(length, 2)) / 425.0) + 19.0;
-        
-        return new Rotation2d(getElbowAngle().getRadians() - angle);
-    }
-
-    public double getLowerExtensionLength() {
-        return stringPotentiometer.getVoltage() * 12.0 / 5.0;
     }
 
     public void updateElbowController() {
@@ -227,19 +185,13 @@ public final class Extension extends Subsystem {
         return feedForward;
     }
 
-    public void upperExtensionStop() {
-        elbowMotor.stopMotor();
-    }
-
     public PIDController getElbowController() {
         return this.elbowController;
     }
 
     private static final class ExtensionActions {
         public static final Action defaultExtensionAction() {
-            Runnable startMethod = () -> {
-                Extension.getInstance().configureElbowController();
-            };
+            Runnable startMethod = () -> {};
 
             Runnable runMethod = () -> {
                 if (Robot.operatorController.getButton(Button.Y)) {

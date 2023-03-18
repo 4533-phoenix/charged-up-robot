@@ -4,7 +4,6 @@ import frc.robot.Constants.*;
 import frc.robot.Robot;
 
 import edu.wpi.first.math.controller.*;
-import edu.wpi.first.math.geometry.*;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.trajectory.Trajectory;
@@ -13,9 +12,6 @@ import frc.libs.java.actions.Action;
 import frc.libs.java.actions.Subsystem;
 import frc.libs.java.actions.auto.*;
 import frc.robot.subsystems.Extension.ExtensionState;
-
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Map;
 
 public final class Auto extends Subsystem {
@@ -125,17 +121,6 @@ public final class Auto extends Subsystem {
         }
 
         public static final Action rightLeftScoreAndLeave() {
-            ArrayList<Pose2d> trajectoryPoints = new ArrayList<Pose2d>(
-                Arrays.asList(
-                    new Pose2d(new Translation2d(5, 0), Rotation2d.fromDegrees(180)),
-                    new Pose2d(new Translation2d(0, 0), Rotation2d.fromDegrees(180))
-                )
-            );
-
-            // Action driveTestPathAction = new DrivePathAction(trajectoryPoints);
-
-            Action driveBackAction = new DriveDistanceAction(-5.0);
-
             Action testAuto = new SeriesAction(
                 new LambdaAction(() -> Extension.getInstance().updateExtensionState(ExtensionState.HIGH_ROW)),
                 new LambdaAction(() -> Gripper.getInstance().enableGripper()),
@@ -152,17 +137,6 @@ public final class Auto extends Subsystem {
         }
 
         public static final Action chargeStationScoreAndEnable() {
-            Pose2d startPose = new Pose2d(new Translation2d(5, 5), Rotation2d.fromDegrees(180));
-  
-            ArrayList<Pose2d> trajectoryPoints = new ArrayList<Pose2d>(
-                Arrays.asList(
-                    startPose,
-                    new Pose2d(startPose.getX() - 3.0, startPose.getY(), Rotation2d.fromDegrees(180))
-                )
-            );
-
-            Action driveBackAction = new DriveDistanceAction(-2.16);
-
             Action testAuto = new SeriesAction(
                 new LambdaAction(() -> Gripper.getInstance().enableGripper()),
                 new LambdaAction(() -> Extension.getInstance().updateExtensionState(ExtensionState.MIDDLE_ROW)),

@@ -39,6 +39,8 @@ public final class SeriesAction extends Action {
 
         this.mRemainingActions.forEach(Action::runEnd);
 
+        this.isFinished = true;
+
         if (this.willThreadRun()) {
             this.getThreadLock().unlock();
         }
