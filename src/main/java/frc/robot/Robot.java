@@ -42,6 +42,12 @@ public final class Robot extends TimedRobot {
     UsbCamera gripperCamera = CameraServer.startAutomaticCapture();
     gripperCamera.setResolution(640, 480);
 
+    PoseEstimator.getInstance().swervePoseEstimator.resetPosition(
+      Swerve.getInstance().getGyroRotation(), 
+      Swerve.getInstance().getModulePositions(), 
+      Auto.getInstance().startPose
+    );
+
     Swerve.getInstance().initialGyroOffset = Swerve.getInstance().getGyroRotation().getDegrees();
     Swerve.getInstance().zeroGyro();
 

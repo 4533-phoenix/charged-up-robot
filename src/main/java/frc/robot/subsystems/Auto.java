@@ -4,6 +4,7 @@ import frc.robot.Constants.*;
 import frc.robot.Robot;
 
 import edu.wpi.first.math.controller.*;
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.trajectory.Trajectory;
@@ -16,6 +17,8 @@ import java.util.Map;
 
 public final class Auto extends Subsystem {
     private static Auto mInstance;
+
+    public Pose2d startPose;
 
     private static final Map<String, Action> autoCommands = Map.ofEntries(
         Map.entry("PathPlanner Test", AutoActions.pathPlannerTest()),
@@ -117,7 +120,10 @@ public final class Auto extends Subsystem {
         }
 
         public static final Action pathPlannerTest() {
-            return new DrivePathAction("PathPlanner Test", 5.0, 3.0, false);
+            DrivePathAction testPath = new DrivePathAction("PathPlanner Test", 5.0, 3.0, false);
+            Auto.getInstance().startPose = testPath.getStartPose();
+
+            return testPath.withSubsystem(Auto.getInstance());
         }
 
         public static final Action rightLeftScoreAndLeave() {

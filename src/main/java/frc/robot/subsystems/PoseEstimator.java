@@ -18,7 +18,7 @@ public final class PoseEstimator extends Subsystem {
 
     Pose2d initialPose = new Pose2d();
 
-    private SwerveDrivePoseEstimator swervePoseEstimator = new SwerveDrivePoseEstimator(
+    public SwerveDrivePoseEstimator swervePoseEstimator = new SwerveDrivePoseEstimator(
         DriveConstants.SWERVE_KINEMATICS, 
         Swerve.getInstance().getGyroRotation(),
         Swerve.getInstance().getModulePositions(),
