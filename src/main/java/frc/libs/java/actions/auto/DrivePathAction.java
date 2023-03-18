@@ -28,14 +28,12 @@ public class DrivePathAction extends Action {
         double startTime = Timer.getFPGATimestamp();
 
         while (Timer.getFPGATimestamp() <= this.mPath.getEndState().timeSeconds + startTime) {
-            System.out.println("running path");
-
             Trajectory.State currState = this.mPath.sample(Timer.getFPGATimestamp() - startTime);
 
             ChassisSpeeds chassisSpeeds = Auto.getInstance().getAutoController().calculate(
                 PoseEstimator.getInstance().getSwervePose(),
                 currState,
-                new Rotation2d()
+                currState.poseMeters.getRotation()
             );
 
             SwerveModuleState[] swerveModuleStates = DriveConstants.SWERVE_KINEMATICS.toSwerveModuleStates(chassisSpeeds);

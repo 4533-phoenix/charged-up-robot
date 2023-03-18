@@ -1,7 +1,8 @@
 package frc.robot.subsystems;
 
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
-import java.util.Arrays;
+import edu.wpi.first.math.MatBuilder;
+import edu.wpi.first.math.Nat;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -25,7 +26,8 @@ public final class PoseEstimator extends Subsystem {
         initialPose
     );
 
-    private PoseEstimator() {}
+    private PoseEstimator() {
+    }
 
     public static PoseEstimator getInstance() {
         if (mInstance == null) {
@@ -74,7 +76,10 @@ public final class PoseEstimator extends Subsystem {
                 pose = LimelightHelper.getBotPose2d(limelightName);
             }
 
-            PoseEstimator.getInstance().swervePoseEstimator.addVisionMeasurement(pose, Timer.getFPGATimestamp() - LimelightHelper.getLatency_Pipeline(limelightName));
+            double trust = (1 - LimelightHelper.getTA(limelightName)) * 4;
+
+            PoseEstimator.getInstance().swervePoseEstimator.setVisionMeasurementStdDevs(new MatBuilder<>(Nat.N3(), Nat.N1()).fill(trust, trust, trust));
+            PoseEstimator.getInstance().swervePoseEstimator.addVisionMeasurement(pose, Timer.getFPGATimestamp());
         }
     }
 
@@ -89,8 +94,8 @@ public final class PoseEstimator extends Subsystem {
 
     @Override
     public void periodic() {
-        PoseEstimator.getInstance().swervePoseEstimator.update(Rotation2d.fromDegrees(Swerve.getInstance().getGyroRotation().getDegrees() + Swerve.getInstance().initialGyroOffset), Swerve.getInstance().getModulePositions());
         addVisionPose2d();
+        PoseEstimator.getInstance().swervePoseEstimator.update(Rotation2d.fromDegrees(Swerve.getInstance().getGyroRotation().getDegrees() + Swerve.getInstance().initialGyroOffset), Swerve.getInstance().getModulePositions());
     }
 
     @Override
