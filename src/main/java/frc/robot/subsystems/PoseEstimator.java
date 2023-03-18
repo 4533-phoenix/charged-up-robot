@@ -1,23 +1,22 @@
 package frc.robot.subsystems;
 
-import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
+import java.util.Arrays;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.networktables.*;
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import frc.libs.java.actions.*;
 import frc.robot.Robot;
 import frc.robot.Constants.*;
+import frc.robot.helpers.LimelightHelper;
 
 public final class PoseEstimator extends Subsystem {
     private static PoseEstimator mInstance;
 
     Pose2d initialPose = new Pose2d();
-    
-    NetworkTable table = NetworkTableInstance.getDefault().getTable("apriltag");
-    NetworkTableEntry position = table.getEntry("position");
-    NetworkTableEntry rotation = table.getEntry("rotation");
 
     private SwerveDrivePoseEstimator swervePoseEstimator = new SwerveDrivePoseEstimator(
         DriveConstants.SWERVE_KINEMATICS, 
@@ -57,21 +56,26 @@ public final class PoseEstimator extends Subsystem {
         this.swervePoseEstimator.resetPosition(gyroAngle, modulePositions, this.initialPose);
     }
 
-    public Translation3d getPositionFromVision() {
-        double[] defaultArray = {0,0,0};
-        double[] positionArray = position.getDoubleArray(defaultArray);
+    public void addVisionPose2d() {
+        Alliance alliance = DriverStation.getAlliance();
 
-        return new Translation3d(positionArray[0], positionArray[1], positionArray[2]);
-    }
+        for (String limelightName : LimelightConstants.LIMELIGHT_NAMES) {
+            if (!LimelightHelper.getTV(limelightName)) {
+                continue;
+            }
 
-    public Rotation2d getRotationFromVision() {
-        double rotationFromTable = rotation.getDouble(0);
+            Pose2d pose = new Pose2d();
 
-        return new Rotation2d(rotationFromTable);
-    }
+            if (alliance == Alliance.Red) {
+                pose = LimelightHelper.getBotPose2d_wpiRed(limelightName);
+            } else if (alliance == Alliance.Blue) {
+                pose = LimelightHelper.getBotPose2d_wpiBlue(limelightName);
+            } else {
+                pose = LimelightHelper.getBotPose2d(limelightName);
+            }
 
-    public Pose2d getVisionPose2d() {
-        return new Pose2d(this.getPositionFromVision().getX(), this.getPositionFromVision().getY(), getRotationFromVision());
+            PoseEstimator.getInstance().swervePoseEstimator.addVisionMeasurement(pose, Timer.getFPGATimestamp() - LimelightHelper.getLatency_Pipeline(limelightName));
+        }
     }
 
     @Override
@@ -86,7 +90,7 @@ public final class PoseEstimator extends Subsystem {
     @Override
     public void periodic() {
         PoseEstimator.getInstance().swervePoseEstimator.update(Rotation2d.fromDegrees(Swerve.getInstance().getGyroRotation().getDegrees() + Swerve.getInstance().initialGyroOffset), Swerve.getInstance().getModulePositions());
-        // PoseEstimator.getInstance().swervePoseEstimator.addVisionMeasurement(PoseEstimator.getInstance().getVisionPose2d(), Timer.getFPGATimestamp());
+        addVisionPose2d();
     }
 
     @Override

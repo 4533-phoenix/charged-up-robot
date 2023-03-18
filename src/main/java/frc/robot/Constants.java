@@ -193,6 +193,12 @@ public final class Constants {
 //         public static final boolean WILL_NOT_CANCEL = false;
 //     }
 
+//      public static final class LimelightConstants {
+//          public static final String[] LIMELIGHT_NAMES = new String[] {
+//              "limelight"
+//          };
+//      }
+
 //  CONSTANTS FOR PRACTICE ROBOT
 
 	public static final class GlobalConstants {
@@ -378,5 +384,10 @@ public final class Constants {
         public static final boolean WILL_CANCEL = true;
 
         public static final boolean WILL_NOT_CANCEL = false;
+    }
+
+    public static final class LimelightConstants {
+        public static final String[] LIMELIGHT_NAMES = new String[] {
+        };
     }
 }
