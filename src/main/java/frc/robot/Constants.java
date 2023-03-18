@@ -290,7 +290,7 @@ public final class Constants {
         public static final double FRONT_LEFT_STEER_ABSOLUTE_ENCODER_OFFSET = 1.4404;
         public static final double FRONT_RIGHT_STEER_ABSOLUTE_ENCODER_OFFSET = 1.5585;
         public static final double BACK_LEFT_STEER_ABSOLUTE_ENCODER_OFFSET = 3.6202;
-        public static final double BACK_RIGHT_STEER_ABSOLUTE_ENCODER_OFFSET = 4.5452;
+        public static final double BACK_RIGHT_STEER_ABSOLUTE_ENCODER_OFFSET = 2.1844;
 
         public static final double DRIVE_MAX_PHYSICAL_VELOCITY = Units.feetToMeters(14.6);
 
