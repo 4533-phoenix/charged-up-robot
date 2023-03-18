@@ -19,7 +19,7 @@ public final class PoseEstimator extends Subsystem {
     NetworkTableEntry position = table.getEntry("position");
     NetworkTableEntry rotation = table.getEntry("rotation");
 
-    private SwerveDrivePoseEstimator swervePoseEstimator = new SwerveDrivePoseEstimator(
+    public SwerveDrivePoseEstimator swervePoseEstimator = new SwerveDrivePoseEstimator(
         DriveConstants.SWERVE_KINEMATICS, 
         Swerve.getInstance().getGyroRotation(),
         Swerve.getInstance().getModulePositions(),
