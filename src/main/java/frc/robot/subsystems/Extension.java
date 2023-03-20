@@ -216,7 +216,7 @@ public final class Extension extends Subsystem {
 
                 // System.out.println("p error: " + Extension.getInstance().getElbowController().getPositionError());
                 // System.out.println("absolute: " + Extension.getInstance().getAbsoluteEncoderAbsolutePosition());
-                System.out.println("angle: " + Extension.getInstance().getElbowAngle().getDegrees());
+                // System.out.println("angle: " + Extension.getInstance().getElbowAngle().getDegrees());
                 // System.out.println("setpoint: " + Extension.getInstance().getElbowController().getSetpoint());
                 // System.out.println("current: " + Extension.getInstance().elbowMotor.getOutputCurrent());
             };

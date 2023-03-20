@@ -170,7 +170,7 @@ public final class Swerve extends Subsystem {
         ChassisSpeeds chassisSpeeds;
         if (fieldRelative) {
             chassisSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(
-                xSpeed, ySpeed, steerSpeed, getGyroRotation()
+                xSpeed, ySpeed, steerSpeed, PoseEstimator.getInstance().getSwerveRotation()
             );
         } else {
             chassisSpeeds = new ChassisSpeeds(xSpeed, ySpeed, steerSpeed);
@@ -308,7 +308,7 @@ public final class Swerve extends Subsystem {
                     Swerve.getInstance().drive(swerveTranslation, swerveRotation, true, true);
                 }
 
-                Swerve.getInstance().printModuleOffsets();
+                // Swerve.getInstance().printModuleOffsets();
             };
 
             Runnable endMethod = () -> {

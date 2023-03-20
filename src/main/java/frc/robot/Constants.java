@@ -8,6 +8,7 @@ import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 public final class Constants {
 //  CONSTANTS FOR COMPETITION ROBOT
 
+
 	public static final class GlobalConstants {
 		// Robot loop time
 		public static final double LOOPER_TIME = 0.02;
@@ -195,7 +196,8 @@ public final class Constants {
 
      public static final class LimelightConstants {
          public static final String[] LIMELIGHT_NAMES = new String[] {
-             "limelight"
+             "limelight-front",
+             "limelight-back"
          };
      }
 
