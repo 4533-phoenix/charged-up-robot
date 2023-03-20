@@ -22,6 +22,8 @@ import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 
 public final class Swerve extends Subsystem {
     private static Swerve mInstance;
@@ -168,7 +170,13 @@ public final class Swerve extends Subsystem {
         steerSpeed = steerLimiter.calculate(steerSpeed);
 
         ChassisSpeeds chassisSpeeds;
-        if (fieldRelative) {
+
+        Alliance alliance = DriverStation.getAlliance();
+        if (fieldRelative && alliance == Alliance.Red) {
+            chassisSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(
+                xSpeed, ySpeed, steerSpeed, PoseEstimator.getInstance().getSwerveRotation().plus(new Rotation2d(Math.PI))
+            );
+        } else if (fieldRelative) {
             chassisSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(
                 xSpeed, ySpeed, steerSpeed, PoseEstimator.getInstance().getSwerveRotation()
             );

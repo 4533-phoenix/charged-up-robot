@@ -68,13 +68,15 @@ public final class PoseEstimator extends Subsystem {
 
             Pose2d pose = new Pose2d();
 
-            if (alliance == Alliance.Red) {
-                pose = LimelightHelper.getBotPose2d_wpiRed(limelightName);
-            } else if (alliance == Alliance.Blue) {
-                pose = LimelightHelper.getBotPose2d_wpiBlue(limelightName);
-            } else {
-                pose = LimelightHelper.getBotPose2d(limelightName);
-            }
+            // if (alliance == Alliance.Red) {
+            //     pose = LimelightHelper.getBotPose2d_wpiRed(limelightName);
+            // } else if (alliance == Alliance.Blue) {
+            //     pose = LimelightHelper.getBotPose2d_wpiBlue(limelightName);
+            // } else {
+            //     pose = LimelightHelper.getBotPose2d(limelightName);
+            // }
+
+            pose = LimelightHelper.getBotPose2d(limelightName);
 
             double trust = (1 - LimelightHelper.getTA(limelightName)) * 4;
 
