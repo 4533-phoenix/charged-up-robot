@@ -79,19 +79,10 @@ public final class PoseEstimator extends Subsystem {
     }
 
     @Override
-    public void log() {
-        SmartDashboard.putNumber("Robot Pose - X", this.getSwervePose().getX());
-        SmartDashboard.putNumber("Robot Pose - Y", this.getSwervePose().getY());
-        SmartDashboard.putNumber("Odometry Robot Pose - X" , this.getOdometrySwervePose().getX());
-        SmartDashboard.putNumber("Odometry Robot Pose - Y" , this.getOdometrySwervePose().getY());
-        SmartDashboard.putNumber("Robot Pose - Angle", this.getSwerveRotation().getDegrees());
-    }
+    public void log() {}
 
     @Override
-    public void periodic() {
-        PoseEstimator.getInstance().swervePoseEstimator.update(Rotation2d.fromDegrees(Swerve.getInstance().getGyroRotation().getDegrees() + Swerve.getInstance().initialGyroOffset), Swerve.getInstance().getModulePositions());
-        addVisionPose2d();
-    }
+    public void periodic() {}
 
     @Override
     public void queryInitialActions() {

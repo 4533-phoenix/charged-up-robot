@@ -14,6 +14,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.cameraserver.CameraServer;
 import edu.wpi.first.cscore.UsbCamera;
+import edu.wpi.first.math.geometry.Rotation2d;
 
 /**
  * The VM is configured to automatically run this class, and to call the functions corresponding to
@@ -62,7 +63,14 @@ public final class Robot extends TimedRobot {
   }
 
   @Override
-  public void robotPeriodic() {}
+  public void robotPeriodic() {
+    PoseEstimator.getInstance().swervePoseEstimator.update(Rotation2d.fromDegrees(Swerve.getInstance().getGyroRotation().getDegrees()), Swerve.getInstance().getModulePositions());
+    PoseEstimator.getInstance().addVisionPose2d();
+
+    SmartDashboard.putNumber("Robot Pose - X", PoseEstimator.getInstance().getSwervePose().getX());
+    SmartDashboard.putNumber("Robot Pose - Y", PoseEstimator.getInstance().getSwervePose().getY());
+    SmartDashboard.putNumber("Robot Pose - Angle", PoseEstimator.getInstance().getSwerveRotation().getDegrees());
+  }
 
   @Override
   public void autonomousInit() {

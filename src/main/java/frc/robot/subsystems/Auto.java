@@ -5,10 +5,12 @@ import frc.robot.Robot;
 
 import edu.wpi.first.math.controller.*;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.libs.java.actions.Action;
 import frc.libs.java.actions.Subsystem;
 import frc.libs.java.actions.auto.*;
@@ -120,7 +122,7 @@ public final class Auto extends Subsystem {
         }
 
         public static final Action pathPlannerTest() {
-            DrivePathAction testPath = new DrivePathAction("PathPlanner Test", 5.0, 3.0, false);
+            DrivePathAction testPath = new DrivePathAction("PathPlanner Test", 5.0, 3.0, true);
             Auto.getInstance().startPose = testPath.getStartPose();
 
             return testPath.withSubsystem(Auto.getInstance());
