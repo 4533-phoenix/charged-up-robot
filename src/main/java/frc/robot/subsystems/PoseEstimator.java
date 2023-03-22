@@ -66,7 +66,14 @@ public final class PoseEstimator extends Subsystem {
                 continue;
             }
 
-            Pose2d pose = LimelightHelper.getBotPose2d(limelightName);
+            Pose2d pose;
+
+            if (alliance == Alliance.Red) {
+                pose = LimelightHelper.getBotPose2d_wpiRed(limelightName);
+            } else {
+                pose = LimelightHelper.getBotPose2d_wpiBlue(limelightName);
+            }
+
             double trust = (1 - LimelightHelper.getTA(limelightName)) * 4;
 
             PoseEstimator.getInstance().swervePoseEstimator.setVisionMeasurementStdDevs(new MatBuilder<>(Nat.N3(), Nat.N1()).fill(trust, trust, trust));

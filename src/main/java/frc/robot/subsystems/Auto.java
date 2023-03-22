@@ -122,7 +122,7 @@ public final class Auto extends Subsystem {
         }
 
         public static final Action pathPlannerTest() {
-            DrivePathAction testPath = new DrivePathAction("PathPlanner Test", 5.0, 3.0, true);
+            DrivePathAction testPath = new DrivePathAction("PathPlanner Test", 5.0, 3.0, false);
             Auto.getInstance().startPose = testPath.getStartPose();
 
             return testPath.withSubsystem(Auto.getInstance());

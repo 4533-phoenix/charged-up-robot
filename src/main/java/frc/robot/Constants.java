@@ -18,17 +18,17 @@ public final class Constants {
 
     public static final class AutoConstants {
         // Holonomic controller PID constants - x
-        public static final double AUTO_X_VELOCITY_KP = 0.05;
+        public static final double AUTO_X_VELOCITY_KP = 0.1;
         public static final double AUTO_X_VELOCITY_KI = 0.0;
-        public static final double AUTO_X_VELOCITY_KD = 0.1;
+        public static final double AUTO_X_VELOCITY_KD = 0.0;
 
         // Holonomic controller PID constants - y
-        public static final double AUTO_Y_VELOCITY_KP = 0.05;
+        public static final double AUTO_Y_VELOCITY_KP = 0.1;
         public static final double AUTO_Y_VELOCITY_KI = 0.0;
-        public static final double AUTO_Y_VELOCITY_KD = 0.1;
+        public static final double AUTO_Y_VELOCITY_KD = 0.0;
 
         // Holonomic controller PID constants - theta velocity (omega)
-        public static final double AUTO_OMEGA_KP = 0.1;
+        public static final double AUTO_OMEGA_KP = 1.2;
         public static final double AUTO_OMEGA_KI = 0.0;
         public static final double AUTO_OMEGA_KD = 0.0;
 
