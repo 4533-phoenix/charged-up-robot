@@ -9,6 +9,7 @@ import frc.robot.Constants.*;
 import frc.robot.subsystems.*;
 import frc.robot.controls.PSController;
 import frc.robot.subsystems.Auto;
+import frc.robot.subsystems.Extension.ExtensionState;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -57,7 +58,11 @@ public final class Robot extends TimedRobot {
     Extension.getInstance().initialAbsoluteEncoderPosition = 1.0 + Extension.getInstance().getAbsoluteEncoderAbsolutePosition() - Extension.getInstance().elbowAbsoluteEncoder.getPositionOffset();
     Extension.getInstance().elbowRelativeEncoder.reset();
 
+    Extension.getInstance().updateExtensionState(ExtensionState.MATCH_START);
+
     LED.getInstance().configureLEDs();
+
+    Gripper.getInstance().enableGripper();
 
     RobotContainer.queryInitialActions();
   }
@@ -79,6 +84,8 @@ public final class Robot extends TimedRobot {
     autonomousRunner.add(
       Auto.getInstance().getAutonomous(this.autoSelected)
     );
+
+    teleopRunner.disable();
 
     autonomousRunner.enable();
   }

@@ -21,6 +21,8 @@ public class DrivePathAction extends Action {
     public DrivePathAction(String path, double maxVelocity, double maxAccel, boolean isReversed) {
         super(() -> {}, () -> {}, () -> {}, true);
 
+        Auto.getInstance().getAutoController().setEnabled(true);
+
         this.mPath = PathPlanner.loadPath(path, maxVelocity, maxAccel, isReversed);
         this.startPose = mPath.getInitialHolonomicPose();
     }
@@ -31,14 +33,13 @@ public class DrivePathAction extends Action {
 
         this.mPath = PathPlannerTrajectory.transformTrajectoryForAlliance(this.mPath, DriverStation.getAlliance());
 
-        while (Timer.getFPGATimestamp() <= this.mPath.getEndState().timeSeconds + startTime) {
+        while (Timer.getFPGATimestamp() <= (this.mPath.getEndState().timeSeconds * 1.15)  + startTime) {
             PathPlannerState currState = (PathPlannerState) this.mPath.sample(Timer.getFPGATimestamp() - startTime);
             currState = PathPlannerTrajectory.transformStateForAlliance(currState, DriverStation.getAlliance());
 
             ChassisSpeeds chassisSpeeds = Auto.getInstance().getAutoController().calculate(
                 PoseEstimator.getInstance().getSwervePose(),
-                currState,
-                currState.holonomicRotation
+                currState
             );
 
             SwerveModuleState[] swerveModuleStates = DriveConstants.SWERVE_KINEMATICS.toSwerveModuleStates(chassisSpeeds);
