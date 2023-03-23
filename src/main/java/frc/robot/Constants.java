@@ -17,26 +17,23 @@ public final class Constants {
 
     public static final class AutoConstants {
         // Holonomic controller PID constants - x
-        public static final double AUTO_X_VELOCITY_KP = 0.05;
+        public static final double AUTO_X_VELOCITY_KP = 0.1;
         public static final double AUTO_X_VELOCITY_KI = 0.0;
-        public static final double AUTO_X_VELOCITY_KD = 0.1;
+        public static final double AUTO_X_VELOCITY_KD = 0.0;
 
         // Holonomic controller PID constants - y
-        public static final double AUTO_Y_VELOCITY_KP = 0.05;
+        public static final double AUTO_Y_VELOCITY_KP = 0.1;
         public static final double AUTO_Y_VELOCITY_KI = 0.0;
-        public static final double AUTO_Y_VELOCITY_KD = 0.1;
+        public static final double AUTO_Y_VELOCITY_KD = 0.0;
 
-        // Holonomic controller PID constants - theta velocity (omega)
-        public static final double AUTO_OMEGA_KP = 0.1;
-        public static final double AUTO_OMEGA_KI = 0.0;
-        public static final double AUTO_OMEGA_KD = 0.0;
+        // Holonomic controller PID constants - angular velocity
+        public static final double AUTO_ROTATION_KP = 1.0;
+        public static final double AUTO_ROTATION_KI = 0.0;
+        public static final double AUTO_ROTATION_KD = 0.0;
 
         // Max translational velocity, acceleration in m/s
         public static final double AUTO_MAX_VELOCITY = Units.feetToMeters(2.5);
         public static final double AUTO_MAX_ACCELERATION = Units.feetToMeters(1.0);
-
-        // Max rotational velocity, acceleration in rad/s
-        public static final TrapezoidProfile.Constraints AUTO_OMEGA_CONSTRAINTS = new TrapezoidProfile.Constraints(6.28, 3.14);
     }
 
 	public static final class ModuleConstants {

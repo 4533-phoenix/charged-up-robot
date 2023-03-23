@@ -3,7 +3,8 @@ package frc.robot.subsystems;
 import frc.robot.Constants.*;
 import frc.robot.Robot;
 
-import edu.wpi.first.math.controller.*;
+import com.pathplanner.lib.controllers.PPHolonomicDriveController;
+import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
@@ -29,7 +30,7 @@ public final class Auto extends Subsystem {
         Map.entry("Do Nothing", AutoActions.doNothing())
     );
 
-    private HolonomicDriveController autoController = new HolonomicDriveController(
+    private PPHolonomicDriveController autoController = new PPHolonomicDriveController(
         new PIDController(
             AutoConstants.AUTO_X_VELOCITY_KP,
             AutoConstants.AUTO_X_VELOCITY_KI,
@@ -40,11 +41,10 @@ public final class Auto extends Subsystem {
             AutoConstants.AUTO_Y_VELOCITY_KI,
             AutoConstants.AUTO_Y_VELOCITY_KD
         ),
-        new ProfiledPIDController(
-            AutoConstants.AUTO_OMEGA_KP,
-            AutoConstants.AUTO_OMEGA_KI,
-            AutoConstants.AUTO_OMEGA_KD,
-            AutoConstants.AUTO_OMEGA_CONSTRAINTS
+        new PIDController(
+            AutoConstants.AUTO_ROTATION_KP,
+            AutoConstants.AUTO_ROTATION_KI,
+            AutoConstants.AUTO_ROTATION_KD
         )
     );
 
@@ -58,18 +58,8 @@ public final class Auto extends Subsystem {
         return mInstance;
     }
 
-    public HolonomicDriveController getAutoController() {
+    public PPHolonomicDriveController getAutoController() {
         return this.autoController;
-    }
-
-    public SwerveModuleState[] getSwerveModuleStates(Trajectory.State trajectoryState) {
-        ChassisSpeeds chassisSpeeds = this.autoController.calculate(
-            PoseEstimator.getInstance().getSwervePose(),
-            trajectoryState,
-            trajectoryState.poseMeters.getRotation()
-        );
-
-        return DriveConstants.SWERVE_KINEMATICS.toSwerveModuleStates(chassisSpeeds);
     }
 
     public void enableChargeStation(boolean direction) {
@@ -106,6 +96,30 @@ public final class Auto extends Subsystem {
         Swerve.getInstance().setModuleStates(DriveConstants.SWERVE_KINEMATICS.toSwerveModuleStates(new ChassisSpeeds()));
     }
 
+    public void driveOverChargeStation(boolean direction) {
+        ChassisSpeeds driveSpeeds;
+       
+        if (direction) {
+            driveSpeeds =  new ChassisSpeeds(Units.feetToMeters(8.0), 0, 0);
+        } else {
+            driveSpeeds = new ChassisSpeeds(Units.feetToMeters(-8.0), 0, 0);
+        }
+
+        SwerveModuleState[] moduleStates = DriveConstants.SWERVE_KINEMATICS.toSwerveModuleStates(driveSpeeds);
+
+        Swerve.getInstance().setModuleStates(moduleStates);
+
+        while (Math.abs(Swerve.getInstance().getPitch()) < 8.0) {}
+
+        while (Math.abs(Swerve.getInstance().getPitch()) > 2.0) {}
+
+        while (Math.abs(Swerve.getInstance().getPitch()) < 8.0) {}
+
+        while (Math.abs(Swerve.getInstance().getPitch()) > 1.5) {}
+        
+        Swerve.getInstance().setModuleStates(DriveConstants.SWERVE_KINEMATICS.toSwerveModuleStates(new ChassisSpeeds()));
+    }
+
     public void adjustChargeStation() {
         while (Math.abs(Swerve.getInstance().getPitch()) > DriveConstants.CHARGE_STATION_PITCH_DEADBAND) {
             ChassisSpeeds driveSpeeds = Swerve.getInstance().getPitch() < 0.0 ? new ChassisSpeeds(-0.5, 0.0, 0.0) : new ChassisSpeeds(0.5, 0.0, 0.0);
@@ -122,7 +136,7 @@ public final class Auto extends Subsystem {
         }
 
         public static final Action pathPlannerTest() {
-            DrivePathAction testPath = new DrivePathAction("PathPlanner Test", 5.0, 3.0, true);
+            DrivePathAction testPath = new DrivePathAction("PathPlanner Test", 1.5, 1.0, false);
             Auto.getInstance().startPose = testPath.getStartPose();
 
             return testPath.withSubsystem(Auto.getInstance());
@@ -133,7 +147,7 @@ public final class Auto extends Subsystem {
                 new LambdaAction(() -> Extension.getInstance().updateExtensionState(ExtensionState.HIGH_ROW)),
                 new LambdaAction(() -> Gripper.getInstance().enableGripper()),
                 new LambdaAction(() -> Swerve.getInstance().setModuleStates(DriveConstants.SWERVE_KINEMATICS.toSwerveModuleStates(new ChassisSpeeds()))),
-                new WaitAction(3.0),
+                new WaitAction(1.25),
                 new LambdaAction(() -> Gripper.getInstance().disableGripper()),
                 new WaitAction(0.5),
                 new DriveDistanceAction(-1.0),
@@ -147,13 +161,16 @@ public final class Auto extends Subsystem {
         public static final Action chargeStationScoreAndEnable() {
             Action testAuto = new SeriesAction(
                 new LambdaAction(() -> Gripper.getInstance().enableGripper()),
-                new LambdaAction(() -> Extension.getInstance().updateExtensionState(ExtensionState.MIDDLE_ROW)),
+                new LambdaAction(() -> Extension.getInstance().updateExtensionState(ExtensionState.HIGH_ROW)),
                 new LambdaAction(() -> Swerve.getInstance().setModuleStates(DriveConstants.SWERVE_KINEMATICS.toSwerveModuleStates(new ChassisSpeeds()))),
-                new WaitAction(4.0),
+                new WaitAction(1.25),
                 new LambdaAction(() -> Gripper.getInstance().disableGripper()),
-                new WaitAction(0.5),
-                new LambdaAction(() -> Auto.getInstance().enableChargeStation(false)),
-                new WaitAction(0.5),
+                new WaitAction(0.15),
+                new DriveDistanceAction(-0.25),
+                new LambdaAction(() -> Extension.getInstance().updateExtensionState(ExtensionState.OFF_GROUND)),
+                new LambdaAction(() -> Auto.getInstance().driveOverChargeStation(false)),
+                new LambdaAction(() -> Auto.getInstance().enableChargeStation(true)),
+                new WaitAction(0.25),
                 new LambdaAction(() -> Auto.getInstance().adjustChargeStation())
             );
 
