@@ -8,7 +8,6 @@ import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 public final class Constants {
 //  CONSTANTS FOR COMPETITION ROBOT
 
-
 	public static final class GlobalConstants {
 		// Robot loop time
 		public static final double LOOPER_TIME = 0.02;
@@ -222,9 +221,9 @@ public final class Constants {
     //     public static final double AUTO_Y_VELOCITY_KD = 0.1;
 
     //     // Holonomic controller PID constants - theta velocity (omega)
-    //     public static final double AUTO_OMEGA_KP = 0.1;
+    //     public static final double AUTO_OMEGA_KP = 8.0;
     //     public static final double AUTO_OMEGA_KI = 0.0;
-    //     public static final double AUTO_OMEGA_KD = 0.0;
+    //     public static final double AUTO_OMEGA_KD = 0.2;
 
     //     // Max translational velocity, acceleration in m/s
     //     public static final double AUTO_MAX_VELOCITY = Units.feetToMeters(2.5);
@@ -277,7 +276,7 @@ public final class Constants {
     //     public static final boolean FRONT_LEFT_DRIVE_ENCODER_REVERSED = false;
     //     public static final boolean FRONT_RIGHT_DRIVE_ENCODER_REVERSED = true;
     //     public static final boolean BACK_LEFT_DRIVE_ENCODER_REVERSED = false;
-    //     public static final boolean BACK_RIGHT_DRIVE_ENCODER_REVERSED = true;
+    //     public static final boolean BACK_RIGHT_DRIVE_ENCODER_REVERSED = false;
 
     //     public static final boolean FRONT_LEFT_STEER_ENCODER_REVERSED = false;
     //     public static final boolean FRONT_RIGHT_STEER_ENCODER_REVERSED = false;
@@ -333,7 +332,7 @@ public final class Constants {
     //     public static final double ELBOW_MAX_ACCELERATION = 1.0;
 
     //     public static final int ELBOW_ABSOLUTE_ENCODER_PORT = 0;
-    //     public static final double ELBOW_ABSOLUTE_ENCODER_OFFSET = 0.8514;
+    //     public static final double ELBOW_ABSOLUTE_ENCODER_OFFSET = 0.318;
 
     //     public static final int ELBOW_ENCODER_PORT_A = 1;
     //     public static final int ELBOW_ENCODER_PORT_B = 2;
