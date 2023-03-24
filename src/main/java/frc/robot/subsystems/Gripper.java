@@ -35,7 +35,7 @@ public final class Gripper extends Subsystem {
     }
 
     public boolean objectInGripper() {
-        return gripperLimitSwitch.get();
+        return !gripperLimitSwitch.get();
     }
 
     private static final class GripperActions {

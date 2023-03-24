@@ -97,6 +97,22 @@ public final class Auto extends Subsystem {
         Swerve.getInstance().setModuleStates(DriveConstants.SWERVE_KINEMATICS.toSwerveModuleStates(new ChassisSpeeds()));
     }
 
+    public void straightenWheels(double time) {
+        double startTime = Timer.getFPGATimestamp();
+
+        ChassisSpeeds driveSpeeds;
+
+        driveSpeeds =  new ChassisSpeeds(Units.feetToMeters(-0.25), 0, 0);
+
+        while (Timer.getFPGATimestamp() - startTime < time) {
+            SwerveModuleState[] moduleStates = DriveConstants.SWERVE_KINEMATICS.toSwerveModuleStates(driveSpeeds);
+
+            Swerve.getInstance().setModuleStates(moduleStates);
+        }
+
+        Swerve.getInstance().setModuleStates(DriveConstants.SWERVE_KINEMATICS.toSwerveModuleStates(new ChassisSpeeds()));
+    }
+
     public void driveOverChargeStation(boolean direction) {
         ChassisSpeeds driveSpeeds;
        
@@ -123,7 +139,7 @@ public final class Auto extends Subsystem {
 
     public void adjustChargeStation() {
         while (Math.abs(Swerve.getInstance().getPitch()) > DriveConstants.CHARGE_STATION_PITCH_DEADBAND) {
-            ChassisSpeeds driveSpeeds = Swerve.getInstance().getPitch() < 0.0 ? new ChassisSpeeds(-0.5, 0.0, 0.0) : new ChassisSpeeds(0.5, 0.0, 0.0);
+            ChassisSpeeds driveSpeeds = Swerve.getInstance().getPitch() < 0.0 ? new ChassisSpeeds(-0.3, 0.0, 0.0) : new ChassisSpeeds(0.3, 0.0, 0.0);
 
             Swerve.getInstance().setModuleStates(DriveConstants.SWERVE_KINEMATICS.toSwerveModuleStates(driveSpeeds));
         }
@@ -151,6 +167,7 @@ public final class Auto extends Subsystem {
                 new WaitAction(1.25),
                 new LambdaAction(() -> Gripper.getInstance().disableGripper()),
                 new WaitAction(0.5),
+                new LambdaAction(() -> Auto.getInstance().straightenWheels(1.0)),
                 new DriveDistanceAction(-1.0),
                 new LambdaAction(() -> Extension.getInstance().updateExtensionState(ExtensionState.OFF_GROUND)),
                 new DriveDistanceAction(-4.0)
@@ -163,13 +180,12 @@ public final class Auto extends Subsystem {
             Action testAuto = new SeriesAction(
                 new LambdaAction(() -> Gripper.getInstance().enableGripper()),
                 new LambdaAction(() -> Extension.getInstance().updateExtensionState(ExtensionState.HIGH_ROW)),
-                new LambdaAction(() -> Swerve.getInstance().setModuleStates(DriveConstants.SWERVE_KINEMATICS.toSwerveModuleStates(new ChassisSpeeds()))),
                 new WaitAction(1.25),
                 new LambdaAction(() -> Gripper.getInstance().disableGripper()),
-                new WaitAction(0.15),
+                new LambdaAction(() -> Auto.getInstance().straightenWheels(1.0)),
+                new WaitAction(1.0),
                 new LambdaAction(() -> Extension.getInstance().updateExtensionState(ExtensionState.OFF_GROUND)),
-                new DrivePathAction("Over Charge Station", 3.5, 5.0, false),
-                new LambdaAction(() -> Auto.getInstance().enableChargeStation(true)),
+                new LambdaAction(() -> Auto.getInstance().enableChargeStation(false)),
                 new WaitAction(0.25),
                 new LambdaAction(() -> Auto.getInstance().adjustChargeStation())
             );

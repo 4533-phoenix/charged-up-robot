@@ -17,17 +17,17 @@ public final class Constants {
 
     public static final class AutoConstants {
         // Holonomic controller PID constants - x
-        public static final double AUTO_X_VELOCITY_KP = 0.1;
+        public static final double AUTO_X_VELOCITY_KP = 1.0;
         public static final double AUTO_X_VELOCITY_KI = 0.0;
         public static final double AUTO_X_VELOCITY_KD = 0.0;
 
         // Holonomic controller PID constants - y
-        public static final double AUTO_Y_VELOCITY_KP = 0.1;
+        public static final double AUTO_Y_VELOCITY_KP = 1.0;
         public static final double AUTO_Y_VELOCITY_KI = 0.0;
         public static final double AUTO_Y_VELOCITY_KD = 0.0;
 
         // Holonomic controller PID constants - angular velocity
-        public static final double AUTO_ROTATION_KP = 1.0;
+        public static final double AUTO_ROTATION_KP = 0.0;
         public static final double AUTO_ROTATION_KI = 0.0;
         public static final double AUTO_ROTATION_KD = 0.0;
 
@@ -48,9 +48,9 @@ public final class Constants {
         public static final double DRIVE_ENCODER_METERS_PER_SECOND = DRIVE_ENCODER_METERS_PER_ROTATION / 60.0;
         public static final double STEER_ENCODER_RADIANS_PER_SECOND = STEER_ENCODER_RADIANS_PER_ROTATION / 60.0;
         
-        public static final double STEER_KP = 0.8;
+        public static final double STEER_KP = 0.5;
         public static final double STEER_KI = 0.0;
-        public static final double STEER_KD = 0.4;
+        public static final double STEER_KD = 0.0;
     }
 
     public static final class DriveConstants {
@@ -106,10 +106,10 @@ public final class Constants {
         public static final double DRIVE_MAX_PHYSICAL_VELOCITY = Units.feetToMeters(14.6);
 
         public static final double DRIVE_MAX_VELOCITY = Units.feetToMeters(12.0);
-        public static final double DRIVE_MAX_ROTATIONAL_VELOCITY = 1.0 * 2.0 * Math.PI; // rad/s
+        public static final double DRIVE_MAX_ROTATIONAL_VELOCITY = 4.0 * 2.0 * Math.PI; // rad/s
 
         public static final double DRIVE_MAX_VELOCITY_SLOW = Units.feetToMeters(3.0);
-        public static final double DRIVE_MAX_ROTATIONAL_VELOCITY_SLOW = 0.4  * 2.0 * Math.PI; // rad/s
+        public static final double DRIVE_MAX_ROTATIONAL_VELOCITY_SLOW = 2.0 * 2.0 * Math.PI; // rad/s
 
         public static final double DRIVE_ROTATION_KP = 11.0;
         public static final double DRIVE_ROTATION_KI = 0.2;
@@ -118,7 +118,7 @@ public final class Constants {
         public static final double DRIVE_MAX_ACCELERATION = 10.0; // m/s^2
         public static final double DRIVE_MAX_ROTATIONAL_ACCELERATION = 7.0; // rad/s^2
 
-        public static final double CHARGE_STATION_PITCH_DEADBAND = 0.75; // degrees
+        public static final double CHARGE_STATION_PITCH_DEADBAND = 1.5; // degrees
     }
 
     public static final class ExtensionConstants {
@@ -175,7 +175,7 @@ public final class Constants {
         public static final int DRIVER_ROT_AXIS = 4;
         
 		// Deadband for drive axes
-        public static final double DRIVE_DEADBAND = 0.025;
+        public static final double DRIVE_DEADBAND = 0.0005;
 
 		// Threshold for trigger being pressed
 		public static final double TRIGGER_THRESHOLD = 0.2;

@@ -24,6 +24,7 @@ import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 
 public final class Swerve extends Subsystem {
     private static Swerve mInstance;
@@ -127,7 +128,7 @@ public final class Swerve extends Subsystem {
     }
 
     public Rotation2d getGyroRotation() {
-        return Rotation2d.fromDegrees(-this.gyro.getYaw() + 180.0);
+        return Rotation2d.fromDegrees(-this.gyro.getYaw());
     }
 
     public SwerveModulePosition[] getModulePositions() {
@@ -172,14 +173,16 @@ public final class Swerve extends Subsystem {
         ChassisSpeeds chassisSpeeds;
 
         Alliance alliance = DriverStation.getAlliance();
-        if (fieldRelative && alliance == Alliance.Red) {
-            chassisSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(
-                xSpeed, ySpeed, steerSpeed, PoseEstimator.getInstance().getSwerveRotation().plus(new Rotation2d(Math.PI))
-            );
-        } else if (fieldRelative) {
-            chassisSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(
-                xSpeed, ySpeed, steerSpeed, PoseEstimator.getInstance().getSwerveRotation()
-            );
+        if (fieldRelative) {
+            if (Robot.operatorController.getButton(Button.BACK)) {
+                chassisSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(
+                    xSpeed, ySpeed, steerSpeed, getGyroRotation()
+                );
+            } else {
+                chassisSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(
+                    xSpeed, ySpeed, steerSpeed, PoseEstimator.getInstance().getSwerveRotation()
+                );
+            }
         } else {
             chassisSpeeds = new ChassisSpeeds(xSpeed, ySpeed, steerSpeed);
         }
@@ -212,7 +215,7 @@ public final class Swerve extends Subsystem {
             ChassisSpeeds chassisSpeeds;
             if (fieldRelative) {
                 chassisSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(
-                    xSpeed, ySpeed, steerSpeed, getGyroRotation()
+                    xSpeed, ySpeed, steerSpeed, PoseEstimator.getInstance().getSwerveRotation()
                 );
             } else {
                 chassisSpeeds = new ChassisSpeeds(xSpeed, ySpeed, steerSpeed);
@@ -300,17 +303,8 @@ public final class Swerve extends Subsystem {
                 
                 double swerveRotation = Swerve.getInstance().getSwerveRotation();
 
-                if (Swerve.getInstance().isSnapping()) {
-                    Swerve.getInstance().snapToDirection(swerveTranslation, Swerve.getInstance().snapSetpoint, true, true);
-                } else if (Robot.driverController.getButton(Button.Y)) {
-                    Swerve.getInstance().setSnapSetpoint(0);
-                } else if (Robot.driverController.getButton(Button.X)) {
-                    Swerve.getInstance().setSnapSetpoint(0.5 * Math.PI);
-                } else if (Robot.driverController.getButton(Button.A)) {
-                    Swerve.getInstance().setSnapSetpoint(Math.PI);
-                } else if (Robot.driverController.getButton(Button.B)) {
-                    Swerve.getInstance().setSnapSetpoint(1.5 * Math.PI);
-                } else if (Robot.driverController.getButton(Button.LB)) {
+                    
+                if (Robot.driverController.getButton(Button.LB)) {
                     Swerve.getInstance().drive(swerveTranslation, swerveRotation, false, true);
                 } else {
                     Swerve.getInstance().drive(swerveTranslation, swerveRotation, true, true);
@@ -343,6 +337,7 @@ public final class Swerve extends Subsystem {
 
     @Override
     public void log() {
+        SmartDashboard.getBoolean("Use Vision Measurements", true);
         SmartDashboard.putNumber("Gyro Heading", this.getGyroRotation().getDegrees());
         SmartDashboard.putNumber("Gyro Pitch", this.gyro.getPitch());
         SmartDashboard.putNumber("Gyro Roll", this.gyro.getRoll());
