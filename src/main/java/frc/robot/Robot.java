@@ -58,8 +58,6 @@ public final class Robot extends TimedRobot {
     Extension.getInstance().initialAbsoluteEncoderPosition = 1.0 + Extension.getInstance().getAbsoluteEncoderAbsolutePosition() - Extension.getInstance().elbowAbsoluteEncoder.getPositionOffset();
     Extension.getInstance().elbowRelativeEncoder.reset();
 
-    Extension.getInstance().updateExtensionState(ExtensionState.MATCH_START);
-
     LED.getInstance().configureLEDs();
 
     Gripper.getInstance().enableGripper();
@@ -88,6 +86,8 @@ public final class Robot extends TimedRobot {
     teleopRunner.disable();
 
     autonomousRunner.enable();
+
+    Extension.getInstance().updateExtensionState(ExtensionState.MATCH_START);
   }
 
   @Override

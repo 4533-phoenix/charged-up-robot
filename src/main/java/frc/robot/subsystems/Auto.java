@@ -11,6 +11,7 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.libs.java.actions.Action;
 import frc.libs.java.actions.Subsystem;
@@ -166,9 +167,8 @@ public final class Auto extends Subsystem {
                 new WaitAction(1.25),
                 new LambdaAction(() -> Gripper.getInstance().disableGripper()),
                 new WaitAction(0.15),
-                new DriveDistanceAction(-0.25),
                 new LambdaAction(() -> Extension.getInstance().updateExtensionState(ExtensionState.OFF_GROUND)),
-                new LambdaAction(() -> Auto.getInstance().driveOverChargeStation(false)),
+                new DrivePathAction("Over Charge Station", 3.5, 5.0, false),
                 new LambdaAction(() -> Auto.getInstance().enableChargeStation(true)),
                 new WaitAction(0.25),
                 new LambdaAction(() -> Auto.getInstance().adjustChargeStation())

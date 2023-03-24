@@ -48,8 +48,9 @@ public final class Constants {
         public static final double DRIVE_ENCODER_METERS_PER_SECOND = DRIVE_ENCODER_METERS_PER_ROTATION / 60.0;
         public static final double STEER_ENCODER_RADIANS_PER_SECOND = STEER_ENCODER_RADIANS_PER_ROTATION / 60.0;
         
-        public static final double STEER_KP = 0.7;
-        public static final double STEER_KD = 0.25;
+        public static final double STEER_KP = 0.8;
+        public static final double STEER_KI = 0.0;
+        public static final double STEER_KD = 0.4;
     }
 
     public static final class DriveConstants {
@@ -110,9 +111,9 @@ public final class Constants {
         public static final double DRIVE_MAX_VELOCITY_SLOW = Units.feetToMeters(3.0);
         public static final double DRIVE_MAX_ROTATIONAL_VELOCITY_SLOW = 0.4  * 2.0 * Math.PI; // rad/s
 
-        public static final double DRIVE_ROTATION_KP = 5.0;
-        public static final double DRIVE_ROTATION_KI = 0.0;
-        public static final double DRIVE_ROTATION_KD = 0.0;
+        public static final double DRIVE_ROTATION_KP = 11.0;
+        public static final double DRIVE_ROTATION_KI = 0.2;
+        public static final double DRIVE_ROTATION_KD = 2500.0;
 
         public static final double DRIVE_MAX_ACCELERATION = 10.0; // m/s^2
         public static final double DRIVE_MAX_ROTATIONAL_ACCELERATION = 7.0; // rad/s^2

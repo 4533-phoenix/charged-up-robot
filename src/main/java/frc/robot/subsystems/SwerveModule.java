@@ -54,6 +54,9 @@ public final class SwerveModule {
 
         this.driveMotor.setIdleMode(IdleMode.kBrake);
 
+        this.driveMotor.setSmartCurrentLimit(30);
+        this.steerMotor.setSmartCurrentLimit(30);
+
         this.driveEncoder = this.driveMotor.getEncoder();
         this.steerEncoder = this.steerMotor.getEncoder();
 

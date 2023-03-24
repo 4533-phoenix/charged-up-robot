@@ -119,6 +119,16 @@ public final class Extension extends Subsystem {
                 this.startTime = currTime;
                 this.waitTime = 0.8;
                 this.armInWaiting = true;
+            } else if (prevState.equals(ExtensionState.MIDDLE_ROW) && (state.equals(ExtensionState.GROUND_LOW_INTAKE) || state.equals(ExtensionState.GROUND_HIGH_INTAKE) || state.equals(ExtensionState.OFF_GROUND))) {
+                this.setLowerExtensionState(LowerExtensionState.ZERO_INCHES);
+                this.startTime = currTime;
+                this.waitTime = 0.4;
+                this.armInWaiting = true;
+            } else if (prevState.equals(ExtensionState.HIGH_ROW) && state.equals(ExtensionState.MIDDLE_ROW)) {
+                this.setLowerExtensionState(LowerExtensionState.ZERO_INCHES);
+                this.startTime = currTime;
+                this.waitTime = 0.7;
+                this.armInWaiting = true;
             } else if (prevState.equals(ExtensionState.MATCH_START) && state.equals(ExtensionState.HIGH_ROW)) {
                 this.setLowerExtensionState(LowerExtensionState.TWELVE_INCHES);
                 this.startTime = currTime;
@@ -199,7 +209,9 @@ public final class Extension extends Subsystem {
 
     private static final class ExtensionActions {
         public static final Action defaultExtensionAction() {
-            Runnable startMethod = () -> {};
+            Runnable startMethod = () -> {
+                Extension.getInstance().updateExtensionState(ExtensionState.MATCH_START);
+            };
 
             Runnable runMethod = () -> {
                 if (Robot.operatorController.getButton(Button.Y)) {
