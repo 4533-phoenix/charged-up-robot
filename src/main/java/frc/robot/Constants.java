@@ -195,6 +195,8 @@ public final class Constants {
     //          "limelight-front",
     //          "limelight-back"
     //      };
+
+    //      public static final double MAX_TAG_OFFSET_DISTANCE = 1.0;
     //  }
 
 //  CONSTANTS FOR PRACTICE ROBOT
@@ -385,5 +387,7 @@ public final class Constants {
     public static final class LimelightConstants {
         public static final String[] LIMELIGHT_NAMES = new String[] {
         };
+
+        public static final double MAX_TAG_OFFSET_DISTANCE = 1.0;
     }
 }
