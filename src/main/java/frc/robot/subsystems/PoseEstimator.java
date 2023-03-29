@@ -85,12 +85,6 @@ public final class PoseEstimator extends Subsystem {
     }
 
     @Override
-    public void log() {}
-
-    @Override
-    public void periodic() {}
-
-    @Override
     public void queryInitialActions() {
         Robot.autonomousRunner.add(
             this.getLoggingAction(),

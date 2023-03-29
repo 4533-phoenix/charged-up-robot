@@ -22,9 +22,6 @@ import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.DriverStation.Alliance;
-import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 
 public final class Swerve extends Subsystem {
     private static Swerve mInstance;
@@ -172,7 +169,6 @@ public final class Swerve extends Subsystem {
 
         ChassisSpeeds chassisSpeeds;
 
-        Alliance alliance = DriverStation.getAlliance();
         if (fieldRelative) {
             if (Robot.operatorController.getButton(Button.BACK)) {
                 chassisSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(
