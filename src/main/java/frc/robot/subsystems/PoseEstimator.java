@@ -5,7 +5,6 @@ import edu.wpi.first.math.MatBuilder;
 import edu.wpi.first.math.Nat;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
@@ -72,6 +71,10 @@ public final class PoseEstimator extends Subsystem {
                 pose = LimelightHelper.getBotPose2d_wpiRed(limelightName);
             } else {
                 pose = LimelightHelper.getBotPose2d_wpiBlue(limelightName);
+            }
+
+            if (PoseEstimator.getInstance().swervePoseEstimator.getEstimatedPosition().getTranslation().getDistance(pose.getTranslation()) > LimelightConstants.MAX_TAG_OFFSET_DISTANCE) {
+                continue;
             }
 
             double trust = (1 - LimelightHelper.getTA(limelightName)) * 4;
