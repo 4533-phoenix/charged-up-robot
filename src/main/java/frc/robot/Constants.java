@@ -48,9 +48,9 @@ public final class Constants {
         public static final double DRIVE_ENCODER_METERS_PER_SECOND = DRIVE_ENCODER_METERS_PER_ROTATION / 60.0;
         public static final double STEER_ENCODER_RADIANS_PER_SECOND = STEER_ENCODER_RADIANS_PER_ROTATION / 60.0;
         
-        public static final double STEER_KP = 0.5;
+        public static final double STEER_KP = 0.7;
         public static final double STEER_KI = 0.0;
-        public static final double STEER_KD = 0.0;
+        public static final double STEER_KD = 0.01;
     }
 
     public static final class DriveConstants {
@@ -105,18 +105,18 @@ public final class Constants {
 
         public static final double DRIVE_MAX_PHYSICAL_VELOCITY = Units.feetToMeters(14.6);
 
-        public static final double DRIVE_MAX_VELOCITY = Units.feetToMeters(12.0);
-        public static final double DRIVE_MAX_ROTATIONAL_VELOCITY = 4.0 * 2.0 * Math.PI; // rad/s
+        public static final double DRIVE_MAX_VELOCITY = Units.feetToMeters(14.0);
+        public static final double DRIVE_MAX_ROTATIONAL_VELOCITY = 1.0 * 2.0 * Math.PI; // rad/s
 
         public static final double DRIVE_MAX_VELOCITY_SLOW = Units.feetToMeters(3.0);
-        public static final double DRIVE_MAX_ROTATIONAL_VELOCITY_SLOW = 2.0 * 2.0 * Math.PI; // rad/s
+        public static final double DRIVE_MAX_ROTATIONAL_VELOCITY_SLOW = 0.25 * 2.0 * Math.PI; // rad/s
 
         public static final double DRIVE_ROTATION_KP = 11.0;
         public static final double DRIVE_ROTATION_KI = 0.2;
         public static final double DRIVE_ROTATION_KD = 2500.0;
 
         public static final double DRIVE_MAX_ACCELERATION = 10.0; // m/s^2
-        public static final double DRIVE_MAX_ROTATIONAL_ACCELERATION = 7.0; // rad/s^2
+        public static final double DRIVE_MAX_ROTATIONAL_ACCELERATION = 25.0; // rad/s^2
 
         public static final double CHARGE_STATION_PITCH_DEADBAND = 1.5; // degrees
     }
@@ -175,7 +175,7 @@ public final class Constants {
         public static final int DRIVER_ROT_AXIS = 4;
         
 		// Deadband for drive axes
-        public static final double DRIVE_DEADBAND = 0.0005;
+        public static final double DRIVE_DEADBAND = 0.01;
 
 		// Threshold for trigger being pressed
 		public static final double TRIGGER_THRESHOLD = 0.2;
