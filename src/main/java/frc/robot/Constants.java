@@ -1,6 +1,5 @@
 package frc.robot;
 
-import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
@@ -48,7 +47,7 @@ public final class Constants {
         public static final double DRIVE_ENCODER_METERS_PER_SECOND = DRIVE_ENCODER_METERS_PER_ROTATION / 60.0;
         public static final double STEER_ENCODER_RADIANS_PER_SECOND = STEER_ENCODER_RADIANS_PER_ROTATION / 60.0;
         
-        public static final double STEER_KP = 0.7;
+        public static final double STEER_KP = 0.65;
         public static final double STEER_KI = 0.0;
         public static final double STEER_KD = 0.01;
     }
