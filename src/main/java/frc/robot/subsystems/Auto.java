@@ -150,7 +150,7 @@ public final class Auto extends Subsystem {
         }
 
         public static final Action pathPlannerTest() {
-            DrivePathAction testPath = new DrivePathAction("PathPlanner Test", 1.5, 1.0, false);
+            DrivePathAction testPath = new DrivePathAction("Over Charge Station", 2.0, 3.0, false);
             Auto.getInstance().startPose = testPath.getStartPose();
 
             return testPath.withSubsystem(Auto.getInstance());

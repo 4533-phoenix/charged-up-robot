@@ -40,6 +40,8 @@ public class DrivePathAction extends Action {
                 currState
             );
 
+            PoseEstimator.getInstance().updatePoseEstimator(); // We put this there because this while loop blocks robot periodic.
+
             SwerveModuleState[] swerveModuleStates = DriveConstants.SWERVE_KINEMATICS.toSwerveModuleStates(chassisSpeeds);
 
             Swerve.getInstance().setModuleStates(swerveModuleStates);

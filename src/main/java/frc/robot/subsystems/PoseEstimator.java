@@ -8,6 +8,8 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import edu.wpi.first.wpilibj.smartdashboard.Field2d;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.libs.java.actions.*;
 import frc.robot.Robot;
 import frc.robot.Constants.*;
@@ -15,7 +17,7 @@ import frc.robot.helpers.LimelightHelper;
 
 public final class PoseEstimator extends Subsystem {
     private static PoseEstimator mInstance;
-
+    private Field2d mField2d = new Field2d();
     Pose2d initialPose = new Pose2d();
 
     public SwerveDrivePoseEstimator swervePoseEstimator = new SwerveDrivePoseEstimator(
@@ -73,15 +75,24 @@ public final class PoseEstimator extends Subsystem {
                 pose = LimelightHelper.getBotPose2d_wpiBlue(limelightName);
             }
 
-            if (PoseEstimator.getInstance().swervePoseEstimator.getEstimatedPosition().getTranslation().getDistance(pose.getTranslation()) > LimelightConstants.MAX_TAG_OFFSET_DISTANCE) {
-                continue;
-            }
+            double trust = (1 - LimelightHelper.getTA(limelightName)) * 15;
+            double latency = LimelightHelper.getLatency_Pipeline(limelightName) / 1000.0;
 
-            double trust = (1 - LimelightHelper.getTA(limelightName)) * 4;
-
-            PoseEstimator.getInstance().swervePoseEstimator.setVisionMeasurementStdDevs(new MatBuilder<>(Nat.N3(), Nat.N1()).fill(trust, trust, trust));
-            PoseEstimator.getInstance().swervePoseEstimator.addVisionMeasurement(pose, Timer.getFPGATimestamp());
+            swervePoseEstimator.setVisionMeasurementStdDevs(new MatBuilder<>(Nat.N3(), Nat.N1()).fill(trust, trust, trust));
+            swervePoseEstimator.addVisionMeasurement(pose, Timer.getFPGATimestamp() - latency);
         }
+    }
+
+    public void updatePoseEstimator() {
+        swervePoseEstimator.update(Rotation2d.fromDegrees(Swerve.getInstance().getGyroRotation().getDegrees()), Swerve.getInstance().getModulePositions());
+        addVisionPose2d();
+
+        mField2d.setRobotPose(getSwervePose());
+
+        SmartDashboard.putNumber("Robot Pose - X", getSwervePose().getX());
+        SmartDashboard.putNumber("Robot Pose - Y", getSwervePose().getY());
+        SmartDashboard.putNumber("Robot Pose - Angle", getSwerveRotation().getDegrees());
+        SmartDashboard.putData("Field", mField2d);
     }
 
     @Override
