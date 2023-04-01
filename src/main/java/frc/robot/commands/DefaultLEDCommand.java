@@ -27,7 +27,7 @@ public class DefaultLEDCommand extends CommandBase {
             mled.setLEDState(LEDState.PURPLE);
           break;
         case 270:
-            mled.setLEDState(LEDState.YELLOW_AND_BLUE);
+            mled.setLEDState(LEDState.YELLOW_AND_BLUE_ANIMATION);
           break;
         default:
           break;

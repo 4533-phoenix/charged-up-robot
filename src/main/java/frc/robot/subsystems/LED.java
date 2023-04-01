@@ -12,6 +12,11 @@ public final class LED implements Subsystem {
     public AddressableLED ledStrip;
     public AddressableLEDBuffer ledBuffer;
 
+    public LEDState ledState;
+    public int animationFrame = 0;
+    public Colors[] currentColors;
+    public AnimationType animationType;
+
     public LED() {}
 
     public enum Colors {
@@ -31,8 +36,12 @@ public final class LED implements Subsystem {
         }
     }
 
+    public enum AnimationType {
+        SCROLL, NONE
+    }
+
     public enum LEDState {
-        YELLOW_AND_BLUE, PURPLE, YELLOW, OFF
+        YELLOW_AND_BLUE, YELLOW_AND_BLUE_ANIMATION, PURPLE, YELLOW, OFF
     }
 
     public void configureLEDs() {
@@ -41,44 +50,76 @@ public final class LED implements Subsystem {
         ledBuffer = new AddressableLEDBuffer(80);
         ledStrip.setLength(ledBuffer.getLength());
 
-        this.setLEDState(LEDState.YELLOW_AND_BLUE);
+        this.setLEDState(LEDState.YELLOW_AND_BLUE_ANIMATION);
 
         ledStrip.setData(ledBuffer);
         ledStrip.start();
     }
 
-    public void fillAllLEDs(Colors color) {
-        IntStream.range(1, this.ledBuffer.getLength())
-            .forEach(i -> this.ledBuffer.setRGB(i, color.r, color.g, color.b));
-    }
-
-    public void fillIntervalLEDs(int interval, Colors[] colors) {
-        IntStream.iterate(0, i -> i + interval)
-            .limit((ledBuffer.getLength() + interval - 1) / interval)
+    public void fillLEDs(Colors[] colors) {
+        int interval = colors.length;
+        IntStream.range(0, ledBuffer.getLength())
             .forEach(i -> {
-                int colorIndex = i % colors.length;
+                int colorIndex = i % interval;
                 ledBuffer.setRGB(i, colors[colorIndex].r, colors[colorIndex].g, colors[colorIndex].b);
             });
     }
 
+    public void scrollAnimateLeds(Colors[] colors) {
+        int interval = colors.length;
+        IntStream.range(0, ledBuffer.getLength())
+            .forEach(i -> {
+                int colorIndex = (i + animationFrame) % interval;
+                ledBuffer.setRGB(i, colors[colorIndex].r, colors[colorIndex].g, colors[colorIndex].b);
+            });
+        animationFrame = (animationFrame + 1) % interval;
+    }
+
     public void setLEDState(LEDState state) {
-        if (state.equals(LEDState.YELLOW_AND_BLUE)) {
-            Colors[] colors = new Colors[] {
-                Colors.YELLOW,
-                Colors.BLUE
-            };
-            fillIntervalLEDs(2, colors);
-        } else if (state.equals(LEDState.PURPLE)) {
-            fillAllLEDs(Colors.PURPLE);
-        } else if (state.equals(LEDState.YELLOW)) {
-            fillAllLEDs(Colors.YELLOW);
-        } else if (state.equals(LEDState.OFF)) {
-            fillAllLEDs(Colors.BLANK);
+        ledState = state;
+
+        switch (ledState) {
+            case YELLOW_AND_BLUE:
+                animationType = AnimationType.NONE;
+                currentColors = new Colors[] { Colors.YELLOW, Colors.BLUE };
+                break;
+            case PURPLE:
+                animationType = AnimationType.NONE;
+                currentColors = new Colors[] { Colors.PURPLE };
+                break;
+            case YELLOW:
+                animationType = AnimationType.NONE;
+                currentColors = new Colors[] { Colors.YELLOW };
+                break;
+            case OFF:
+                animationType = AnimationType.NONE;
+                currentColors = new Colors[] { Colors.BLANK };
+                break;
+            case YELLOW_AND_BLUE_ANIMATION:
+                animationType = AnimationType.SCROLL;
+                animationFrame = 0;
+                currentColors = new Colors[] { Colors.YELLOW, Colors.BLUE, Colors.BLUE, Colors.BLUE, Colors.BLUE };
+                break;
+            default:
+                break;
         }
     
         this.ledStrip.setData(this.ledBuffer);
     }
 
     @Override
-    public void periodic() {}
+    public void periodic() {
+        if (currentColors.length > 0) {
+            switch (animationType) {
+                case NONE:
+                    fillLEDs(currentColors);
+                    break;
+                case SCROLL:
+                    scrollAnimateLeds(currentColors);
+                    break;
+                default:
+                    break;
+            }
+        }
+    }
 }
