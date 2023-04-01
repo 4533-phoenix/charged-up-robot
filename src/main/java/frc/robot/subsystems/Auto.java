@@ -10,9 +10,6 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.Timer;
-import frc.libs.java.actions.Action;
-import frc.libs.java.actions.Subsystem;
-import frc.libs.java.actions.auto.*;
 import frc.robot.subsystems.Extension.ExtensionState;
 import java.util.Map;
 
@@ -20,13 +17,6 @@ public final class Auto extends Subsystem {
     private static Auto mInstance;
 
     public Pose2d startPose;
-
-    private static final Map<String, Action> autoCommands = Map.ofEntries(
-        Map.entry("PathPlanner Test", AutoActions.pathPlannerTest()),
-        Map.entry("Right/Left Score and Leave", AutoActions.rightLeftScoreAndLeave()),
-        Map.entry("Charge Station Score and Enable", AutoActions.chargeStationScoreAndEnable()),
-        Map.entry("Do Nothing", AutoActions.doNothing())
-    );
 
     private PPHolonomicDriveController autoController = new PPHolonomicDriveController(
         new PIDController(
@@ -145,17 +135,6 @@ public final class Auto extends Subsystem {
     }
 
     private static final class AutoActions {
-        public static final Action doNothing() {
-            return new SeriesAction();
-        }
-
-        public static final Action pathPlannerTest() {
-            DrivePathAction testPath = new DrivePathAction("Over Charge Station", 2.0, 3.0, false);
-            Auto.getInstance().startPose = testPath.getStartPose();
-
-            return testPath.withSubsystem(Auto.getInstance());
-        }
-
         public static final Action rightLeftScoreAndLeave() {
             Action testAuto = new SeriesAction(
                 new LambdaAction(() -> Extension.getInstance().updateExtensionState(ExtensionState.HIGH_ROW)),

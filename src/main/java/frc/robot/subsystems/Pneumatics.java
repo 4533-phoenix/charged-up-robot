@@ -2,16 +2,15 @@ package frc.robot.subsystems;
 
 import edu.wpi.first.wpilibj.Compressor;
 import edu.wpi.first.wpilibj.PneumaticsModuleType;
-import frc.libs.java.actions.*;
-import frc.robot.Robot;
+import edu.wpi.first.wpilibj2.command.Subsystem;
 import frc.robot.Constants.*;
 
-public final class Pneumatics extends Subsystem {
+public final class Pneumatics implements Subsystem {
     private static Pneumatics mInstance;
 
     private final Compressor compressor = new Compressor(GlobalConstants.PCM_ID, PneumaticsModuleType.CTREPCM);
 
-    private Pneumatics() {}
+    public Pneumatics() {}
 
     public static Pneumatics getInstance() {
         if (mInstance == null) {
@@ -29,36 +28,6 @@ public final class Pneumatics extends Subsystem {
         compressor.disable();
     }
 
-    private static final class PneumaticsActions {
-        public static final Action defaultPneumaticsAction() {
-            Runnable startMethod = () -> {
-                Pneumatics.getInstance().enableCompressor();
-            };
-
-            Runnable runMethod = () -> {};
-
-            Runnable endMethod = () -> {
-                Pneumatics.getInstance().disableCompressor();
-            };
-
-            return new Action(startMethod, runMethod, endMethod, ActionConstants.WILL_NOT_CANCEL);
-        }
-    }
-
-    @Override
-    public void log() {}
-
     @Override
     public void periodic() {}
-
-    @Override
-    public void queryInitialActions() {
-        Robot.autonomousRunner.add(
-            PneumaticsActions.defaultPneumaticsAction()
-        );
-
-        Robot.teleopRunner.add(
-            PneumaticsActions.defaultPneumaticsAction()
-        );
-    }
 }
