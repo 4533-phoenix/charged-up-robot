@@ -42,8 +42,7 @@ public class RobotContainer {
     public final Map<String, Command> autoCommands = Map.ofEntries(
         Map.entry("PathPlanner Test", new PathPlannerTest(this.swerve, this.extension, this.gripper)),
         Map.entry("Right/Left Score and Leave", new RightLeftScoreAndLeave(this.swerve, this.extension, this.gripper)),
-        Map.entry("Charge Station Score and Enable", new ChargeStationScoreAndEnable(this.swerve, this.extension, this.gripper)),
-        Map.entry("Do Nothing", null)
+        Map.entry("Charge Station Score and Enable", new ChargeStationScoreAndEnable(this.swerve, this.extension, this.gripper))
     );
 
     public Extension getExtension() {

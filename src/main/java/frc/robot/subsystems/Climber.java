@@ -28,6 +28,10 @@ public class Climber implements Subsystem {
         climbMotor.set(-0.5);
     }
 
+    public void stopClimber() {
+        climbMotor.set(0.0);
+    }
+
     @Override
     public void periodic() {}
 }

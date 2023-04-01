@@ -35,7 +35,6 @@ public final class Robot extends TimedRobot {
   public void robotInit() {
     chooser.setDefaultOption("PathPlanner Test", "PathPlanner Test");
     chooser.addOption("Right/Left Score and Leave", "Right/Left Score and Leave");
-    chooser.addOption("Do Nothing", "Do Nothing");
     chooser.addOption("Charge Station Score and Enable", "Charge Station Score and Enable");
     SmartDashboard.putData("Select Auto", chooser);
     

@@ -14,6 +14,8 @@ public final class LED implements Subsystem {
 
     public LEDState ledState;
     public int animationFrame = 0;
+    public int animationSpeed = 0;
+    public int currentAnimationTime = 0;
     public Colors[] currentColors;
     public AnimationType animationType;
 
@@ -56,6 +58,11 @@ public final class LED implements Subsystem {
         ledStrip.start();
     }
 
+    public void resetAnimation() {
+        animationFrame = 0;
+        currentAnimationTime = 0;
+    }
+
     public void fillLEDs(Colors[] colors) {
         int interval = colors.length;
         IntStream.range(0, ledBuffer.getLength())
@@ -66,13 +73,17 @@ public final class LED implements Subsystem {
     }
 
     public void scrollAnimateLeds(Colors[] colors) {
-        int interval = colors.length;
-        IntStream.range(0, ledBuffer.getLength())
-            .forEach(i -> {
-                int colorIndex = (i + animationFrame) % interval;
-                ledBuffer.setRGB(i, colors[colorIndex].r, colors[colorIndex].g, colors[colorIndex].b);
-            });
-        animationFrame = (animationFrame + 1) % interval;
+        currentAnimationTime = (currentAnimationTime + 1) % animationSpeed;
+
+        if (currentAnimationTime == 0) {
+            int interval = colors.length;
+            IntStream.range(0, ledBuffer.getLength())
+                .forEach(i -> {
+                    int colorIndex = (i + animationFrame) % interval;
+                    ledBuffer.setRGB(i, colors[colorIndex].r, colors[colorIndex].g, colors[colorIndex].b);
+                });
+            animationFrame = (animationFrame + 1) % interval;
+        }
     }
 
     public void setLEDState(LEDState state) {
@@ -97,7 +108,8 @@ public final class LED implements Subsystem {
                 break;
             case YELLOW_AND_BLUE_ANIMATION:
                 animationType = AnimationType.SCROLL;
-                animationFrame = 0;
+                animationSpeed = 50;
+                resetAnimation();
                 currentColors = new Colors[] { Colors.YELLOW, Colors.BLUE, Colors.BLUE, Colors.BLUE, Colors.BLUE };
                 break;
             default:

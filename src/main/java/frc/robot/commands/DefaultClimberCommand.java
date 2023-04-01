@@ -20,6 +20,8 @@ public class DefaultClimberCommand extends CommandBase {
             mClimber.raiseClimber();
         } else if (Robot.driverController.getButton(Button.B)) {
             mClimber.lowerClimber();
+        } else {
+            mClimber.stopClimber();
         }
     }
 }
