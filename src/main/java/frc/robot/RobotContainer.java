@@ -4,6 +4,7 @@ import java.util.Map;
 import edu.wpi.first.wpilibj2.command.*;
 import frc.robot.commands.DefaultExtensionCommand;
 import frc.robot.commands.DefaultGripperCommand;
+import frc.robot.commands.DefaultLEDCommand;
 import frc.robot.commands.DefaultSwerveCommand;
 import frc.robot.commands.autos.ChargeStationScoreAndEnable;
 import frc.robot.commands.autos.PathPlannerTest;
@@ -24,6 +25,7 @@ public class RobotContainer {
         CommandScheduler.getInstance().registerSubsystem(pneumatics);
         CommandScheduler.getInstance().registerSubsystem(swerve);
 
+        led.setDefaultCommand(new DefaultLEDCommand(led));
         swerve.setDefaultCommand(new DefaultSwerveCommand(swerve));
         gripper.setDefaultCommand(new DefaultGripperCommand(gripper));
         extension.setDefaultCommand(new DefaultExtensionCommand(extension));

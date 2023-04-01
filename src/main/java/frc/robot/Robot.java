@@ -83,17 +83,7 @@ public final class Robot extends TimedRobot {
   public void teleopInit() {}
 
   @Override
-  public void teleopPeriodic() {
-    if (Robot.operatorController.getPOV() == 0) {
-      robotContainer.getLED().setLEDState(LEDState.YELLOW);
-    } else if (Robot.operatorController.getPOV() == 90) {
-      robotContainer.getLED().setLEDState(LEDState.OFF);
-    } else if (Robot.operatorController.getPOV() == 180) {
-      robotContainer.getLED().setLEDState(LEDState.PURPLE);
-    } else if (Robot.operatorController.getPOV() == 270) {
-      robotContainer.getLED().setLEDState(LEDState.YELLOW_AND_BLUE);
-    }
-  }
+  public void teleopPeriodic() {}
 
   @Override
   public void disabledInit() {
