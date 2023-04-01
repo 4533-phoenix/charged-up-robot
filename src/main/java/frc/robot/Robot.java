@@ -10,6 +10,7 @@ import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.cameraserver.CameraServer;
 import edu.wpi.first.cscore.UsbCamera;
 
@@ -62,12 +63,14 @@ public final class Robot extends TimedRobot {
   }
 
   @Override
-  public void robotPeriodic() {}
+  public void robotPeriodic() {
+    CommandScheduler.getInstance().run();
+  }
 
   @Override
   public void autonomousInit() {
-    this.autoSelected = chooser.getSelected();
-    autoCommand = robotContainer.autoCommands.get(this.autoSelected);
+    autoSelected = chooser.getSelected();
+    autoCommand = robotContainer.autoCommands.get(autoSelected);
 
     if (autoCommand != null) {
       autoCommand.schedule();
