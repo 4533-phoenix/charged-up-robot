@@ -2,26 +2,24 @@ package frc.robot.subsystems;
 
 import frc.robot.Constants.*;
 
-import java.util.stream.IntStream;
-
 import edu.wpi.first.wpilibj.AddressableLED;
 import edu.wpi.first.wpilibj.AddressableLEDBuffer;
 import edu.wpi.first.wpilibj2.command.Subsystem;
 
 public final class LED implements Subsystem {
-    public AddressableLED ledStrip;
-    public AddressableLEDBuffer ledBuffer;
+    private AddressableLED ledStrip;
+    private AddressableLEDBuffer ledBuffer;
 
-    public LEDState ledState;
-    public int animationFrame = 0;
-    public int animationSpeed = 0;
-    public int currentAnimationTime = 0;
-    public Colors[] currentColors;
-    public AnimationType animationType;
+    private LEDState ledState;
+    private int animationFrame = 0;
+    private int animationSpeed = 0;
+    private int currentAnimationTime = 0;
+    private Colors[] currentColors;
+    private AnimationType animationType;
 
     public LED() {}
 
-    public enum Colors {
+    private enum Colors {
         BLUE(153, 153, 2),
         YELLOW(66, 247, 245),
         PURPLE(140, 32, 137),
@@ -38,7 +36,7 @@ public final class LED implements Subsystem {
         }
     }
 
-    public enum AnimationType {
+    private enum AnimationType {
         SCROLL, NONE
     }
 
@@ -58,32 +56,33 @@ public final class LED implements Subsystem {
         ledStrip.start();
     }
 
-    public void resetAnimation() {
+    private void resetAnimation() {
         animationFrame = 0;
         currentAnimationTime = 0;
     }
 
-    public void fillLEDs(Colors[] colors) {
-        int interval = colors.length;
-        IntStream.range(0, ledBuffer.getLength())
-            .forEach(i -> {
-                int colorIndex = i % interval;
-                ledBuffer.setRGB(i, colors[colorIndex].r, colors[colorIndex].g, colors[colorIndex].b);
-            });
+    private void setAnimation(int speed, AnimationType type) {
+        resetAnimation();
+        animationSpeed = speed;
+        animationType = type;
     }
 
-    public void scrollAnimateLeds(Colors[] colors) {
-        currentAnimationTime = (currentAnimationTime + 1) % animationSpeed;
-
-        if (currentAnimationTime == 0) {
-            int interval = colors.length;
-            IntStream.range(0, ledBuffer.getLength())
-                .forEach(i -> {
-                    int colorIndex = (i + animationFrame) % interval;
-                    ledBuffer.setRGB(i, colors[colorIndex].r, colors[colorIndex].g, colors[colorIndex].b);
-                });
-            animationFrame = (animationFrame + 1) % interval;
+    private void fillLEDs(Colors[] colors) {
+        int interval = ledBuffer.getLength() / colors.length;
+        for (int i = 0; i < ledBuffer.getLength(); i++) {
+            int colorIndex = (i / interval) % colors.length;
+            ledBuffer.setRGB(i, colors[colorIndex].r, colors[colorIndex].g, colors[colorIndex].b);
         }
+    }
+
+    private void scrollAnimateLEDs(Colors[] colors) {
+        int interval = colors.length;
+        int startIndex = animationFrame % interval;
+        for (int i = 0; i < ledBuffer.getLength(); i++) {
+            int colorIndex = (i + startIndex) % interval;
+            ledBuffer.setRGB(i, colors[colorIndex].r, colors[colorIndex].g, colors[colorIndex].b);
+        }
+        animationFrame = (animationFrame + 1) % interval;
     }
 
     public void setLEDState(LEDState state) {
@@ -91,25 +90,23 @@ public final class LED implements Subsystem {
 
         switch (ledState) {
             case YELLOW_AND_BLUE:
-                animationType = AnimationType.NONE;
+                setAnimation(0, AnimationType.NONE);
                 currentColors = new Colors[] { Colors.YELLOW, Colors.BLUE };
                 break;
             case PURPLE:
-                animationType = AnimationType.NONE;
+                setAnimation(0, AnimationType.NONE);
                 currentColors = new Colors[] { Colors.PURPLE };
                 break;
             case YELLOW:
-                animationType = AnimationType.NONE;
+                setAnimation(0, AnimationType.NONE);
                 currentColors = new Colors[] { Colors.YELLOW };
                 break;
             case OFF:
-                animationType = AnimationType.NONE;
+                setAnimation(0, AnimationType.NONE);
                 currentColors = new Colors[] { Colors.BLANK };
                 break;
             case YELLOW_AND_BLUE_ANIMATION:
-                animationType = AnimationType.SCROLL;
-                animationSpeed = 50;
-                resetAnimation();
+                setAnimation(25, AnimationType.SCROLL);
                 currentColors = new Colors[] { Colors.YELLOW, Colors.BLUE, Colors.BLUE, Colors.BLUE, Colors.BLUE };
                 break;
             default:
@@ -122,15 +119,20 @@ public final class LED implements Subsystem {
     @Override
     public void periodic() {
         if (currentColors.length > 0) {
-            switch (animationType) {
-                case NONE:
-                    fillLEDs(currentColors);
-                    break;
-                case SCROLL:
-                    scrollAnimateLeds(currentColors);
-                    break;
-                default:
-                    break;
+            if (animationType == AnimationType.NONE) {
+                fillLEDs(currentColors);
+            } else {
+                currentAnimationTime = (currentAnimationTime + 1) % animationSpeed;
+
+                if (currentAnimationTime == 0) {
+                    switch (animationType) {
+                        case SCROLL:
+                            scrollAnimateLEDs(currentColors);
+                            break;
+                        default:
+                            break;
+                    }
+                }
             }
         }
 
