@@ -28,6 +28,7 @@ public final class Robot extends TimedRobot {
   public static final SendableChooser<String> chooser = new SendableChooser<String>();
 
   private String autoSelected = chooser.getSelected();
+  private Command autoCommand;
 
   @Override
   public void robotInit() {
@@ -66,7 +67,7 @@ public final class Robot extends TimedRobot {
   @Override
   public void autonomousInit() {
     this.autoSelected = chooser.getSelected();
-    Command autoCommand = robotContainer.autoCommands.get(this.autoSelected);
+    autoCommand = robotContainer.autoCommands.get(this.autoSelected);
 
     if (autoCommand != null) {
       autoCommand.schedule();
@@ -77,7 +78,11 @@ public final class Robot extends TimedRobot {
   public void autonomousPeriodic() {}
 
   @Override
-  public void teleopInit() {}
+  public void teleopInit() {
+    if (autoCommand != null) {
+      autoCommand.cancel();
+    }
+  }
 
   @Override
   public void teleopPeriodic() {}
