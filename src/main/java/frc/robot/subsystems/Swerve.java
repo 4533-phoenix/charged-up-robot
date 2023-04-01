@@ -24,6 +24,8 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.math.trajectory.TrapezoidProfile;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.math.MatBuilder;
 import edu.wpi.first.math.Nat;
 import edu.wpi.first.math.controller.PIDController;
@@ -269,6 +271,90 @@ public final class Swerve implements Subsystem {
         System.out.println("Front right: " + frontRight.getAbsoluteEncoderRad());
         System.out.println("Back left: " + backLeft.getAbsoluteEncoderRad());
         System.out.println("Back right: " + backRight.getAbsoluteEncoderRad());
+    }
+
+    public void enableChargeStation(boolean direction) {
+        ChassisSpeeds driveSpeeds;
+       
+        if (direction) {
+            driveSpeeds =  new ChassisSpeeds(Units.feetToMeters(6.5), 0, 0);
+        } else {
+            driveSpeeds = new ChassisSpeeds(Units.feetToMeters(-6.5), 0, 0);
+        }
+
+        SwerveModuleState[] moduleStates = DriveConstants.SWERVE_KINEMATICS.toSwerveModuleStates(driveSpeeds);
+
+        this.setModuleStates(moduleStates);
+
+        while (Math.abs(this.getPitch()) < 8.0) {
+            moduleStates = DriveConstants.SWERVE_KINEMATICS.toSwerveModuleStates(driveSpeeds);
+
+            this.setModuleStates(moduleStates);
+        }
+
+        if (direction) {
+            driveSpeeds =  new ChassisSpeeds(Units.feetToMeters(2.0), 0, 0);
+        } else {
+            driveSpeeds = new ChassisSpeeds(Units.feetToMeters(-2.0), 0, 0);
+        }
+
+        while (Math.abs(this.getPitch()) > 2.0) {
+            moduleStates = DriveConstants.SWERVE_KINEMATICS.toSwerveModuleStates(driveSpeeds);
+
+            this.setModuleStates(moduleStates);
+        }
+        
+        this.setModuleStates(DriveConstants.SWERVE_KINEMATICS.toSwerveModuleStates(new ChassisSpeeds()));
+    }
+
+    public void straightenWheels(double time) {
+        double startTime = Timer.getFPGATimestamp();
+
+        ChassisSpeeds driveSpeeds;
+
+        driveSpeeds =  new ChassisSpeeds(Units.feetToMeters(-0.25), 0, 0);
+
+        while (Timer.getFPGATimestamp() - startTime < time) {
+            SwerveModuleState[] moduleStates = DriveConstants.SWERVE_KINEMATICS.toSwerveModuleStates(driveSpeeds);
+
+            this.setModuleStates(moduleStates);
+        }
+
+        this.setModuleStates(DriveConstants.SWERVE_KINEMATICS.toSwerveModuleStates(new ChassisSpeeds()));
+    }
+
+    public void driveOverChargeStation(boolean direction) {
+        ChassisSpeeds driveSpeeds;
+       
+        if (direction) {
+            driveSpeeds =  new ChassisSpeeds(Units.feetToMeters(8.0), 0, 0);
+        } else {
+            driveSpeeds = new ChassisSpeeds(Units.feetToMeters(-8.0), 0, 0);
+        }
+
+        SwerveModuleState[] moduleStates = DriveConstants.SWERVE_KINEMATICS.toSwerveModuleStates(driveSpeeds);
+
+        this.setModuleStates(moduleStates);
+
+        while (Math.abs(this.getPitch()) < 8.0) {}
+
+        while (Math.abs(this.getPitch()) > 2.0) {}
+
+        while (Math.abs(this.getPitch()) < 8.0) {}
+
+        while (Math.abs(this.getPitch()) > 1.5) {}
+        
+        this.setModuleStates(DriveConstants.SWERVE_KINEMATICS.toSwerveModuleStates(new ChassisSpeeds()));
+    }
+
+    public void adjustChargeStation() {
+        while (Math.abs(this.getPitch()) > DriveConstants.CHARGE_STATION_PITCH_DEADBAND) {
+            ChassisSpeeds driveSpeeds = this.getPitch() < 0.0 ? new ChassisSpeeds(-0.3, 0.0, 0.0) : new ChassisSpeeds(0.3, 0.0, 0.0);
+
+            this.setModuleStates(DriveConstants.SWERVE_KINEMATICS.toSwerveModuleStates(driveSpeeds));
+        }
+
+        this.setModuleStates(DriveConstants.SWERVE_KINEMATICS.toSwerveModuleStates(new ChassisSpeeds()));
     }
 
     public Command followTrajectoryCommand(PathPlannerTrajectory path) {

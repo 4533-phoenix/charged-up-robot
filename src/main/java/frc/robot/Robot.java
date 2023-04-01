@@ -8,11 +8,11 @@ import frc.robot.Constants.*;
 import frc.robot.subsystems.*;
 import frc.robot.subsystems.LED.LEDState; 
 import frc.robot.controls.PSController;
-import frc.robot.subsystems.Auto;
 import frc.robot.subsystems.Extension.ExtensionState;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.cameraserver.CameraServer;
 import edu.wpi.first.cscore.UsbCamera;
 
@@ -69,6 +69,11 @@ public final class Robot extends TimedRobot {
   @Override
   public void autonomousInit() {
     this.autoSelected = chooser.getSelected();
+    Command autoCommand = robotContainer.autoCommands.get(this.autoSelected);
+
+    if (autoCommand != null) {
+      autoCommand.schedule();
+    }
   }
 
   @Override
