@@ -1,9 +1,6 @@
 package frc.robot.commands.autos;
 
-import java.time.Instant;
-
 import edu.wpi.first.wpilibj2.command.*;
-import frc.robot.commands.DriveDistanceCommand;
 import frc.robot.subsystems.*;
 import frc.robot.subsystems.Extension.ExtensionState;
 

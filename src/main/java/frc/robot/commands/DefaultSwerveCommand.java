@@ -16,17 +16,8 @@ public class DefaultSwerveCommand extends CommandBase {
 
     @Override
     public void execute() {
-        if (Robot.driverController.getButton(Button.RB)) {
-            mSwerve.slowMode = true;
-        } else {
-            mSwerve.slowMode = false;
-        }
-            
-        if (Robot.driverController.getButton(Button.LB)) {
-            mSwerve.drive(mSwerve.getSwerveTranslation(), mSwerve.getSwerveRotation(), false, true);
-        } else {
-            mSwerve.drive(mSwerve.getSwerveTranslation(), mSwerve.getSwerveRotation(), true, true);
-        }
+        mSwerve.setSlowMode(Robot.driverController.getButton(Button.RB));
+        mSwerve.drive(mSwerve.getSwerveTranslation(), mSwerve.getSwerveRotation(), !Robot.driverController.getButton(Button.LB), true);
 
         if (Robot.driverController.getButton(Button.START)) {
             mSwerve.zeroYaw();

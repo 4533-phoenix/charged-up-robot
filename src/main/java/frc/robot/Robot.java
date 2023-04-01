@@ -5,10 +5,7 @@
 package frc.robot;
 
 import frc.robot.Constants.*;
-import frc.robot.subsystems.*;
-import frc.robot.subsystems.LED.LEDState; 
 import frc.robot.controls.PSController;
-import frc.robot.subsystems.Extension.ExtensionState;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
