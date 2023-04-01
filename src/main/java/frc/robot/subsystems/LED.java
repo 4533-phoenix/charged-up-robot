@@ -121,5 +121,7 @@ public final class LED implements Subsystem {
                     break;
             }
         }
+
+        ledStrip.setData(ledBuffer);
     }
 }
