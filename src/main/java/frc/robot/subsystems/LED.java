@@ -20,8 +20,8 @@ public final class LED implements Subsystem {
     public LED() {}
 
     private enum Colors {
-        BLUE(153, 153, 2),
-        YELLOW(66, 247, 245),
+        YELLOW(153, 153, 2),
+        BLUE(66, 247, 245),
         PURPLE(140, 32, 137),
         BLANK(0, 0, 0);
     
@@ -106,8 +106,8 @@ public final class LED implements Subsystem {
                 currentColors = new Colors[] { Colors.BLANK };
                 break;
             case YELLOW_AND_BLUE_ANIMATION:
-                setAnimation(25, AnimationType.SCROLL);
-                currentColors = new Colors[] { Colors.YELLOW, Colors.BLUE, Colors.BLUE, Colors.BLUE, Colors.BLUE };
+                setAnimation(50, AnimationType.SCROLL);
+                currentColors = new Colors[] { Colors.YELLOW, Colors.YELLOW, Colors.BLUE, Colors.BLUE, Colors.BLUE };
                 break;
             default:
                 break;
