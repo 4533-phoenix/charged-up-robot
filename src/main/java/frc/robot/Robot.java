@@ -21,7 +21,7 @@ import edu.wpi.first.cscore.UsbCamera;
  * project.
  */
 public final class Robot extends TimedRobot {
-  private final RobotContainer robotContainer = new RobotContainer();
+  public static final RobotContainer robotContainer = new RobotContainer();
 
   public static final PSController driverController = new PSController(OIConstants.DRIVER_CONTROLLER_PORT);
   public static final PSController operatorController = new PSController(OIConstants.OPERATOR_CONTROLLER_PORT);
