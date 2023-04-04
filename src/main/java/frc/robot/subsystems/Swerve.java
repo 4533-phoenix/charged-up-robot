@@ -93,13 +93,11 @@ public final class Swerve implements Subsystem {
 
     private Field2d mField2d = new Field2d();
 
-    public Pose2d initialPose = new Pose2d();
-
     public SwerveDrivePoseEstimator swervePoseEstimator = new SwerveDrivePoseEstimator(
         DriveConstants.SWERVE_KINEMATICS, 
         this.getGyroRotation(),
         this.getModulePositions(),
-        initialPose
+        new Pose2d()
     );
     
     public Swerve() {
@@ -228,8 +226,8 @@ public final class Swerve implements Subsystem {
         this.swervePoseEstimator.resetPosition(this.getEstimatedPose().getRotation(), this.getModulePositions(), new Pose2d());
     }
 
-    public void resetPoseEstimator(Rotation2d gyroAngle, SwerveModulePosition[] modulePositions) {
-        this.swervePoseEstimator.resetPosition(gyroAngle, modulePositions, this.initialPose);
+    public void resetPoseEstimator(Rotation2d gyroAngle, SwerveModulePosition[] modulePositions, Pose2d startPose) {
+        this.swervePoseEstimator.resetPosition(gyroAngle, modulePositions, startPose);
     }
 
     public void stopDrive() {

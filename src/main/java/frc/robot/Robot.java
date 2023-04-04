@@ -36,18 +36,13 @@ public final class Robot extends TimedRobot {
     chooser.setDefaultOption("PathPlanner Test", "PathPlanner Test");
     chooser.addOption("Right/Left Score and Leave", "Right/Left Score and Leave");
     chooser.addOption("Charge Station Score and Enable", "Charge Station Score and Enable");
+    chooser.addOption("Lane Two Piece", "Lane Two Piece");
     SmartDashboard.putData("Select Auto", chooser);
     
     UsbCamera gripperCamera = CameraServer.startAutomaticCapture();
     gripperCamera.setResolution(640, 480);
 
     robotContainer.getPneumatics().enableCompressor();
-
-    robotContainer.getSwerve().swervePoseEstimator.resetPosition(
-      robotContainer.getSwerve().getGyroRotation(), 
-      robotContainer.getSwerve().getModulePositions(), 
-      robotContainer.getSwerve().initialPose
-    );
 
     robotContainer.getSwerve().zeroGyro();
 
@@ -77,7 +72,10 @@ public final class Robot extends TimedRobot {
   }
 
   @Override
-  public void autonomousPeriodic() {}
+  public void autonomousPeriodic() {
+    robotContainer.getExtension().updateExtensionState();
+    robotContainer.getExtension().updateElbowController();
+  }
 
   @Override
   public void teleopInit() {
