@@ -4,15 +4,13 @@
 
 package frc.robot;
 
-import frc.libs.java.actions.ActionRunner;
 import frc.robot.Constants.*;
-import frc.robot.subsystems.*;
 import frc.robot.controls.PSController;
-import frc.robot.subsystems.Auto;
-import frc.robot.subsystems.Extension.ExtensionState;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.cameraserver.CameraServer;
 import edu.wpi.first.cscore.UsbCamera;
 
@@ -23,100 +21,82 @@ import edu.wpi.first.cscore.UsbCamera;
  * project.
  */
 public final class Robot extends TimedRobot {
-  public static final ActionRunner autonomousRunner = new ActionRunner();
-  public static final ActionRunner teleopRunner = new ActionRunner();
+  public static final RobotContainer robotContainer = new RobotContainer();
 
   public static final PSController driverController = new PSController(OIConstants.DRIVER_CONTROLLER_PORT);
   public static final PSController operatorController = new PSController(OIConstants.OPERATOR_CONTROLLER_PORT);
 
   public static final SendableChooser<String> chooser = new SendableChooser<String>();
-  private String autoSelected;
+
+  private String autoSelected = chooser.getSelected();
+  private Command autoCommand;
 
   @Override
   public void robotInit() {
     chooser.setDefaultOption("PathPlanner Test", "PathPlanner Test");
     chooser.addOption("Right/Left Score and Leave", "Right/Left Score and Leave");
-    chooser.addOption("Do Nothing", "Do Nothing");
     chooser.addOption("Charge Station Score and Enable", "Charge Station Score and Enable");
+    chooser.addOption("Lane Two Piece", "Lane Two Piece");
     SmartDashboard.putData("Select Auto", chooser);
     
     UsbCamera gripperCamera = CameraServer.startAutomaticCapture();
     gripperCamera.setResolution(640, 480);
 
-    PoseEstimator.getInstance().swervePoseEstimator.resetPosition(
-      Swerve.getInstance().getGyroRotation(), 
-      Swerve.getInstance().getModulePositions(), 
-      Auto.getInstance().startPose
-    );
+    robotContainer.getPneumatics().enableCompressor();
 
-    Swerve.getInstance().initialGyroOffset = Swerve.getInstance().getGyroRotation().getDegrees();
-    Swerve.getInstance().zeroGyro();
+    robotContainer.getSwerve().zeroGyro();
 
-    Extension.getInstance().elbowAbsoluteEncoder.setDutyCycleRange(1.0 / 1024.0, 1023.0 / 1024.0);
-    Extension.getInstance().elbowAbsoluteEncoder.setPositionOffset(ExtensionConstants.ELBOW_ABSOLUTE_ENCODER_OFFSET);
-    Extension.getInstance().initialAbsoluteEncoderPosition = 1.0 + Extension.getInstance().getAbsoluteEncoderAbsolutePosition() - Extension.getInstance().elbowAbsoluteEncoder.getPositionOffset();
-    Extension.getInstance().elbowRelativeEncoder.reset();
+    robotContainer.getExtension().elbowAbsoluteEncoder.setDutyCycleRange(1.0 / 1024.0, 1023.0 / 1024.0);
+    robotContainer.getExtension().elbowAbsoluteEncoder.setPositionOffset(ExtensionConstants.ELBOW_ABSOLUTE_ENCODER_OFFSET);
+    robotContainer.getExtension().initialAbsoluteEncoderPosition = 1.0 + robotContainer.getExtension().getAbsoluteEncoderAbsolutePosition() - robotContainer.getExtension().elbowAbsoluteEncoder.getPositionOffset();
+    robotContainer.getExtension().elbowRelativeEncoder.reset();
 
-    LED.getInstance().configureLEDs();
+    robotContainer.getLED().configureLEDs();
 
-    Gripper.getInstance().enableGripper();
-
-    RobotContainer.queryInitialActions();
+    robotContainer.getGripper().enableGripper();
   }
 
   @Override
   public void robotPeriodic() {
-    PoseEstimator.getInstance().updatePoseEstimator();
+    CommandScheduler.getInstance().run();
   }
 
   @Override
   public void autonomousInit() {
-    this.autoSelected = chooser.getSelected();
+    autoSelected = chooser.getSelected();
+    autoCommand = robotContainer.autoCommands.get(autoSelected);
 
-    autonomousRunner.add(
-      Auto.getInstance().getAutonomous(this.autoSelected)
-    );
-
-    teleopRunner.disable();
-
-    autonomousRunner.enable();
-
-    Extension.getInstance().updateExtensionState(ExtensionState.MATCH_START);
+    if (autoCommand != null) {
+      autoCommand.schedule();
+    }
   }
 
   @Override
   public void autonomousPeriodic() {
-    autonomousRunner.run();
+    robotContainer.getExtension().updateExtensionState();
+    robotContainer.getExtension().updateElbowController();
   }
 
   @Override
   public void teleopInit() {
-    autonomousRunner.disable();
-
-    teleopRunner.enable();
+    if (autoCommand != null) {
+      autoCommand.cancel();
+    }
   }
 
   @Override
-  public void teleopPeriodic() {
-    teleopRunner.run();
-  }
+  public void teleopPeriodic() {}
 
   @Override
   public void disabledInit() {
-    autonomousRunner.disable();
-
-    teleopRunner.disable();
+    robotContainer.getPneumatics().disableCompressor();
   }
 
   @Override
   public void disabledPeriodic() {}
 
   @Override
-  public void testInit() {
-    autonomousRunner.disable();
-
-    teleopRunner.disable();
-  }
+  public void testInit() {}
 
   @Override
   public void testPeriodic() {}

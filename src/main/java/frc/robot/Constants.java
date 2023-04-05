@@ -152,13 +152,19 @@ public final class Constants {
         public static final double ELBOW_KA = 0.0;
     }
 
-    public static final class GripperConstants{
+    public static final class GripperConstants {
         public static final int GRIPPER_PCM_PORT = 0;
         public static final int DISTANCE_SENSOR_PORT = 0;
         public static final int LIMIT_SWITCH_PORT = 3;
 
         public static final double DISTANCE_VOLTAGE_THRESHOLD_CUBE = 2.3;
         public static final double DISTANCE_VOLTAGE_THRESHOLD_CONE = 2.3;
+    }
+
+    public static final class ClimbConstants {
+        public static final int CLIMB_MOTOR_PORT = 17;
+
+        public static final int DROP_SERVO_PORT = 1;
     }
 
 	public static final class OIConstants {

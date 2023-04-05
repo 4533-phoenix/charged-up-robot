@@ -3,29 +3,37 @@ package frc.robot.subsystems;
 import frc.robot.controls.PSController.Axis;
 import frc.robot.controls.PSController.Button;
 import frc.robot.controls.PSController.Side;
-import frc.libs.java.actions.Action;
-import frc.libs.java.actions.Subsystem;
+import frc.robot.helpers.LimelightHelper;
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Subsystem;
 import frc.robot.Robot;
 import frc.robot.Constants.*;
 
 import com.kauailabs.navx.frc.AHRS;
+import com.pathplanner.lib.PathPlannerTrajectory;
+import com.pathplanner.lib.commands.PPSwerveControllerCommand;
 
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.SPI;
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
-import edu.wpi.first.math.trajectory.TrapezoidProfile;
-import edu.wpi.first.math.controller.ProfiledPIDController;
+import edu.wpi.first.math.util.Units;
+import edu.wpi.first.math.MatBuilder;
+import edu.wpi.first.math.Nat;
+import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.filter.SlewRateLimiter;
+import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
-public final class Swerve extends Subsystem {
-    private static Swerve mInstance;
-
+public final class Swerve implements Subsystem {
     private SwerveModule[] swerveMods;
 
     private final SwerveModule frontLeft = new SwerveModule(
@@ -72,29 +80,30 @@ public final class Swerve extends Subsystem {
     private SlewRateLimiter yLimiter = new SlewRateLimiter(DriveConstants.DRIVE_MAX_ACCELERATION);
     private SlewRateLimiter steerLimiter = new SlewRateLimiter(DriveConstants.DRIVE_MAX_ROTATIONAL_ACCELERATION);
     
-    private ProfiledPIDController rotationController = new ProfiledPIDController(
-        DriveConstants.DRIVE_ROTATION_KP,
-        DriveConstants.DRIVE_ROTATION_KI, 
-        DriveConstants.DRIVE_ROTATION_KD, 
-        new TrapezoidProfile.Constraints(DriveConstants.DRIVE_MAX_ROTATIONAL_VELOCITY, DriveConstants.DRIVE_MAX_ROTATIONAL_ACCELERATION)
-    );
+    private PIDController xController = new PIDController(AutoConstants.AUTO_X_VELOCITY_KP, 
+        AutoConstants.AUTO_X_VELOCITY_KI, AutoConstants.AUTO_X_VELOCITY_KD);
+    private PIDController yController = new PIDController(AutoConstants.AUTO_Y_VELOCITY_KP, 
+        AutoConstants.AUTO_Y_VELOCITY_KI, AutoConstants.AUTO_Y_VELOCITY_KD);
+    private PIDController thetaController = new PIDController(AutoConstants.AUTO_ROTATION_KP, 
+        AutoConstants.AUTO_ROTATION_KI, AutoConstants.AUTO_ROTATION_KD);
 
     private AHRS gyro = new AHRS(SPI.Port.kMXP);
 
-    private boolean isSnapping = false;
-
-    private double snapSetpoint;
-
-    private double snapStartTime;
-
     public boolean slowMode;
 
-    public double initialGyroOffset;
+    private Field2d mField2d = new Field2d();
+
+    public SwerveDrivePoseEstimator swervePoseEstimator = new SwerveDrivePoseEstimator(
+        DriveConstants.SWERVE_KINEMATICS, 
+        this.getGyroRotation(),
+        this.getModulePositions(),
+        new Pose2d()
+    );
     
-    private Swerve() {
+    public Swerve() {
         this.zeroGyro();
 
-        this.rotationController.enableContinuousInput(0.0, 2.0 * Math.PI);
+        this.thetaController.enableContinuousInput(-Math.PI, Math.PI);
 
         this.swerveMods = new SwerveModule[] {
            frontLeft,
@@ -102,14 +111,6 @@ public final class Swerve extends Subsystem {
            backLeft,
            backRight 
         };
-    }
-
-    public static Swerve getInstance() {
-        if (mInstance == null) {
-            mInstance = new Swerve();
-        }
-
-        return mInstance;
     }
 
     public void zeroGyro() {
@@ -146,6 +147,10 @@ public final class Swerve extends Subsystem {
         backRight.setDesiredState(desiredStates[3]);
     }
 
+    public void setSlowMode(Boolean enabled) {
+        slowMode = enabled;
+    }
+
     public void drive(Translation2d translation, double rotation, boolean fieldRelative, boolean isOpenLoop) {
         double xSpeed, ySpeed, steerSpeed;
 
@@ -176,7 +181,7 @@ public final class Swerve extends Subsystem {
                 );
             } else {
                 chassisSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(
-                    xSpeed, ySpeed, steerSpeed, PoseEstimator.getInstance().getSwerveRotation()
+                    xSpeed, ySpeed, steerSpeed, this.getEstimatedPose().getRotation()
                 );
             }
         } else {
@@ -186,43 +191,6 @@ public final class Swerve extends Subsystem {
         SwerveModuleState[] moduleStates = DriveConstants.SWERVE_KINEMATICS.toSwerveModuleStates(chassisSpeeds);
 
         this.setModuleStates(moduleStates);
-    }
-
-    public void snapToDirection(Translation2d translation, double rotationSetpoint, boolean fieldRelative, boolean isOpenLoop) {
-        if (Math.abs(PoseEstimator.getInstance().getSwerveRotation().getRadians() - this.snapSetpoint) > 0.05 && Timer.getFPGATimestamp() - this.snapStartTime < 3.0) {
-            double xSpeed, ySpeed, steerSpeed;
-
-            if (slowMode) {
-                xSpeed = DriveConstants.DRIVE_MAX_VELOCITY_SLOW * translation.getX();
-                ySpeed = DriveConstants.DRIVE_MAX_VELOCITY_SLOW * translation.getY();
-            } else {
-                xSpeed = DriveConstants.DRIVE_MAX_VELOCITY * translation.getX();
-                ySpeed = DriveConstants.DRIVE_MAX_VELOCITY * translation.getY();
-            }
-
-            xSpeed = Math.abs(xSpeed) > OIConstants.DRIVE_DEADBAND ? xSpeed : 0.0;
-            ySpeed = Math.abs(ySpeed) > OIConstants.DRIVE_DEADBAND ? ySpeed : 0.0;
-
-            xSpeed = xLimiter.calculate(xSpeed);
-            ySpeed = yLimiter.calculate(ySpeed);
-
-            steerSpeed = rotationController.calculate(PoseEstimator.getInstance().getSwerveRotation().getRadians() % 2.0 * Math.PI, this.snapSetpoint);
-
-            ChassisSpeeds chassisSpeeds;
-            if (fieldRelative) {
-                chassisSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(
-                    xSpeed, ySpeed, steerSpeed, PoseEstimator.getInstance().getSwerveRotation()
-                );
-            } else {
-                chassisSpeeds = new ChassisSpeeds(xSpeed, ySpeed, steerSpeed);
-            }
-
-        SwerveModuleState[] moduleStates = DriveConstants.SWERVE_KINEMATICS.toSwerveModuleStates(chassisSpeeds);
-
-        this.setModuleStates(moduleStates);
-        } else {
-            this.isSnapping = false;
-        }
     }
 
     public Translation2d getSwerveTranslation() {
@@ -240,13 +208,6 @@ public final class Swerve extends Subsystem {
         }
     }
 
-    public void printModuleOffsets() {
-        System.out.println("Front left: " + frontLeft.getAbsoluteEncoderRad());
-        System.out.println("Front right: " + frontRight.getAbsoluteEncoderRad());
-        System.out.println("Back left: " + backLeft.getAbsoluteEncoderRad());
-        System.out.println("Back right: " + backRight.getAbsoluteEncoderRad());
-    }
-
     public double getSwerveRotation() {
         double rotAxis = -Math.pow(Robot.driverController.getAxis(Side.RIGHT, Axis.X), 3);
 
@@ -257,86 +218,157 @@ public final class Swerve extends Subsystem {
         }
     }
 
-    public void setSnapSetpoint(double setpoint) {
-        this.snapSetpoint = setpoint;
-        this.snapStartTime = Timer.getFPGATimestamp();
-
-        // this.isSnapping = true;
+    public Pose2d getEstimatedPose() {
+        return this.swervePoseEstimator.getEstimatedPosition();
     }
 
-    public double getSnapSetpoint() {
-        return snapSetpoint;
+    public void resetSwervePose() {
+        this.swervePoseEstimator.resetPosition(this.getEstimatedPose().getRotation(), this.getModulePositions(), new Pose2d());
     }
 
-    public boolean isSnapping() {
-        return isSnapping;
+    public void resetPoseEstimator(Rotation2d gyroAngle, SwerveModulePosition[] modulePositions, Pose2d startPose) {
+        this.swervePoseEstimator.resetPosition(gyroAngle, modulePositions, startPose);
     }
 
-    private static final class SwerveActions {
-        public static final Action defaultDriveAction() {
-            Runnable startMethod = () -> {
-                Swerve.getInstance().drive(new Translation2d(), 0.0, true, true);
-            };
+    public void stopDrive() {
+        ChassisSpeeds chassisSpeeds = new ChassisSpeeds();
 
-            Runnable runMethod = () -> {
-                if (Robot.driverController.getButton(Button.RB)) {
-                    Swerve.getInstance().slowMode = true;
-                } else {
-                    Swerve.getInstance().slowMode = false;
-                }
+        this.setModuleStates(DriveConstants.SWERVE_KINEMATICS.toSwerveModuleStates(chassisSpeeds));
+    }
 
-                // if (Robot.driverController.getButton(Button.Y)) {
-                //     return 0.0;
-                // } else if (Robot.driverController.getButton(Button.X)) {
-                //     return 0.5 * Math.PI;
-                // } else if (Robot.driverController.getButton(Button.A)) {
-                //     return Math.PI;
-                // } else {
-                //     return 1.5 * Math.PI;
-                // }
+    public void addVisionPose2d() {
+        Alliance alliance = DriverStation.getAlliance();
 
-                Translation2d swerveTranslation = Swerve.getInstance().getSwerveTranslation();
-                
-                double swerveRotation = Swerve.getInstance().getSwerveRotation();
+        for (String limelightName : LimelightConstants.LIMELIGHT_NAMES) {
+            if (!LimelightHelper.getTV(limelightName)) {
+                continue;
+            }
 
-                    
-                if (Robot.driverController.getButton(Button.LB)) {
-                    Swerve.getInstance().drive(swerveTranslation, swerveRotation, false, true);
-                } else {
-                    Swerve.getInstance().drive(swerveTranslation, swerveRotation, true, true);
-                }
+            Pose2d pose;
 
-                // Swerve.getInstance().printModuleOffsets();
-            };
+            if (alliance == Alliance.Red) {
+                pose = LimelightHelper.getBotPose2d_wpiRed(limelightName);
+            } else {
+                pose = LimelightHelper.getBotPose2d_wpiBlue(limelightName);
+            }
 
-            Runnable endMethod = () -> {
-                Swerve.getInstance().drive(new Translation2d(), 0.0, true, true);
-            };
+            double trust = (1 - LimelightHelper.getTA(limelightName)) * 15;
+            double latency = LimelightHelper.getLatency_Pipeline(limelightName) / 1000.0;
 
-            return new Action(startMethod, runMethod, endMethod, ActionConstants.WILL_NOT_CANCEL);
-        }
-
-        public static final Action startButtonAction() {
-            Runnable startMethod = () -> {};
-
-            Runnable runMethod = () -> {
-                if (Robot.driverController.getButton(Button.START)) {
-                    Swerve.getInstance().zeroYaw();
-                }
-            };
-
-            Runnable endMethod = () -> {};
-
-            return new Action(startMethod, runMethod, endMethod, ActionConstants.WILL_NOT_CANCEL);
+            swervePoseEstimator.setVisionMeasurementStdDevs(new MatBuilder<>(Nat.N3(), Nat.N1()).fill(trust, trust, trust));
+            swervePoseEstimator.addVisionMeasurement(pose, Timer.getFPGATimestamp() - latency);
         }
     }
 
-    @Override
-    public void log() {
-        SmartDashboard.getBoolean("Use Vision Measurements", true);
-        SmartDashboard.putNumber("Gyro Heading", this.getGyroRotation().getDegrees());
-        SmartDashboard.putNumber("Gyro Pitch", this.gyro.getPitch());
-        SmartDashboard.putNumber("Gyro Roll", this.gyro.getRoll());
+    public void updatePoseEstimator() {
+        swervePoseEstimator.update(this.getGyroRotation(), this.getModulePositions());
+        addVisionPose2d();
+
+        mField2d.setRobotPose(this.getEstimatedPose());
+    }
+
+    public void printModuleOffsets() {
+        System.out.println("Front left: " + frontLeft.getAbsoluteEncoderRad());
+        System.out.println("Front right: " + frontRight.getAbsoluteEncoderRad());
+        System.out.println("Back left: " + backLeft.getAbsoluteEncoderRad());
+        System.out.println("Back right: " + backRight.getAbsoluteEncoderRad());
+    }
+
+    public void enableChargeStation(boolean direction) {
+        ChassisSpeeds driveSpeeds;
+       
+        if (direction) {
+            driveSpeeds =  new ChassisSpeeds(Units.feetToMeters(6.5), 0, 0);
+        } else {
+            driveSpeeds = new ChassisSpeeds(Units.feetToMeters(-6.5), 0, 0);
+        }
+
+        SwerveModuleState[] moduleStates = DriveConstants.SWERVE_KINEMATICS.toSwerveModuleStates(driveSpeeds);
+
+        this.setModuleStates(moduleStates);
+
+        while (Math.abs(this.getPitch()) < 8.0) {
+            moduleStates = DriveConstants.SWERVE_KINEMATICS.toSwerveModuleStates(driveSpeeds);
+
+            this.setModuleStates(moduleStates);
+        }
+
+        if (direction) {
+            driveSpeeds =  new ChassisSpeeds(Units.feetToMeters(2.0), 0, 0);
+        } else {
+            driveSpeeds = new ChassisSpeeds(Units.feetToMeters(-2.0), 0, 0);
+        }
+
+        while (Math.abs(this.getPitch()) > 2.0) {
+            moduleStates = DriveConstants.SWERVE_KINEMATICS.toSwerveModuleStates(driveSpeeds);
+
+            this.setModuleStates(moduleStates);
+        }
+        
+        this.setModuleStates(DriveConstants.SWERVE_KINEMATICS.toSwerveModuleStates(new ChassisSpeeds()));
+    }
+
+    public void straightenWheels(double time) {
+        double startTime = Timer.getFPGATimestamp();
+
+        ChassisSpeeds driveSpeeds;
+
+        driveSpeeds =  new ChassisSpeeds(Units.feetToMeters(-0.25), 0, 0);
+
+        while (Timer.getFPGATimestamp() - startTime < time) {
+            SwerveModuleState[] moduleStates = DriveConstants.SWERVE_KINEMATICS.toSwerveModuleStates(driveSpeeds);
+
+            this.setModuleStates(moduleStates);
+        }
+
+        this.setModuleStates(DriveConstants.SWERVE_KINEMATICS.toSwerveModuleStates(new ChassisSpeeds()));
+    }
+
+    public void driveOverChargeStation(boolean direction) {
+        ChassisSpeeds driveSpeeds;
+       
+        if (direction) {
+            driveSpeeds =  new ChassisSpeeds(Units.feetToMeters(8.0), 0, 0);
+        } else {
+            driveSpeeds = new ChassisSpeeds(Units.feetToMeters(-8.0), 0, 0);
+        }
+
+        SwerveModuleState[] moduleStates = DriveConstants.SWERVE_KINEMATICS.toSwerveModuleStates(driveSpeeds);
+
+        this.setModuleStates(moduleStates);
+
+        while (Math.abs(this.getPitch()) < 8.0) {}
+
+        while (Math.abs(this.getPitch()) > 2.0) {}
+
+        while (Math.abs(this.getPitch()) < 8.0) {}
+
+        while (Math.abs(this.getPitch()) > 1.5) {}
+        
+        this.setModuleStates(DriveConstants.SWERVE_KINEMATICS.toSwerveModuleStates(new ChassisSpeeds()));
+    }
+
+    public void adjustChargeStation() {
+        while (Math.abs(this.getPitch()) > DriveConstants.CHARGE_STATION_PITCH_DEADBAND) {
+            ChassisSpeeds driveSpeeds = this.getPitch() < 0.0 ? new ChassisSpeeds(-0.3, 0.0, 0.0) : new ChassisSpeeds(0.3, 0.0, 0.0);
+
+            this.setModuleStates(DriveConstants.SWERVE_KINEMATICS.toSwerveModuleStates(driveSpeeds));
+        }
+
+        this.setModuleStates(DriveConstants.SWERVE_KINEMATICS.toSwerveModuleStates(new ChassisSpeeds()));
+    }
+
+    public Command followTrajectoryCommand(PathPlannerTrajectory path) {
+        return new PPSwerveControllerCommand(
+            path, 
+            this::getEstimatedPose, 
+            DriveConstants.SWERVE_KINEMATICS, 
+            this.xController, 
+            this.yController, 
+            this.thetaController, 
+            this::setModuleStates,
+            true,
+            this).andThen(() -> stopDrive());
     }
 
     @Override
@@ -344,22 +376,18 @@ public final class Swerve extends Subsystem {
         SwerveModuleState[] swerveModuleStates = new SwerveModuleState[4];
 
         for (int i = 0; i < 4; i++) {
-            swerveModuleStates[i] = Swerve.getInstance().swerveMods[i].getState();
+            swerveModuleStates[i] = this.swerveMods[i].getState();
         }
-    }
 
-    @Override
-    public void queryInitialActions() {
-        Robot.autonomousRunner.add(
-            this.getLoggingAction(),
-            this.getPeriodicAction()
-        );
+        this.updatePoseEstimator();
 
-        Robot.teleopRunner.add(
-            this.getLoggingAction(),
-            this.getPeriodicAction(),
-            SwerveActions.defaultDriveAction(),
-            SwerveActions.startButtonAction()
-        );
+        SmartDashboard.putNumber("Gyro Heading", this.getGyroRotation().getDegrees());
+        SmartDashboard.putNumber("Gyro Pitch", this.gyro.getPitch());
+
+        SmartDashboard.putNumber("Robot Pose - X", this.getEstimatedPose().getX());
+        SmartDashboard.putNumber("Robot Pose - Y", getEstimatedPose().getY());
+        SmartDashboard.putNumber("Robot Pose - Angle", getEstimatedPose().getRotation().getDegrees());
+
+        SmartDashboard.putData("Field", mField2d);
     }
 }

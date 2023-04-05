@@ -1,29 +1,47 @@
 package frc.robot.subsystems;
 
-import frc.libs.java.actions.*;
-import frc.robot.Robot;
 import frc.robot.Constants.*;
+
 import edu.wpi.first.wpilibj.AddressableLED;
 import edu.wpi.first.wpilibj.AddressableLEDBuffer;
+import edu.wpi.first.wpilibj2.command.Subsystem;
 
-public final class LED extends Subsystem {
-    private static LED mInstance;
+public final class LED implements Subsystem {
+    private AddressableLED ledStrip;
+    private AddressableLEDBuffer ledBuffer;
 
-    public AddressableLED ledStrip;
-    public AddressableLEDBuffer ledBuffer;
+    private LEDState ledState;
+    private int animationFrame = 0;
+    private int animationSpeed = 0;
+    private int currentAnimationTime = 0;
+    private Colors[] currentColors;
+    private AnimationType animationType;
 
-    private LED() {}
+    public LED() {}
 
-    public enum LEDState {
-        YELLOW_AND_BLUE, PURPLE, YELLOW, OFF
+    private enum Colors {
+        YELLOW(153, 153, 2),
+        BLUE(66, 247, 245),
+        PURPLE(140, 32, 137),
+        BLANK(0, 0, 0);
+    
+        public final int r;
+        public final int g;
+        public final int b;
+    
+        Colors(int r, int g, int b) {
+            this.r = r;
+            this.g = g;
+            this.b = b;
+        }
     }
 
-    public static LED getInstance() {
-        if (mInstance == null) {
-            mInstance = new LED();
-        }
+    private enum AnimationType {
+        SCROLL, NONE
+    }
 
-        return mInstance;
+    public enum LEDState {
+        YELLOW_AND_BLUE, YELLOW_AND_BLUE_ANIMATION, PURPLE, YELLOW, OFF
     }
 
     public void configureLEDs() {
@@ -32,71 +50,92 @@ public final class LED extends Subsystem {
         ledBuffer = new AddressableLEDBuffer(80);
         ledStrip.setLength(ledBuffer.getLength());
 
-        this.setLEDState(LEDState.YELLOW_AND_BLUE);
+        this.setLEDState(LEDState.YELLOW_AND_BLUE_ANIMATION);
 
         ledStrip.setData(ledBuffer);
         ledStrip.start();
     }
 
-    public void setLEDState(LEDState state) {
-        if (state.equals(LEDState.YELLOW_AND_BLUE)) {
-            for (int i = 1; i < this.ledBuffer.getLength(); i += 2) {
-                this.ledBuffer.setRGB(i - 1, 66, 247, 245);
-                this.ledBuffer.setRGB(i, 153, 153, 2);
-            }
-        } else if (state.equals(LEDState.PURPLE)) {
-            for (int i = 1; i < this.ledBuffer.getLength(); i++) {
-                this.ledBuffer.setRGB(i, 140, 32, 137);
-            }
-        } else if (state.equals(LEDState.YELLOW)) {
-            for (int i = 1; i < this.ledBuffer.getLength(); i++) {
-                this.ledBuffer.setRGB(i, 153, 153, 2);
-            }
-        } else if (state.equals(LEDState.OFF)) {
-            for (int i = 1; i < this.ledBuffer.getLength(); i++) {
-                this.ledBuffer.setRGB(i, 0, 0, 0);
-            }
-        }
+    private void resetAnimation() {
+        animationFrame = 0;
+        currentAnimationTime = 0;
+    }
 
+    private void setAnimation(int speed, AnimationType type) {
+        resetAnimation();
+        animationSpeed = speed;
+        animationType = type;
+    }
+
+    private void fillLEDs(Colors[] colors) {
+        int interval = ledBuffer.getLength() / colors.length;
+        for (int i = 0; i < ledBuffer.getLength(); i++) {
+            int colorIndex = (i / interval) % colors.length;
+            ledBuffer.setRGB(i, colors[colorIndex].r, colors[colorIndex].g, colors[colorIndex].b);
+        }
+    }
+
+    private void scrollAnimateLEDs(Colors[] colors) {
+        int interval = colors.length;
+        int startIndex = animationFrame % interval;
+        for (int i = 0; i < ledBuffer.getLength(); i++) {
+            int colorIndex = (i + startIndex) % interval;
+            ledBuffer.setRGB(i, colors[colorIndex].r, colors[colorIndex].g, colors[colorIndex].b);
+        }
+        animationFrame = (animationFrame + 1) % interval;
+    }
+
+    public void setLEDState(LEDState state) {
+        ledState = state;
+
+        switch (ledState) {
+            case YELLOW_AND_BLUE:
+                setAnimation(0, AnimationType.NONE);
+                currentColors = new Colors[] { Colors.YELLOW, Colors.BLUE };
+                break;
+            case PURPLE:
+                setAnimation(0, AnimationType.NONE);
+                currentColors = new Colors[] { Colors.PURPLE };
+                break;
+            case YELLOW:
+                setAnimation(0, AnimationType.NONE);
+                currentColors = new Colors[] { Colors.YELLOW };
+                break;
+            case OFF:
+                setAnimation(0, AnimationType.NONE);
+                currentColors = new Colors[] { Colors.BLANK };
+                break;
+            case YELLOW_AND_BLUE_ANIMATION:
+                setAnimation(50, AnimationType.SCROLL);
+                currentColors = new Colors[] { Colors.YELLOW, Colors.YELLOW, Colors.BLUE, Colors.BLUE, Colors.BLUE };
+                break;
+            default:
+                break;
+        }
+    
         this.ledStrip.setData(this.ledBuffer);
     }
 
-    private static final class LEDActions {
-        public static final Action defaultLEDAction() {
-            Runnable startMethod = () -> {};
+    @Override
+    public void periodic() {
+        if (currentColors.length > 0) {
+            if (animationType == AnimationType.NONE) {
+                fillLEDs(currentColors);
+            } else {
+                currentAnimationTime = (currentAnimationTime + 1) % animationSpeed;
 
-            Runnable runMethod = () -> {
-                if (Robot.operatorController.getPOV() == 0) {
-                    LED.getInstance().setLEDState(LEDState.YELLOW);
-                } else if (Robot.operatorController.getPOV() == 90) {
-                    LED.getInstance().setLEDState(LEDState.OFF);
-                } else if (Robot.operatorController.getPOV() == 180) {
-                    LED.getInstance().setLEDState(LEDState.PURPLE);
-                } else if (Robot.operatorController.getPOV() == 270) {
-                    LED.getInstance().setLEDState(LEDState.YELLOW_AND_BLUE);
+                if (currentAnimationTime == 0) {
+                    switch (animationType) {
+                        case SCROLL:
+                            scrollAnimateLEDs(currentColors);
+                            break;
+                        default:
+                            break;
+                    }
                 }
-            };
-
-            Runnable endMethod = () -> {};
-
-            return new Action(startMethod, runMethod, endMethod, ActionConstants.WILL_NOT_CANCEL);
+            }
         }
-    }
 
-    @Override
-    public void log() {}
-
-    @Override
-    public void periodic() {}
-
-    @Override
-    public void queryInitialActions() {
-        Robot.autonomousRunner.add(
-            LEDActions.defaultLEDAction()
-        );
-
-        Robot.teleopRunner.add(
-            LEDActions.defaultLEDAction()
-        );
+        ledStrip.setData(ledBuffer);
     }
 }
