@@ -42,10 +42,10 @@ public final class Extension implements Subsystem {
         ZERO_INCHES, FIVE_INCHES, SEVEN_INCHES, TWELVE_INCHES, OFF
     }
 
-    public final double[] elbowSetpoints = {15.5, 15.5, 37.5, 99.0, 177.0, 100.0};
+    public final double[] elbowSetpoints = {15.5, 15.5, 37.5, 99.0, 177.0, 106.0, 145.0};
 
     public static enum ExtensionState {
-        GROUND_LOW_INTAKE, GROUND_HIGH_INTAKE, OFF_GROUND, MIDDLE_ROW, HIGH_ROW, ABOVE_MATCH_START, LOWER, HIGHER
+        GROUND_LOW_INTAKE, GROUND_HIGH_INTAKE, OFF_GROUND, MIDDLE_ROW, HIGH_ROW, ABOVE_MATCH_START, KNOCKDOWN, LOWER, HIGHER
     }
 
     public Extension() {
@@ -118,6 +118,10 @@ public final class Extension implements Subsystem {
                 this.startTime = currTime;
                 this.waitTime = 0.25;
                 this.armInWaiting = true;
+            } else if (!prevState.equals(ExtensionState.KNOCKDOWN) && state.equals(ExtensionState.KNOCKDOWN)) {
+                this.startTime = currTime;
+                this.waitTime = 2.0;
+                this.armInWaiting = true;
             } else {
                 switch (state) {
                     case GROUND_LOW_INTAKE:
@@ -143,12 +147,17 @@ public final class Extension implements Subsystem {
                     case ABOVE_MATCH_START:
                         this.setLowerExtensionState(LowerExtensionState.ZERO_INCHES);
                         this.elbowController.setSetpoint(elbowSetpoints[5] / 360.0);
+                        break;
+                    case KNOCKDOWN:
+                        this.setLowerExtensionState(LowerExtensionState.ZERO_INCHES);
+                        this.elbowController.setSetpoint(elbowSetpoints[6] / 360.0);
+                        break;
                     case HIGHER:
                         this.armSetpoint += 0.002;
                         this.elbowController.setSetpoint(armSetpoint);
                         break;
                     case LOWER:
-                        if (!prevState.equals(ExtensionState.HIGH_ROW) || this.getElbowAngle().getDegrees() > 180.0) {
+                        if (!prevState.equals(ExtensionState.HIGH_ROW) || this.getElbowAngle().getDegrees() > 183.0) {
                             this.armSetpoint -= 0.002;
                             this.elbowController.setSetpoint(armSetpoint);
                         }

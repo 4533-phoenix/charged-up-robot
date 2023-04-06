@@ -19,9 +19,7 @@ public class DefaultExtensionCommand extends CommandBase {
     public void execute() {
         if (Robot.operatorController.getButton(Button.Y)) {
             mExtension.updateExtensionState(ExtensionState.GROUND_LOW_INTAKE);
-        } else if (Robot.operatorController.getButton(Button.BACK)) {
-            mExtension.updateExtensionState(ExtensionState.GROUND_HIGH_INTAKE);
-        } else if (Robot.operatorController.getButton(Button.X)) {
+        } else if (Robot.operatorController.getButton(Button.X) || Robot.operatorController.getButton(Button.BACK)) {
             mExtension.updateExtensionState(ExtensionState.OFF_GROUND);
         } else if (Robot.operatorController.getButton(Button.B)) {
             mExtension.updateExtensionState(ExtensionState.MIDDLE_ROW);
@@ -31,6 +29,8 @@ public class DefaultExtensionCommand extends CommandBase {
             mExtension.updateExtensionState(ExtensionState.HIGHER);
         } else if (Robot.operatorController.getButton(Button.LB)) {
             mExtension.updateExtensionState(ExtensionState.LOWER);
+        } else if (Robot.operatorController.getButton(Button.START)) {
+            mExtension.updateExtensionState(ExtensionState.KNOCKDOWN);
         } else {
             mExtension.updateExtensionState();
         }

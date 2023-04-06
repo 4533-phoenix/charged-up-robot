@@ -18,6 +18,7 @@ import frc.robot.commands.autos.LaneTwoPiece;
 import frc.robot.commands.autos.OverChargeStationPickup;
 import frc.robot.commands.autos.PathPlannerTest;
 import frc.robot.commands.autos.RightLeftScoreAndLeave;
+import frc.robot.controls.PSController.Button;
 import frc.robot.subsystems.*;
 
 public class RobotContainer {
@@ -45,10 +46,7 @@ public class RobotContainer {
         configureButtonBindings();
     }
 
-    private void configureButtonBindings() {
-        // new Trigger(() -> Robot.operatorController.getButton(Button.BACK)).onTrue(new SetClimbPositionCommand(this.extension, this.climber));
-        // new Trigger(() -> Robot.operatorController.getButton(Button.START)).onTrue(new ForkliftClimbCommand(this.extension, this.climber));
-    }
+    private void configureButtonBindings() {}
 
     public final Map<String, Command> autoCommands = Map.ofEntries(
         Map.entry("PathPlanner Test", new PathPlannerTest(this.swerve, this.extension, this.gripper)),

@@ -17,7 +17,11 @@ public class Climber implements Subsystem {
     }
 
     public void releaseClimber() {
-        dropServo.set(0.5);
+        dropServo.set(0.75);
+    }
+
+    public void resetServo() {
+        dropServo.set(0.0);
     }
 
     public void raiseClimber() {

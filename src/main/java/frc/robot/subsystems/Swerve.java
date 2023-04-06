@@ -269,7 +269,7 @@ public final class Swerve implements Subsystem {
                 pose = LimelightHelper.getBotPose2d_wpiBlue(limelightName);
             }
 
-            double trust = (1 - LimelightHelper.getTA(limelightName)) * 15;
+            double trust = (1 - LimelightHelper.getTA(limelightName) * 20);
             double latency = LimelightHelper.getLatency_Pipeline(limelightName) / 1000.0;
 
             swervePoseEstimator.setVisionMeasurementStdDevs(new MatBuilder<>(Nat.N3(), Nat.N1()).fill(trust, trust, trust));

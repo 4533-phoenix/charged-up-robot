@@ -16,10 +16,12 @@ public class DefaultClimberCommand extends CommandBase {
 
     @Override
     public void execute() {
-        if (Robot.driverController.getButton(Button.A)) {
+        if (Robot.operatorController.getButton(Button.START)) {
+            mClimber.releaseClimber();
+        }
+
+        if (Robot.operatorController.getButton(Button.BACK)) {
             mClimber.raiseClimber();
-        } else if (Robot.driverController.getButton(Button.B)) {
-            mClimber.lowerClimber();
         } else {
             mClimber.stopClimber();
         }
