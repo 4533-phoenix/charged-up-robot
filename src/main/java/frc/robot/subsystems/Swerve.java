@@ -89,9 +89,13 @@ public final class Swerve implements Subsystem {
 
     private AHRS gyro = new AHRS(SPI.Port.kMXP);
 
-    public boolean slowMode;
+    private DriveSpeed driveSpeed;
 
     private Field2d mField2d = new Field2d();
+
+    public enum DriveSpeed {
+        SLOW, STANDARD, FAST
+    }
 
     public SwerveDrivePoseEstimator swervePoseEstimator = new SwerveDrivePoseEstimator(
         DriveConstants.SWERVE_KINEMATICS, 
@@ -147,21 +151,34 @@ public final class Swerve implements Subsystem {
         backRight.setDesiredState(desiredStates[3]);
     }
 
-    public void setSlowMode(Boolean enabled) {
-        slowMode = enabled;
+    public void setDriveSpeed(DriveSpeed speed) {
+        this.driveSpeed = speed;
     }
 
     public void drive(Translation2d translation, double rotation, boolean fieldRelative, boolean isOpenLoop) {
         double xSpeed, ySpeed, steerSpeed;
 
-        if (slowMode) {
-            xSpeed = DriveConstants.DRIVE_MAX_VELOCITY_SLOW * translation.getX();
-            ySpeed = DriveConstants.DRIVE_MAX_VELOCITY_SLOW * translation.getY();
-            steerSpeed = DriveConstants.DRIVE_MAX_ROTATIONAL_VELOCITY_SLOW * rotation;
-        } else {
-            xSpeed = DriveConstants.DRIVE_MAX_VELOCITY * translation.getX();
-            ySpeed = DriveConstants.DRIVE_MAX_VELOCITY * translation.getY();
-            steerSpeed = DriveConstants.DRIVE_MAX_ROTATIONAL_VELOCITY * rotation;
+        switch (this.driveSpeed) {
+            case SLOW:
+                xSpeed = DriveConstants.DRIVE_MAX_VELOCITY_SLOW * translation.getX();
+                ySpeed = DriveConstants.DRIVE_MAX_VELOCITY_SLOW * translation.getY();
+                steerSpeed = DriveConstants.DRIVE_MAX_ROTATIONAL_VELOCITY_SLOW * rotation;
+                break;
+            case STANDARD:
+                xSpeed = DriveConstants.DRIVE_MAX_VELOCITY * translation.getX();
+                ySpeed = DriveConstants.DRIVE_MAX_VELOCITY * translation.getY();
+                steerSpeed = DriveConstants.DRIVE_MAX_ROTATIONAL_VELOCITY * rotation;
+                break;
+            case FAST:
+                xSpeed = DriveConstants.DRIVE_MAX_VELOCITY_FAST * translation.getX();
+                ySpeed = DriveConstants.DRIVE_MAX_VELOCITY_FAST * translation.getY();
+                steerSpeed = DriveConstants.DRIVE_MAX_ROTATIONAL_VELOCITY_FAST * rotation;
+                break;
+            default:
+                xSpeed = DriveConstants.DRIVE_MAX_VELOCITY * translation.getX();
+                ySpeed = DriveConstants.DRIVE_MAX_VELOCITY * translation.getY();
+                steerSpeed = DriveConstants.DRIVE_MAX_ROTATIONAL_VELOCITY * rotation;
+                break;
         }
 
         xSpeed = Math.abs(xSpeed) > OIConstants.DRIVE_DEADBAND ? xSpeed : 0.0;

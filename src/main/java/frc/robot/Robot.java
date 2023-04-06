@@ -37,6 +37,10 @@ public final class Robot extends TimedRobot {
     chooser.addOption("Right/Left Score and Leave", "Right/Left Score and Leave");
     chooser.addOption("Charge Station Score and Enable", "Charge Station Score and Enable");
     chooser.addOption("Lane Two Piece", "Lane Two Piece");
+    chooser.addOption("Lane Three Piece", "Lane Three Piece");
+    chooser.addOption("Bump Two Piece", "Bump Two Piece");
+    chooser.addOption("Bump Three Piece", "Bump Three Piece");
+    chooser.addOption("Over Charge Station Pickup", "Over Charge Station Pickup");
     SmartDashboard.putData("Select Auto", chooser);
     
     UsbCamera gripperCamera = CameraServer.startAutomaticCapture();

@@ -12,12 +12,10 @@ import frc.robot.subsystems.*;
 import frc.robot.subsystems.Extension.ExtensionState;
 
 
-public class LaneThreePiece extends SequentialCommandGroup {
-    public LaneThreePiece(Swerve swerve, Gripper gripper, Extension extension) {
-        PathPlannerTrajectory path1 = PathPlanner.loadPath("Lane Pickup Piece 1", 3.0, 2.0);
-        PathPlannerTrajectory path2 = PathPlanner.loadPath("Lane Score Cube 1", 3.0, 2.0);
-        PathPlannerTrajectory path3 = PathPlanner.loadPath("Lane Pickup Piece 2", 3.5, 2.5);
-        PathPlannerTrajectory path4 = PathPlanner.loadPath("Lane Score Hybrid 2", 4.0, 3.0);
+public class BumpTwoPiece extends SequentialCommandGroup {
+    public BumpTwoPiece(Swerve swerve, Gripper gripper, Extension extension) {
+        PathPlannerTrajectory path1 = PathPlanner.loadPath("Bump Pickup Piece 1", 3.0, 2.0);
+        PathPlannerTrajectory path2 = PathPlanner.loadPath("Bump Score Cube 1", 3.0, 2.0);
 
         addRequirements(swerve, extension, gripper);
         addCommands(
@@ -31,21 +29,9 @@ public class LaneThreePiece extends SequentialCommandGroup {
                 new WaitForGamepieceCommand(gripper).withTimeout(path1.getTotalTimeSeconds())),
             new InstantCommand(() -> gripper.enableGripper(), gripper),
             new InstantCommand(() -> extension.updateExtensionState(ExtensionState.OFF_GROUND), extension),
-            new ParallelCommandGroup(
-                swerve.followTrajectoryCommand(path2),
-                new SequentialCommandGroup(
-                    new WaitCommand(1.0),
-                    new InstantCommand(() -> extension.updateExtensionState(ExtensionState.MIDDLE_ROW), extension)
-                )),
-            new WaitCommand(0.25),
-            new InstantCommand(() -> gripper.disableGripper(), gripper),
-            new WaitCommand(0.2),
-            new ParallelCommandGroup(
-                swerve.followTrajectoryCommand(path3),
-                new WaitForGamepieceCommand(gripper).withTimeout(path1.getTotalTimeSeconds())),
-            new InstantCommand(() -> gripper.enableGripper(), gripper),
-            new InstantCommand(() -> extension.updateExtensionState(ExtensionState.OFF_GROUND), extension),
-            swerve.followTrajectoryCommand(path4),
+            swerve.followTrajectoryCommand(path2),
+            new InstantCommand(() -> extension.updateExtensionState(ExtensionState.MIDDLE_ROW), extension),
+            new WaitCommand(2.0),
             new InstantCommand(() -> gripper.disableGripper(), gripper)
         );
     }

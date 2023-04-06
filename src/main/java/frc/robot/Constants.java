@@ -110,9 +110,8 @@ public final class Constants {
         public static final double DRIVE_MAX_VELOCITY_SLOW = Units.feetToMeters(3.0);
         public static final double DRIVE_MAX_ROTATIONAL_VELOCITY_SLOW = 0.25 * 2.0 * Math.PI; // rad/s
 
-        public static final double DRIVE_ROTATION_KP = 11.0;
-        public static final double DRIVE_ROTATION_KI = 0.2;
-        public static final double DRIVE_ROTATION_KD = 2500.0;
+        public static final double DRIVE_MAX_VELOCITY_FAST = Units.feetToMeters(8.5);
+        public static final double DRIVE_MAX_ROTATIONAL_VELOCITY_FAST = 0.25 * 2.0 * Math.PI; // rad/s
 
         public static final double DRIVE_MAX_ACCELERATION = 10.0; // m/s^2
         public static final double DRIVE_MAX_ROTATIONAL_ACCELERATION = 25.0; // rad/s^2

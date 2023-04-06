@@ -42,10 +42,10 @@ public final class Extension implements Subsystem {
         ZERO_INCHES, FIVE_INCHES, SEVEN_INCHES, TWELVE_INCHES, OFF
     }
 
-    public final double[] elbowSetpoints = {15.5, 15.5, 37.5, 99.0, 177.0, 90.0};
+    public final double[] elbowSetpoints = {15.5, 15.5, 37.5, 99.0, 177.0, 100.0};
 
     public static enum ExtensionState {
-        GROUND_LOW_INTAKE, GROUND_HIGH_INTAKE, OFF_GROUND, MIDDLE_ROW, HIGH_ROW, MATCH_START, LOWER, HIGHER
+        GROUND_LOW_INTAKE, GROUND_HIGH_INTAKE, OFF_GROUND, MIDDLE_ROW, HIGH_ROW, ABOVE_MATCH_START, LOWER, HIGHER
     }
 
     public Extension() {
@@ -113,7 +113,7 @@ public final class Extension implements Subsystem {
                 this.startTime = currTime;
                 this.waitTime = 0.7;
                 this.armInWaiting = true;
-            } else if (prevState.equals(ExtensionState.MATCH_START) && state.equals(ExtensionState.HIGH_ROW)) {
+            } else if (prevState.equals(ExtensionState.ABOVE_MATCH_START) && state.equals(ExtensionState.HIGH_ROW)) {
                 this.setLowerExtensionState(LowerExtensionState.TWELVE_INCHES);
                 this.startTime = currTime;
                 this.waitTime = 0.25;
@@ -140,7 +140,7 @@ public final class Extension implements Subsystem {
                         this.setLowerExtensionState(LowerExtensionState.TWELVE_INCHES);
                         this.elbowController.setSetpoint(elbowSetpoints[4] / 360.0);
                         break;
-                    case MATCH_START:
+                    case ABOVE_MATCH_START:
                         this.setLowerExtensionState(LowerExtensionState.ZERO_INCHES);
                         this.elbowController.setSetpoint(elbowSetpoints[5] / 360.0);
                     case HIGHER:

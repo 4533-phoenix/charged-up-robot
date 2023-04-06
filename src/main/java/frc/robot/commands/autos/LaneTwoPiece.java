@@ -21,8 +21,9 @@ public class LaneTwoPiece extends SequentialCommandGroup {
         addCommands(
             new InstantCommand(() -> swerve.resetPoseEstimator(swerve.getGyroRotation(), swerve.getModulePositions(), path1.getInitialPose()), swerve),
             new InstantCommand(() -> gripper.disableGripper(), gripper),
-            new InstantCommand(() -> extension.updateExtensionState(ExtensionState.GROUND_HIGH_INTAKE)),
+            new InstantCommand(() -> extension.updateExtensionState(ExtensionState.ABOVE_MATCH_START)),
             new WaitCommand(0.5),
+            new InstantCommand(() -> extension.updateExtensionState(ExtensionState.GROUND_HIGH_INTAKE)),
             new ParallelCommandGroup(
                 swerve.followTrajectoryCommand(path1),
                 new WaitForGamepieceCommand(gripper).withTimeout(path1.getTotalTimeSeconds())),

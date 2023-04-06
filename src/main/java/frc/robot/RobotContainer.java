@@ -10,11 +10,14 @@ import frc.robot.commands.DefaultLEDCommand;
 import frc.robot.commands.DefaultSwerveCommand;
 import frc.robot.commands.ForkliftClimbCommand;
 import frc.robot.commands.SetClimbPositionCommand;
+import frc.robot.commands.autos.BumpThreePiece;
+import frc.robot.commands.autos.BumpTwoPiece;
 import frc.robot.commands.autos.ChargeStationScoreAndEnable;
+import frc.robot.commands.autos.LaneThreePiece;
 import frc.robot.commands.autos.LaneTwoPiece;
+import frc.robot.commands.autos.OverChargeStationPickup;
 import frc.robot.commands.autos.PathPlannerTest;
 import frc.robot.commands.autos.RightLeftScoreAndLeave;
-import frc.robot.controls.PSController.*;
 import frc.robot.subsystems.*;
 
 public class RobotContainer {
@@ -51,7 +54,11 @@ public class RobotContainer {
         Map.entry("PathPlanner Test", new PathPlannerTest(this.swerve, this.extension, this.gripper)),
         Map.entry("Right/Left Score and Leave", new RightLeftScoreAndLeave(this.swerve, this.extension, this.gripper)),
         Map.entry("Charge Station Score and Enable", new ChargeStationScoreAndEnable(this.swerve, this.extension, this.gripper)),
-        Map.entry("Lane Two Piece", new LaneTwoPiece(this.swerve, this.gripper, this.extension))
+        Map.entry("Lane Two Piece", new LaneTwoPiece(this.swerve, this.gripper, this.extension)),
+        Map.entry("Lane Three Piece", new LaneThreePiece(this.swerve, this.gripper, this.extension)),
+        Map.entry("Bump Two Piece", new BumpTwoPiece(this.swerve, this.gripper, this.extension)),
+        Map.entry("Bump Three Piece", new BumpThreePiece(this.swerve, this.gripper, this.extension)),
+        Map.entry("Over Charge Station Pickup", new OverChargeStationPickup(this.swerve, this.gripper, this.extension))
     );
 
     public Extension getExtension() {

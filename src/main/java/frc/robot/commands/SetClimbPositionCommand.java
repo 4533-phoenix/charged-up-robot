@@ -8,7 +8,7 @@ public class SetClimbPositionCommand extends SequentialCommandGroup {
     public SetClimbPositionCommand(Extension extension, Climber climber) {
         addRequirements(extension, climber);
         addCommands(
-            new InstantCommand(() -> extension.updateExtensionState(ExtensionState.MATCH_START), extension), 
+            new InstantCommand(() -> extension.updateExtensionState(ExtensionState.ABOVE_MATCH_START), extension), 
             new InstantCommand(() -> climber.releaseClimber(), climber)
         );
     }
