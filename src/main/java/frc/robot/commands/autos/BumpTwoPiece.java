@@ -2,6 +2,7 @@ package frc.robot.commands.autos;
 
 import com.pathplanner.lib.PathPlanner;
 import com.pathplanner.lib.PathPlannerTrajectory;
+import com.pathplanner.lib.PathPlannerTrajectory.PathPlannerState;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -19,17 +20,11 @@ public class BumpTwoPiece extends SequentialCommandGroup {
         PathPlannerTrajectory path1 = PathPlanner.loadPath("Bump Pickup Piece 1 Slow", 1.0, 1.0);
         PathPlannerTrajectory path2 = PathPlanner.loadPath("Bump Score Cube 1 Slow", 1.2, 1.0);
 
-        final Pose2d initialPose;
-
-        if (DriverStation.getAlliance().equals(Alliance.Red)) {
-            initialPose = new Pose2d(16.53 - path1.getInitialState().poseMeters.getX(), path1.getInitialState().poseMeters.getY(), path1.getInitialState().poseMeters.getRotation());
-        } else {
-            initialPose = path1.getInitialState().poseMeters;
-        }
+        PathPlannerState initialState = PathPlannerTrajectory.transformStateForAlliance(path1.getInitialState(), DriverStation.getAlliance());
 
         addRequirements(swerve, extension, gripper);    
         addCommands(
-            new InstantCommand(() -> swerve.resetPoseEstimator(swerve.getGyroRotation(), swerve.getModulePositions(), initialPose), swerve),
+            new InstantCommand(() -> swerve.resetPoseEstimator(swerve.getGyroRotation(), swerve.getModulePositions(), initialState.poseMeters), swerve),
             new InstantCommand(() -> gripper.disableGripper(), gripper),
             new InstantCommand(() -> extension.updateExtensionState(ExtensionState.ABOVE_MATCH_START)),
             new WaitCommand(0.5),

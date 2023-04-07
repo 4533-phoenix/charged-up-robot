@@ -16,8 +16,10 @@ public class DriveDistanceCommand extends CommandBase {
 
     private boolean isFinished = false;
 
-    public DriveDistanceCommand(double startTime, Swerve swerve) {
+    public DriveDistanceCommand(double distanceMeters, Swerve swerve) {
         this.mSwerve = swerve;
+
+        this.distanceMeters = distanceMeters;
 
         addRequirements(swerve);
     }
@@ -31,26 +33,28 @@ public class DriveDistanceCommand extends CommandBase {
 
     @Override
     public void execute() {
+        this.startTime = Timer.getFPGATimestamp();
+
         ChassisSpeeds driveSpeeds;
        
         if (this.distanceMeters >= 0) {
-            driveSpeeds =  new ChassisSpeeds(AutoConstants.AUTO_MAX_VELOCITY, 0, 0);
+            driveSpeeds =  new ChassisSpeeds(-AutoConstants.AUTO_MAX_VELOCITY, 0, 0);
         } else {
-            driveSpeeds = new ChassisSpeeds(-AutoConstants.AUTO_MAX_VELOCITY, 0, 0);
+            driveSpeeds = new ChassisSpeeds(AutoConstants.AUTO_MAX_VELOCITY, 0, 0);
         }
 
         SwerveModuleState[] moduleStates = DriveConstants.SWERVE_KINEMATICS.toSwerveModuleStates(driveSpeeds);
 
         mSwerve.setModuleStates(moduleStates);
 
-        if (Timer.getFPGATimestamp() - startTime <= this.totalTime) {
+        if (Timer.getFPGATimestamp() - startTime >= this.totalTime) {
             this.isFinished = true;
         }
     }
 
     @Override
     public void end(boolean interrupted) {
-        mSwerve.setModuleStates(DriveConstants.SWERVE_KINEMATICS.toSwerveModuleStates(new ChassisSpeeds()));
+        mSwerve.stopDrive();
     }
 
     @Override

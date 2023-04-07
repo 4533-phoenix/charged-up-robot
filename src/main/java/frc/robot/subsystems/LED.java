@@ -1,7 +1,7 @@
 package frc.robot.subsystems;
 
 import frc.robot.Constants.*;
-
+import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.wpilibj.AddressableLED;
 import edu.wpi.first.wpilibj.AddressableLEDBuffer;
 import edu.wpi.first.wpilibj2.command.Subsystem;
@@ -14,6 +14,7 @@ public final class LED implements Subsystem {
     private int animationFrame = 0;
     private int animationSpeed = 0;
     private int currentAnimationTime = 0;
+    private boolean solidDrawn = false;
     private Colors[] currentColors;
     private AnimationType animationType;
 
@@ -59,6 +60,7 @@ public final class LED implements Subsystem {
     private void resetAnimation() {
         animationFrame = 0;
         currentAnimationTime = 0;
+        solidDrawn = false;
     }
 
     private void setAnimation(int speed, AnimationType type) {
@@ -73,6 +75,8 @@ public final class LED implements Subsystem {
             int colorIndex = (i / interval) % colors.length;
             ledBuffer.setRGB(i, colors[colorIndex].r, colors[colorIndex].g, colors[colorIndex].b);
         }
+        ledStrip.setData(ledBuffer);
+        solidDrawn = true;
     }
 
     private void scrollAnimateLEDs(Colors[] colors) {
@@ -83,6 +87,7 @@ public final class LED implements Subsystem {
             ledBuffer.setRGB(i, colors[colorIndex].r, colors[colorIndex].g, colors[colorIndex].b);
         }
         animationFrame = (animationFrame + 1) % interval;
+        ledStrip.setData(ledBuffer);
     }
 
     public void setLEDState(LEDState state) {
@@ -120,7 +125,9 @@ public final class LED implements Subsystem {
     public void periodic() {
         if (currentColors.length > 0) {
             if (animationType == AnimationType.NONE) {
-                fillLEDs(currentColors);
+                if (!solidDrawn) {
+                    fillLEDs(currentColors);
+                }
             } else {
                 currentAnimationTime = (currentAnimationTime + 1) % animationSpeed;
 
@@ -135,7 +142,5 @@ public final class LED implements Subsystem {
                 }
             }
         }
-
-        ledStrip.setData(ledBuffer);
     }
 }

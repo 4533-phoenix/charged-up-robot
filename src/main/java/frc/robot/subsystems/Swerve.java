@@ -6,11 +6,13 @@ import frc.robot.controls.PSController.Side;
 import frc.robot.helpers.LimelightHelper;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Subsystem;
+import frc.robot.Constants;
 import frc.robot.Robot;
 import frc.robot.Constants.*;
 
 import com.kauailabs.navx.frc.AHRS;
 import com.pathplanner.lib.PathPlannerTrajectory;
+import com.pathplanner.lib.PathPlannerTrajectory.PathPlannerState;
 import com.pathplanner.lib.commands.PPSwerveControllerCommand;
 
 import edu.wpi.first.wpilibj.DriverStation;
@@ -32,6 +34,7 @@ import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.math.trajectory.Trajectory.State;
 
 public final class Swerve implements Subsystem {
     private SwerveModule[] swerveMods;
@@ -254,8 +257,6 @@ public final class Swerve implements Subsystem {
     }
 
     public void addVisionPose2d() {
-        Alliance alliance = DriverStation.getAlliance();
-
         for (String limelightName : LimelightConstants.LIMELIGHT_NAMES) {
             if (!LimelightHelper.getTV(limelightName)) {
                 continue;
@@ -263,13 +264,13 @@ public final class Swerve implements Subsystem {
 
             Pose2d pose;
 
-            if (alliance == Alliance.Red) {
+            if (DriverStation.getAlliance() == Alliance.Red) {
                 pose = LimelightHelper.getBotPose2d_wpiRed(limelightName);
             } else {
                 pose = LimelightHelper.getBotPose2d_wpiBlue(limelightName);
             }
 
-            double trust = (1 - LimelightHelper.getTA(limelightName) * 20);
+            double trust = ((1 - LimelightHelper.getTA(limelightName)) * Constants.PoseEstimatorConstants.VISION_UNTRUST);
             double latency = LimelightHelper.getLatency_Pipeline(limelightName) / 1000.0;
 
             swervePoseEstimator.setVisionMeasurementStdDevs(new MatBuilder<>(Nat.N3(), Nat.N1()).fill(trust, trust, trust));
@@ -281,7 +282,35 @@ public final class Swerve implements Subsystem {
         swervePoseEstimator.update(this.getGyroRotation(), this.getModulePositions());
         addVisionPose2d();
 
-        mField2d.setRobotPose(this.getEstimatedPose());
+        if (DriverStation.getAlliance().equals(Alliance.Red)) {
+            Pose2d estimatedPose = this.getEstimatedPose();
+            mField2d.setRobotPose(new Pose2d(16.53 - estimatedPose.getX(), 8.02 - estimatedPose.getY(), estimatedPose.getRotation().plus(Rotation2d.fromDegrees(180))));
+        } else {
+            mField2d.setRobotPose(this.getEstimatedPose());
+        }
+    }
+    
+    public void driveDistance(double distanceMeters) {
+        double startTime = Timer.getFPGATimestamp();
+        double totalTime = Math.abs(distanceMeters) / AutoConstants.AUTO_MAX_VELOCITY;
+
+        ChassisSpeeds driveSpeeds;
+        
+        if (distanceMeters >= 0) {
+            driveSpeeds =  new ChassisSpeeds(AutoConstants.AUTO_MAX_VELOCITY, 0, 0);
+        } else {
+            driveSpeeds = new ChassisSpeeds(-AutoConstants.AUTO_MAX_VELOCITY, 0, 0);
+        }
+
+        SwerveModuleState[] moduleStates;
+
+        while (Timer.getFPGATimestamp() - startTime <= totalTime) {
+            moduleStates = DriveConstants.SWERVE_KINEMATICS.toSwerveModuleStates(driveSpeeds);
+
+            this.setModuleStates(moduleStates);
+        }
+
+        this.stopDrive();
     }
 
     public void printModuleOffsets() {

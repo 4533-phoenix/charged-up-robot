@@ -42,7 +42,7 @@ public final class Extension implements Subsystem {
         ZERO_INCHES, FIVE_INCHES, SEVEN_INCHES, TWELVE_INCHES, OFF
     }
 
-    public final double[] elbowSetpoints = {15.5, 15.5, 37.5, 99.0, 177.0, 106.0, 145.0};
+    public final double[] elbowSetpoints = {15.5, 15.5, 37.5, 103.0, 177.0, 106.0, 145.0};
 
     public static enum ExtensionState {
         GROUND_LOW_INTAKE, GROUND_HIGH_INTAKE, OFF_GROUND, MIDDLE_ROW, HIGH_ROW, ABOVE_MATCH_START, KNOCKDOWN, LOWER, HIGHER

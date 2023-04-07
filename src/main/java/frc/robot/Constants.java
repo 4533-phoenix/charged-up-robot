@@ -47,7 +47,7 @@ public final class Constants {
         public static final double DRIVE_ENCODER_METERS_PER_SECOND = DRIVE_ENCODER_METERS_PER_ROTATION / 60.0;
         public static final double STEER_ENCODER_RADIANS_PER_SECOND = STEER_ENCODER_RADIANS_PER_ROTATION / 60.0;
         
-        public static final double STEER_KP = 0.65;
+        public static final double STEER_KP = 0.5;
         public static final double STEER_KI = 0.0;
         public static final double STEER_KD = 0.01;
     }
@@ -195,13 +195,16 @@ public final class Constants {
         public static final boolean WILL_NOT_CANCEL = false;
     }
 
-     public static final class LimelightConstants {
-         public static final String[] LIMELIGHT_NAMES = new String[] {
-             "limelight-front",
-             "limelight-back"
-         };
-     }
+    public static final class LimelightConstants {
+        public static final String[] LIMELIGHT_NAMES = new String[] {
+            "limelight-front",
+            "limelight-back"
+        };
+    }
 
+    public static final class PoseEstimatorConstants {
+        public static double VISION_UNTRUST = 10;
+    }
 //  CONSTANTS FOR PRACTICE ROBOT
 
 	// public static final class GlobalConstants {
@@ -390,5 +393,9 @@ public final class Constants {
     // public static final class LimelightConstants {
     //     public static final String[] LIMELIGHT_NAMES = new String[] {
     //     };
+    // }
+
+    // public static final class PoseEstimatorConstants {
+    //     public static double VISION_UNTRUST = 10;
     // }
 }
