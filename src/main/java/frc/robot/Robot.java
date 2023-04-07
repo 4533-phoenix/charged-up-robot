@@ -6,6 +6,7 @@ package frc.robot;
 
 import frc.robot.Constants.*;
 import frc.robot.controls.PSController;
+import frc.robot.helpers.LimelightHelper;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -67,6 +68,10 @@ public final class Robot extends TimedRobot {
 
   @Override
   public void autonomousInit() {
+    for (String limelightName : Constants.LimelightConstants.LIMELIGHT_NAMES) {
+      LimelightHelper.setLEDMode_ForceOn(limelightName);
+    }
+
     autoSelected = chooser.getSelected();
     autoCommand = robotContainer.autoCommands.get(autoSelected);
 
@@ -85,6 +90,10 @@ public final class Robot extends TimedRobot {
 
   @Override
   public void teleopInit() {
+    for (String limelightName : Constants.LimelightConstants.LIMELIGHT_NAMES) {
+      LimelightHelper.setLEDMode_ForceOn(limelightName);
+    }
+
     if (autoCommand != null) {
       autoCommand.cancel();
     }
@@ -97,6 +106,10 @@ public final class Robot extends TimedRobot {
 
   @Override
   public void disabledInit() {
+    for (String limelightName : Constants.LimelightConstants.LIMELIGHT_NAMES) {
+      LimelightHelper.setLEDMode_ForceOff(limelightName);
+    }
+
     robotContainer.getPneumatics().disableCompressor();
   }
 
