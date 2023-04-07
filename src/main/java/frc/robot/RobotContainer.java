@@ -2,14 +2,11 @@ package frc.robot;
 
 import java.util.Map;
 import edu.wpi.first.wpilibj2.command.*;
-import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.commands.DefaultClimberCommand;
 import frc.robot.commands.DefaultExtensionCommand;
 import frc.robot.commands.DefaultGripperCommand;
 import frc.robot.commands.DefaultLEDCommand;
 import frc.robot.commands.DefaultSwerveCommand;
-import frc.robot.commands.ForkliftClimbCommand;
-import frc.robot.commands.SetClimbPositionCommand;
 import frc.robot.commands.autos.BumpThreePiece;
 import frc.robot.commands.autos.BumpTwoPiece;
 import frc.robot.commands.autos.ChargeStationScoreAndEnable;
@@ -18,7 +15,6 @@ import frc.robot.commands.autos.LaneTwoPiece;
 import frc.robot.commands.autos.OverChargeStationPickup;
 import frc.robot.commands.autos.PathPlannerTest;
 import frc.robot.commands.autos.RightLeftScoreAndLeave;
-import frc.robot.controls.PSController.Button;
 import frc.robot.subsystems.*;
 
 public class RobotContainer {

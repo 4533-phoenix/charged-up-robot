@@ -2,7 +2,6 @@ package frc.robot.commands.autos;
 
 import com.pathplanner.lib.PathPlanner;
 import com.pathplanner.lib.PathPlannerTrajectory;
-import com.pathplanner.lib.PathPlannerTrajectory.PathPlannerState;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -15,11 +14,10 @@ import frc.robot.commands.WaitForGamepieceCommand;
 import frc.robot.subsystems.*;
 import frc.robot.subsystems.Extension.ExtensionState;
 
-
 public class BumpTwoPiece extends SequentialCommandGroup {
     public BumpTwoPiece(Swerve swerve, Gripper gripper, Extension extension) {
-        PathPlannerTrajectory path1 = PathPlanner.loadPath("Bump Pickup Piece 1", 3.0, 2.0);
-        PathPlannerTrajectory path2 = PathPlanner.loadPath("Bump Score Cube 1", 3.0, 2.0);
+        PathPlannerTrajectory path1 = PathPlanner.loadPath("Bump Pickup Piece 1 Slow", 1.0, 1.0);
+        PathPlannerTrajectory path2 = PathPlanner.loadPath("Bump Score Cube 1 Slow", 1.2, 1.0);
 
         final Pose2d initialPose;
 
@@ -43,7 +41,7 @@ public class BumpTwoPiece extends SequentialCommandGroup {
             new InstantCommand(() -> extension.updateExtensionState(ExtensionState.OFF_GROUND), extension),
             swerve.followTrajectoryCommand(path2),
             new InstantCommand(() -> extension.updateExtensionState(ExtensionState.MIDDLE_ROW), extension),
-            new WaitCommand(2.0),
+            new WaitCommand(1.5),
             new InstantCommand(() -> gripper.disableGripper(), gripper)
         );
     }
