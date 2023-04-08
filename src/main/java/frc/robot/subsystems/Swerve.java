@@ -93,6 +93,7 @@ public final class Swerve implements Subsystem {
     private AHRS gyro = new AHRS(SPI.Port.kMXP);
 
     private DriveSpeed driveSpeed;
+    private boolean fieldRelative = true;
 
     private Field2d mField2d = new Field2d();
 
@@ -158,6 +159,14 @@ public final class Swerve implements Subsystem {
         this.driveSpeed = speed;
     }
 
+    public void setFieldRelative(boolean fieldRelative) {
+        this.fieldRelative = fieldRelative;
+    }
+
+    public boolean getFieldRelative() {
+        return fieldRelative;
+    }
+
     public void drive(Translation2d translation, double rotation, boolean fieldRelative, boolean isOpenLoop) {
         double xSpeed, ySpeed, steerSpeed;
 
@@ -195,15 +204,9 @@ public final class Swerve implements Subsystem {
         ChassisSpeeds chassisSpeeds;
 
         if (fieldRelative) {
-            if (Robot.operatorController.getButton(Button.BACK)) {
-                chassisSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(
-                    xSpeed, ySpeed, steerSpeed, getGyroRotation()
-                );
-            } else {
-                chassisSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(
-                    xSpeed, ySpeed, steerSpeed, this.getEstimatedPose().getRotation()
-                );
-            }
+            chassisSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(
+                xSpeed, ySpeed, steerSpeed, this.getEstimatedPose().getRotation()
+            );
         } else {
             chassisSpeeds = new ChassisSpeeds(xSpeed, ySpeed, steerSpeed);
         }
@@ -211,31 +214,6 @@ public final class Swerve implements Subsystem {
         SwerveModuleState[] moduleStates = DriveConstants.SWERVE_KINEMATICS.toSwerveModuleStates(chassisSpeeds);
 
         this.setModuleStates(moduleStates);
-    }
-
-    public Translation2d getSwerveTranslation() {
-        double forwardAxis = -Robot.driverController.getAxis(Side.LEFT, Axis.Y);
-        double strafeAxis = -Robot.driverController.getAxis(Side.LEFT, Axis.X);
-
-        Translation2d tAxes = new Translation2d(forwardAxis, strafeAxis);
-
-        double dist = tAxes.getNorm();
-
-        if (Math.abs(tAxes.getNorm()) < OIConstants.DRIVE_DEADBAND) {
-            return new Translation2d();
-        } else {
-            return new Translation2d(forwardAxis * dist, strafeAxis * dist);
-        }
-    }
-
-    public double getSwerveRotation() {
-        double rotAxis = -Math.pow(Robot.driverController.getAxis(Side.RIGHT, Axis.X), 3);
-
-        if (Math.abs(rotAxis) < OIConstants.DRIVE_DEADBAND) {
-            return 0.0;
-        } else {
-            return rotAxis;
-        }
     }
 
     public Pose2d getEstimatedPose() {

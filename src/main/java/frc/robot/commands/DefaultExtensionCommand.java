@@ -17,24 +17,7 @@ public class DefaultExtensionCommand extends CommandBase {
 
     @Override
     public void execute() {
-        if (Robot.operatorController.getButton(Button.Y)) {
-            mExtension.updateExtensionState(ExtensionState.GROUND_LOW_INTAKE);
-        } else if (Robot.operatorController.getButton(Button.X) || Robot.operatorController.getButton(Button.BACK)) {
-            mExtension.updateExtensionState(ExtensionState.OFF_GROUND);
-        } else if (Robot.operatorController.getButton(Button.B)) {
-            mExtension.updateExtensionState(ExtensionState.MIDDLE_ROW);
-        } else if (Robot.operatorController.getButton(Button.A)) {
-            mExtension.updateExtensionState(ExtensionState.HIGH_ROW);
-        } else if (Robot.operatorController.getButton(Button.RB)) {
-            mExtension.updateExtensionState(ExtensionState.HIGHER);
-        } else if (Robot.operatorController.getButton(Button.LB)) {
-            mExtension.updateExtensionState(ExtensionState.LOWER);
-        } else if (Robot.operatorController.getButton(Button.START)) {
-            mExtension.updateExtensionState(ExtensionState.KNOCKDOWN);
-        } else {
-            mExtension.updateExtensionState();
-        }
-
+        mExtension.updateExtensionState();
         mExtension.updateElbowController();
     }
 }

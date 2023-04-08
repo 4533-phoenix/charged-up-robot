@@ -1,5 +1,9 @@
 package frc.robot.commands;
 
+import java.util.function.Supplier;
+
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.Robot;
 import frc.robot.controls.PSController.Button;
@@ -10,26 +14,20 @@ import frc.robot.subsystems.*;
 public class DefaultSwerveCommand extends CommandBase {
     private final Swerve mSwerve;
 
-    public DefaultSwerveCommand(Swerve swerve) {
+    private Supplier<Translation2d> swerveTranslation;
+    private Supplier<Double> swerveRotation;
+
+    public DefaultSwerveCommand(Swerve swerve, Supplier<Translation2d> swerveTranslation, Supplier<Double> swerveRotation) {
         mSwerve = swerve;
+
+        this.swerveTranslation = swerveTranslation;
+        this.swerveRotation = swerveRotation;
 
         addRequirements(swerve);
     }
 
     @Override
     public void execute() {
-        if (Robot.driverController.getButton(Button.RB)) {
-            mSwerve.setDriveSpeed(DriveSpeed.SLOW);
-        } else if (Robot.driverController.getTrigger(Side.RIGHT)) {
-            mSwerve.setDriveSpeed(DriveSpeed.FAST);
-        } else {
-            mSwerve.setDriveSpeed(DriveSpeed.STANDARD);
-        }
-        
-        mSwerve.drive(mSwerve.getSwerveTranslation(), mSwerve.getSwerveRotation(), !Robot.driverController.getButton(Button.LB), true);
-
-        if (Robot.driverController.getButton(Button.START)) {
-            mSwerve.zeroYaw();
-        }
+        mSwerve.drive(this.swerveTranslation.get(), this.swerveRotation.get(), mSwerve.getFieldRelative(), true);
     }
 }

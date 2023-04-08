@@ -5,7 +5,6 @@
 package frc.robot;
 
 import frc.robot.Constants.*;
-import frc.robot.controls.PSController;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -22,9 +21,6 @@ import edu.wpi.first.cscore.UsbCamera;
  */
 public final class Robot extends TimedRobot {
   public static final RobotContainer robotContainer = new RobotContainer();
-
-  public static final PSController driverController = new PSController(OIConstants.DRIVER_CONTROLLER_PORT);
-  public static final PSController operatorController = new PSController(OIConstants.OPERATOR_CONTROLLER_PORT);
 
   public static final SendableChooser<String> chooser = new SendableChooser<String>();
 
@@ -73,8 +69,6 @@ public final class Robot extends TimedRobot {
     if (autoCommand != null) {
       autoCommand.schedule();
     }
-
-    robotContainer.getClimber().resetServo();
   }
 
   @Override
@@ -88,8 +82,6 @@ public final class Robot extends TimedRobot {
     if (autoCommand != null) {
       autoCommand.cancel();
     }
-
-    robotContainer.getClimber().resetServo();
   }
 
   @Override
