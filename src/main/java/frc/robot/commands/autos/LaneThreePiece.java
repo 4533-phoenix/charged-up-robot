@@ -17,8 +17,8 @@ import edu.wpi.first.wpilibj.DriverStation.Alliance;
 
 public class LaneThreePiece extends SequentialCommandGroup {
     public LaneThreePiece(Swerve swerve, Gripper gripper, Extension extension) {
-        PathPlannerTrajectory path1 = PathPlanner.loadPath("Lane Pickup Piece 1", 3.0, 2.0);
-        PathPlannerTrajectory path2 = PathPlanner.loadPath("Lane Score Cube 1", 3.0, 2.0);
+        PathPlannerTrajectory path1 = PathPlanner.loadPath("Lane Pickup Piece 1 Slow", 3.0, 2.0);
+        PathPlannerTrajectory path2 = PathPlanner.loadPath("Lane Score Cube 1 Slow", 3.0, 2.0);
         PathPlannerTrajectory path3 = PathPlanner.loadPath("Lane Pickup Piece 2", 3.5, 2.5);
         PathPlannerTrajectory path4 = PathPlanner.loadPath("Lane Score Hybrid 2", 4.0, 3.0);
 
