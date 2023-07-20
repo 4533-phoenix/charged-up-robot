@@ -202,11 +202,11 @@ public final class Extension implements Subsystem {
 
     @Override
     public void periodic() {
-        // System.out.println("p error: " + this.getElbowController().getPositionError());
-        // System.out.println("absolute: " + this.getAbsoluteEncoderAbsolutePosition());
-        System.out.println("angle: " + this.getElbowAngle().getDegrees());
-        // System.out.println("setpoint: " + this.getElbowController().getSetpoint());
-        // System.out.println("current: " + this.elbowMotor.getOutputCurrent());
+        // System.out.println("p error: " + Extension.getInstance().getElbowController().getPositionError());
+        // System.out.println("absolute: " + Extension.getInstance().getAbsoluteEncoderAbsolutePosition());
+        // System.out.println("angle: " + Extension.getInstance().getElbowAngle().getDegrees());
+        // System.out.println("setpoint: " + Extension.getInstance().getElbowController().getSetpoint());
+        // System.out.println("current: " + Extension.getInstance().elbowMotor.getOutputCurrent());
 
         SmartDashboard.putNumber("Upper arm angle", this.getElbowAngle().getDegrees());
         SmartDashboard.putNumber("Upper arm setpoint", this.armSetpoint * 360.0);

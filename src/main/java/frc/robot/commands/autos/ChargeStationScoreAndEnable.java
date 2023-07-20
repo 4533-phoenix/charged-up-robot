@@ -12,7 +12,7 @@ public class ChargeStationScoreAndEnable extends SequentialCommandGroup {
             new WaitCommand(0.5),
             new InstantCommand(() -> swerve.straightenWheels(1.0), swerve), 
             new InstantCommand(() -> swerve.enableChargeStation(true), swerve),
-            new WaitCommand(0.25),
+            new WaitCommand(2.0),
             new InstantCommand(() -> swerve.adjustChargeStation(), swerve)
         );
     }
