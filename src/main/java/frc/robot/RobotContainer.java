@@ -2,7 +2,6 @@ package frc.robot;
 
 import java.util.Map;
 import edu.wpi.first.wpilibj2.command.*;
-import frc.robot.commands.DefaultClimberCommand;
 import frc.robot.commands.DefaultExtensionCommand;
 import frc.robot.commands.DefaultGripperCommand;
 import frc.robot.commands.DefaultLEDCommand;
@@ -23,7 +22,6 @@ public class RobotContainer {
     private final LED led = new LED();
     private final Pneumatics pneumatics = new Pneumatics();
     private final Swerve swerve = new Swerve();
-    private final Climber climber = new Climber();
 
     public RobotContainer() {
         CommandScheduler.getInstance().registerSubsystem(extension);
@@ -31,13 +29,11 @@ public class RobotContainer {
         CommandScheduler.getInstance().registerSubsystem(led);
         CommandScheduler.getInstance().registerSubsystem(pneumatics);
         CommandScheduler.getInstance().registerSubsystem(swerve);
-        CommandScheduler.getInstance().registerSubsystem(climber);
 
         led.setDefaultCommand(new DefaultLEDCommand(led));
         swerve.setDefaultCommand(new DefaultSwerveCommand(swerve));
         gripper.setDefaultCommand(new DefaultGripperCommand(gripper));
         extension.setDefaultCommand(new DefaultExtensionCommand(extension));
-        climber.setDefaultCommand(new DefaultClimberCommand(climber));
 
         configureButtonBindings();
     }
@@ -73,9 +69,5 @@ public class RobotContainer {
 
     public Swerve getSwerve() {
         return this.swerve;
-    }
-
-    public Climber getClimber() {
-        return this.climber;
     }
 }

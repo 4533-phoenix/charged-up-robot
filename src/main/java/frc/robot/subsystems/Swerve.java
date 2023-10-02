@@ -314,10 +314,10 @@ public final class Swerve implements Subsystem {
     }
 
     public void printModuleOffsets() {
-        System.out.println("Front left: " + frontLeft.getAbsoluteEncoderRad());
-        System.out.println("Front right: " + frontRight.getAbsoluteEncoderRad());
-        System.out.println("Back left: " + backLeft.getAbsoluteEncoderRad());
-        System.out.println("Back right: " + backRight.getAbsoluteEncoderRad());
+        System.out.println("Front left: " + frontLeft.getAbsoluteEncoderValue());
+        System.out.println("Front right: " + frontRight.getAbsoluteEncoderValue());
+        System.out.println("Back left: " + backLeft.getAbsoluteEncoderValue());
+        System.out.println("Back right: " + backRight.getAbsoluteEncoderValue());
     }
 
     public void enableChargeStation(boolean direction) {
@@ -435,5 +435,7 @@ public final class Swerve implements Subsystem {
         SmartDashboard.putNumber("Robot Pose - Angle", getEstimatedPose().getRotation().getDegrees());
 
         SmartDashboard.putData("Field", mField2d);
+
+        this.printModuleOffsets();
     }
 }

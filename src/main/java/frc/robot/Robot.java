@@ -73,8 +73,6 @@ public final class Robot extends TimedRobot {
     if (autoCommand != null) {
       autoCommand.schedule();
     }
-
-    robotContainer.getClimber().resetServo();
   }
 
   @Override
@@ -88,8 +86,6 @@ public final class Robot extends TimedRobot {
     if (autoCommand != null) {
       autoCommand.cancel();
     }
-
-    robotContainer.getClimber().resetServo();
   }
 
   @Override

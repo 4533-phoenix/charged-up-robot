@@ -120,6 +120,16 @@ public final class SwerveModule {
     }
 
     /**
+     * Gives the absolute reading of where the absolute encoder thinks it is in radians
+     * Used for reading the absolute encoder offset
+     * 
+     * @return Absolute position of the absolute encoder in radians
+     */
+    public double getAbsoluteEncoderValue() {
+        return absoluteEncoder.getAbsolutePosition() * (Math.PI / 180.00) * (this.absoluteEncoderReversed ? -1.0 : 1.0);
+    }
+
+    /**
      * Sets the drive encoder to position = 0 and the steer relative encoder to the position of the 
      * steer absolute encoder
      */
