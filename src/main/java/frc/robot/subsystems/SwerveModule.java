@@ -6,22 +6,27 @@ import com.revrobotics.RelativeEncoder;
 import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
-import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.ModuleConstants;
 import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.controller.ProfiledPIDController;
+import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.geometry.Rotation2d;
 
 public final class SwerveModule {
     private final CANSparkMax driveMotor;
-
     private final CANSparkMax steerMotor;
 
     private final RelativeEncoder driveEncoder;
     private final RelativeEncoder steerEncoder;
 
-    private final PIDController steerPIDController;
+    private final SimpleMotorFeedforward driveFeedforwardController;
+    private final SimpleMotorFeedforward steerFeedforwardController;
+
+    private final PIDController drivePIDController;
+    private final ProfiledPIDController steerPIDController;
 
     private final CANCoder absoluteEncoder;
     private final boolean absoluteEncoderReversed;
@@ -63,12 +68,32 @@ public final class SwerveModule {
         this.driveEncoder.setVelocityConversionFactor(ModuleConstants.DRIVE_ENCODER_METERS_PER_SECOND);
         this.steerEncoder.setPositionConversionFactor(ModuleConstants.STEER_ENCODER_RADIANS_PER_ROTATION);
         this.steerEncoder.setVelocityConversionFactor(ModuleConstants.STEER_ENCODER_RADIANS_PER_SECOND);
-
-        this.steerPIDController = new PIDController(
-            ModuleConstants.STEER_KP, 
-            ModuleConstants.STEER_KI, 
-            ModuleConstants.STEER_KD
+        
+        this.driveFeedforwardController = new SimpleMotorFeedforward(
+            ModuleConstants.DRIVE_KS, 
+            ModuleConstants.DRIVE_KV, 
+            ModuleConstants.DRIVE_KA
         );
+
+        this.steerFeedforwardController = new SimpleMotorFeedforward(
+            ModuleConstants.STEER_KS,
+            ModuleConstants.STEER_KV,
+            ModuleConstants.STEER_KA
+        );
+
+        this.drivePIDController = new PIDController(
+            ModuleConstants.DRIVE_KP, 
+            ModuleConstants.DRIVE_KI, 
+            ModuleConstants.DRIVE_KD
+        );
+
+        this.steerPIDController = new ProfiledPIDController(
+            ModuleConstants.STEER_KP, 
+            ModuleConstants.STEER_KI,
+            ModuleConstants.STEER_KD, 
+            new TrapezoidProfile.Constraints(Math.PI, Math.PI)
+        );
+
         this.steerPIDController.enableContinuousInput(-Math.PI, Math.PI);
 
         this.resetEncoders();
@@ -156,6 +181,14 @@ public final class SwerveModule {
         return new SwerveModuleState(this.getDriveVelocity(), new Rotation2d(this.getSteerPosition()));
     }
 
+    public PIDController getDrivePIDController() {
+        return this.drivePIDController;
+    }
+
+    public ProfiledPIDController getSteerPIDController() {
+        return this.steerPIDController;
+    }
+
     /**
      * Optimizes and sets the speeds of the drive and steer motors
      * 
@@ -169,15 +202,24 @@ public final class SwerveModule {
 
         state = SwerveModuleState.optimize(state, this.getState().angle);
 
-        this.driveMotor.set(state.speedMetersPerSecond / DriveConstants.DRIVE_MAX_PHYSICAL_VELOCITY);
-        this.steerMotor.set(this.steerPIDController.calculate(this.getSteerPosition(), state.angle.getRadians()));
+        this.driveMotor.setVoltage(
+            this.driveFeedforwardController.calculate(state.speedMetersPerSecond) 
+            + this.drivePIDController.calculate(this.getDriveVelocity(), state.speedMetersPerSecond)
+        );
+
+        this.steerPIDController.setGoal(state.angle.getRadians());
+
+        this.steerMotor.setVoltage(
+            this.steerFeedforwardController.calculate(this.steerPIDController.getSetpoint().velocity)
+            + this.steerPIDController.calculate(this.getSteerPosition())
+        );
     }
 
     /**
      * Sets the speeds of the drive and steer motors to zero
      */
     public void stop() {
-        this.driveMotor.set(0.0);
-        this.steerMotor.set(0.0);
+        this.driveMotor.setVoltage(0.0);
+        this.steerMotor.setVoltage(0.0);
     }
 }

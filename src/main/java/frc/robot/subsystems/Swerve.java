@@ -78,10 +78,6 @@ public final class Swerve implements Subsystem {
         DriveConstants.BACK_RIGHT_STEER_ABSOLUTE_ENCODER_OFFSET,
         DriveConstants.BACK_RIGHT_STEER_ABSOLUTE_ENCODER_REVERSED
     );
-
-    private SlewRateLimiter xLimiter = new SlewRateLimiter(DriveConstants.DRIVE_MAX_ACCELERATION);
-    private SlewRateLimiter yLimiter = new SlewRateLimiter(DriveConstants.DRIVE_MAX_ACCELERATION);
-    private SlewRateLimiter steerLimiter = new SlewRateLimiter(DriveConstants.DRIVE_MAX_ROTATIONAL_ACCELERATION);
     
     private PIDController xController = new PIDController(AutoConstants.AUTO_X_VELOCITY_KP, 
         AutoConstants.AUTO_X_VELOCITY_KI, AutoConstants.AUTO_X_VELOCITY_KD);
@@ -145,6 +141,10 @@ public final class Swerve implements Subsystem {
         };
     }
 
+    public SwerveModule[] getSwerveModules() {
+        return this.swerveMods;
+    }
+
     public void setModuleStates(SwerveModuleState[] desiredStates) {
         SwerveDriveKinematics.desaturateWheelSpeeds(desiredStates, DriveConstants.DRIVE_MAX_PHYSICAL_VELOCITY);
 
@@ -187,10 +187,6 @@ public final class Swerve implements Subsystem {
         xSpeed = Math.abs(xSpeed) > OIConstants.DRIVE_DEADBAND ? xSpeed : 0.0;
         ySpeed = Math.abs(ySpeed) > OIConstants.DRIVE_DEADBAND ? ySpeed : 0.0;
         steerSpeed = Math.abs(steerSpeed) > OIConstants.DRIVE_DEADBAND ? steerSpeed : 0.0;
-
-        xSpeed = xLimiter.calculate(xSpeed);
-        ySpeed = yLimiter.calculate(ySpeed);
-        steerSpeed = steerLimiter.calculate(steerSpeed);
 
         ChassisSpeeds chassisSpeeds;
 

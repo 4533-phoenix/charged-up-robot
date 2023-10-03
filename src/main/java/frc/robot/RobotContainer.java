@@ -31,7 +31,7 @@ public class RobotContainer {
         CommandScheduler.getInstance().registerSubsystem(swerve);
 
         led.setDefaultCommand(new DefaultLEDCommand(led));
-        swerve.setDefaultCommand(new DefaultSwerveCommand(swerve));
+        // swerve.setDefaultCommand(new DefaultSwerveCommand(swerve));
         gripper.setDefaultCommand(new DefaultGripperCommand(gripper));
         extension.setDefaultCommand(new DefaultExtensionCommand(extension));
 

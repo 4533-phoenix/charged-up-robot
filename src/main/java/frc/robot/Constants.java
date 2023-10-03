@@ -47,6 +47,18 @@ public final class Constants {
         public static final double DRIVE_ENCODER_METERS_PER_SECOND = DRIVE_ENCODER_METERS_PER_ROTATION / 60.0;
         public static final double STEER_ENCODER_RADIANS_PER_SECOND = STEER_ENCODER_RADIANS_PER_ROTATION / 60.0;
         
+        public static final double DRIVE_KS = 0.0;
+        public static final double DRIVE_KV = 0.0;
+        public static final double DRIVE_KA = 0.0;
+
+        public static final double STEER_KS = 0.0;
+        public static final double STEER_KV = 0.0;
+        public static final double STEER_KA = 0.0;
+        
+        public static final double DRIVE_KP = 2.0 / 5.0;
+        public static final double DRIVE_KI = 0.0;
+        public static final double DRIVE_KD = 0.01;
+
         public static final double STEER_KP = 0.5;
         public static final double STEER_KI = 0.0;
         public static final double STEER_KD = 0.01;
