@@ -20,8 +20,6 @@ public class DefaultGripperCommand extends CommandBase {
             mGripper.enableGripper();
         } else if (Robot.driverController.getTrigger(Side.LEFT) || Robot.operatorController.getTrigger(Side.LEFT)) {
             mGripper.disableGripper();
-        } else if (mGripper.objectInGripper()) {
-            mGripper.enableGripper();
         }
     }
 }
