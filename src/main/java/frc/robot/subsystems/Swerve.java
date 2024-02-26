@@ -11,9 +11,16 @@ import frc.robot.Robot;
 import frc.robot.Constants.*;
 
 import com.kauailabs.navx.frc.AHRS;
-import com.pathplanner.lib.PathPlannerTrajectory;
-import com.pathplanner.lib.PathPlannerTrajectory.PathPlannerState;
-import com.pathplanner.lib.commands.PPSwerveControllerCommand;
+import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.commands.PathPlannerAuto;
+import com.pathplanner.lib.path.PathConstraints;
+import com.pathplanner.lib.path.PathPlannerPath;
+import com.pathplanner.lib.path.PathPlannerTrajectory;
+import com.pathplanner.lib.path.PathPlannerTrajectory.State;
+import com.pathplanner.lib.util.HolonomicPathFollowerConfig;
+import com.pathplanner.lib.util.ReplanningConfig;
+//import com.pathplanner.lib.commands.SwerveControllerCommand;
+import edu.wpi.first.wpilibj2.command.SwerveControllerCommand; 
 
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.SPI;
@@ -405,7 +412,7 @@ public final class Swerve implements Subsystem {
     }
 
     public Command followTrajectoryCommand(PathPlannerTrajectory path) {
-        return new PPSwerveControllerCommand(
+        return new PPSwerveControllerCommand(   //was PPSwerveControllerCommand  but JEC changed it
             path, 
             this::getEstimatedPose, 
             DriveConstants.SWERVE_KINEMATICS, 

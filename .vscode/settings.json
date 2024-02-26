@@ -25,6 +25,5 @@
       }
     },
   ],
-  "java.test.defaultConfig": "WPIlibUnitTests",
-  "editor.inlayHints.enabled": "off"
+  "java.test.defaultConfig": "WPIlibUnitTests"
 }

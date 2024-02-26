@@ -1,13 +1,13 @@
 package frc.robot.commands;
 
-import edu.wpi.first.wpilibj2.command.CommandBase;
+import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Robot;
 import frc.robot.controls.PSController.Button;
 import frc.robot.controls.PSController.Side;
 import frc.robot.subsystems.Swerve.DriveSpeed;
 import frc.robot.subsystems.*;
 
-public class DefaultSwerveCommand extends CommandBase {
+public class DefaultSwerveCommand extends Command {
     private final Swerve mSwerve;
 
     public DefaultSwerveCommand(Swerve swerve) {

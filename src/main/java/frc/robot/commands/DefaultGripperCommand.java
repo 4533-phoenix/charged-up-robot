@@ -1,11 +1,11 @@
 package frc.robot.commands;
 
-import edu.wpi.first.wpilibj2.command.CommandBase;
+import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.*;
 import frc.robot.Robot;
 import frc.robot.controls.PSController.*;
 
-public class DefaultGripperCommand extends CommandBase {
+public class DefaultGripperCommand extends Command {
     private final Gripper mGripper;
 
     public DefaultGripperCommand(Gripper gripper) {

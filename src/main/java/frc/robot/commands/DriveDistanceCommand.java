@@ -3,11 +3,11 @@ package frc.robot.commands;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj.Timer;
-import edu.wpi.first.wpilibj2.command.CommandBase;
+import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.Swerve;
 import frc.robot.Constants.*;
 
-public class DriveDistanceCommand extends CommandBase {
+public class DriveDistanceCommand extends Command {
     Swerve mSwerve;
 
     private double startTime;
