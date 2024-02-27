@@ -1,10 +1,10 @@
 package frc.robot.subsystems;
 
-import com.ctre.phoenix.sensors.CANCoder;
+import com.ctre.phoenix6.hardware.CANcoder;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.RelativeEncoder;
-import com.revrobotics.CANSparkMax.IdleMode;
-import com.revrobotics.CANSparkMaxLowLevel.MotorType;
+import com.revrobotics.CANSparkBase.IdleMode;
+import com.revrobotics.CANSparkLowLevel.MotorType;
 
 import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.ModuleConstants;
@@ -23,7 +23,7 @@ public final class SwerveModule {
 
     private final PIDController steerPIDController;
 
-    private final CANCoder absoluteEncoder;
+    private final CANcoder absoluteEncoder;
     private final boolean absoluteEncoderReversed;
     private final double absoluteEncoderOffsetRad;
 
@@ -43,7 +43,7 @@ public final class SwerveModule {
             int absoluteEncoderID, double absoluteEncoderOffset, boolean absoluteEncoderReversed) {
         this.absoluteEncoderOffsetRad = absoluteEncoderOffset;
         this.absoluteEncoderReversed = absoluteEncoderReversed;
-        this.absoluteEncoder = new CANCoder(absoluteEncoderID);
+        this.absoluteEncoder = new CANcoder(absoluteEncoderID);
         
         this.driveMotor = new CANSparkMax(driveMotorID, MotorType.kBrushless);
         this.steerMotor = new CANSparkMax(steerMotorID, MotorType.kBrushless);
@@ -105,10 +105,16 @@ public final class SwerveModule {
     /**
      * Gives the position of the steer absolute encoder in radians, on a scale of 0 to 6.28
      * 
-     * @return Position of the absolute encoder in radians
+     * @return Position of the absolute encoder in radians and apply encoder offset
      */
     public double getAbsoluteEncoderRad() {
-        double angle = absoluteEncoder.getAbsolutePosition();
+        // in 2023 this getAbsolutePostion returned an angle in degrees by default.
+        // see https://store.ctr-electronics.com/content/api/java/html/classcom_1_1ctre_1_1phoenix_1_1sensors_1_1_c_a_n_coder.html#a6f3d322d9755702e75da4273f63e587e
+        // in 2024 aka CTRE phoenix v6 it now returns rotation.
+        // see https://api.ctr-electronics.com/phoenix6/release/java/com/ctre/phoenix6/hardware/CANcoder.html
+        // see https://pro.docs.ctr-electronics.com/en/latest/docs/migration/migration-guide/index.html   
+        //double angle = absoluteEncoder.getAbsolutePosition();
+        double angle = Rotation2d.fromRotations(absoluteEncoder.getAbsolutePosition().getValue()).getRadians();
         angle *= Math.PI / 180.0;
         angle %= 2.0 * Math.PI;
         angle -= absoluteEncoderOffsetRad;
@@ -123,10 +129,12 @@ public final class SwerveModule {
      * Gives the absolute reading of where the absolute encoder thinks it is in radians
      * Used for reading the absolute encoder offset
      * 
-     * @return Absolute position of the absolute encoder in radians
+     * @return Absolute position of the absolute encoder in radians without applying encoder offset
      */
     public double getAbsoluteEncoderValue() {
-        return absoluteEncoder.getAbsolutePosition() * (Math.PI / 180.00) * (this.absoluteEncoderReversed ? -1.0 : 1.0);
+        //return absoluteEncoder.getAbsolutePosition() * (Math.PI / 180.00) * (this.absoluteEncoderReversed ? -1.0 : 1.0); //using phoenix 5 used to return radians
+        // now CTRE phoenix 6 returns rotations.
+        return Rotation2d.fromRotations(absoluteEncoder.getAbsolutePosition().getValue()).getRadians() * (Math.PI / 180.00) * (this.absoluteEncoderReversed ? -1.0 : 1.0);
     }
 
     /**

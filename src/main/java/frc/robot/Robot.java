@@ -28,7 +28,7 @@ public final class Robot extends TimedRobot {
 
   public static final SendableChooser<String> chooser = new SendableChooser<String>();
 
-  private String autoSelected = chooser.getSelected();
+  //private String autoSelected = chooser.getSelected();
   private Command autoCommand;
 
   @Override
@@ -46,18 +46,10 @@ public final class Robot extends TimedRobot {
     UsbCamera gripperCamera = CameraServer.startAutomaticCapture();
     gripperCamera.setResolution(640, 480);
 
-    robotContainer.getPneumatics().enableCompressor();
 
     robotContainer.getSwerve().zeroGyro();
 
-    robotContainer.getExtension().elbowAbsoluteEncoder.setDutyCycleRange(1.0 / 1024.0, 1023.0 / 1024.0);
-    robotContainer.getExtension().elbowAbsoluteEncoder.setPositionOffset(ExtensionConstants.ELBOW_ABSOLUTE_ENCODER_OFFSET);
-    robotContainer.getExtension().initialAbsoluteEncoderPosition = 1.0 + robotContainer.getExtension().getAbsoluteEncoderAbsolutePosition() - robotContainer.getExtension().elbowAbsoluteEncoder.getPositionOffset();
-    robotContainer.getExtension().elbowRelativeEncoder.reset();
 
-    robotContainer.getLED().configureLEDs();
-
-    robotContainer.getGripper().enableGripper();
   }
 
   @Override
@@ -67,18 +59,11 @@ public final class Robot extends TimedRobot {
 
   @Override
   public void autonomousInit() {
-    autoSelected = chooser.getSelected();
-    autoCommand = robotContainer.autoCommands.get(autoSelected);
 
-    if (autoCommand != null) {
-      autoCommand.schedule();
-    }
   }
 
   @Override
   public void autonomousPeriodic() {
-    robotContainer.getExtension().updateExtensionState();
-    robotContainer.getExtension().updateElbowController();
   }
 
   @Override
@@ -93,7 +78,6 @@ public final class Robot extends TimedRobot {
 
   @Override
   public void disabledInit() {
-    robotContainer.getPneumatics().disableCompressor();
   }
 
   @Override

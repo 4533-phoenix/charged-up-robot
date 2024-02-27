@@ -4,23 +4,25 @@ import frc.robot.controls.PSController.Axis;
 import frc.robot.controls.PSController.Button;
 import frc.robot.controls.PSController.Side;
 import frc.robot.helpers.LimelightHelper;
-import edu.wpi.first.wpilibj2.command.Command;
+//import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Subsystem;
-import frc.robot.Constants;
+//import frc.robot.Constants;
 import frc.robot.Robot;
 import frc.robot.Constants.*;
 
 import com.kauailabs.navx.frc.AHRS;
-import com.pathplanner.lib.auto.AutoBuilder;
-import com.pathplanner.lib.commands.PathPlannerAuto;
-import com.pathplanner.lib.path.PathConstraints;
-import com.pathplanner.lib.path.PathPlannerPath;
-import com.pathplanner.lib.path.PathPlannerTrajectory;
-import com.pathplanner.lib.path.PathPlannerTrajectory.State;
-import com.pathplanner.lib.util.HolonomicPathFollowerConfig;
-import com.pathplanner.lib.util.ReplanningConfig;
+// import com.pathplanner.lib.auto.AutoBuilder;
+// import com.pathplanner.lib.commands.PathPlannerAuto;
+// import com.pathplanner.lib.path.PathConstraints;
+// import com.pathplanner.lib.path.PathPlannerPath;
+// import com.pathplanner.lib.path.PathPlannerTrajectory;
+// import com.pathplanner.lib.path.PathPlannerTrajectory.State;
+// import com.pathplanner.lib.util.HolonomicPathFollowerConfig;
+
+// import com.pathplanner.lib.util.ReplanningConfig;
+// import edu.wpi.first.wpilibj2.command.SwerveControllerCommand;
 //import com.pathplanner.lib.commands.SwerveControllerCommand;
-import edu.wpi.first.wpilibj2.command.SwerveControllerCommand; 
+//import edu.wpi.first.wpilibj2.command.SwerveControllerCommand; 
 
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.SPI;
@@ -34,14 +36,14 @@ import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.util.Units;
-import edu.wpi.first.math.MatBuilder;
-import edu.wpi.first.math.Nat;
+// import edu.wpi.first.math.MatBuilder;
+// import edu.wpi.first.math.Nat;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.math.trajectory.Trajectory.State;
+//import edu.wpi.first.math.trajectory.Trajectory.State;
 
 public final class Swerve implements Subsystem {
     private SwerveModule[] swerveMods;
@@ -90,10 +92,10 @@ public final class Swerve implements Subsystem {
     private SlewRateLimiter yLimiter = new SlewRateLimiter(DriveConstants.DRIVE_MAX_ACCELERATION);
     private SlewRateLimiter steerLimiter = new SlewRateLimiter(DriveConstants.DRIVE_MAX_ROTATIONAL_ACCELERATION);
     
-    private PIDController xController = new PIDController(AutoConstants.AUTO_X_VELOCITY_KP, 
-        AutoConstants.AUTO_X_VELOCITY_KI, AutoConstants.AUTO_X_VELOCITY_KD);
-    private PIDController yController = new PIDController(AutoConstants.AUTO_Y_VELOCITY_KP, 
-        AutoConstants.AUTO_Y_VELOCITY_KI, AutoConstants.AUTO_Y_VELOCITY_KD);
+    // private PIDController xController = new PIDController(AutoConstants.AUTO_X_VELOCITY_KP, 
+    //     AutoConstants.AUTO_X_VELOCITY_KI, AutoConstants.AUTO_X_VELOCITY_KD);
+    // private PIDController yController = new PIDController(AutoConstants.AUTO_Y_VELOCITY_KP, 
+    //     AutoConstants.AUTO_Y_VELOCITY_KI, AutoConstants.AUTO_Y_VELOCITY_KD);
     private PIDController thetaController = new PIDController(AutoConstants.AUTO_ROTATION_KP, 
         AutoConstants.AUTO_ROTATION_KI, AutoConstants.AUTO_ROTATION_KD);
 
@@ -271,16 +273,18 @@ public final class Swerve implements Subsystem {
 
             Pose2d pose;
 
-            if (DriverStation.getAlliance() == Alliance.Red) {
-                pose = LimelightHelper.getBotPose2d_wpiRed(limelightName);
-            } else {
-                pose = LimelightHelper.getBotPose2d_wpiBlue(limelightName);
-            }
+            //if (DriverStation.getAlliance() == Alliance.Red) {
+            //     pose = LimelightHelper.getBotPose2d_wpiRed(limelightName);
+            // } else {
+            //     pose = LimelightHelper.getBotPose2d_wpiBlue(limelightName);
+            // }
+            pose = LimelightHelper.getBotPose2d_wpiBlue(limelightName);
 
-            double trust = ((1 - LimelightHelper.getTA(limelightName)) * Constants.PoseEstimatorConstants.VISION_UNTRUST);
+           // double trust = ((1 - LimelightHelper.getTA(limelightName)) * Constants.PoseEstimatorConstants.VISION_UNTRUST);
             double latency = LimelightHelper.getLatency_Pipeline(limelightName) / 1000.0;
 
-            swervePoseEstimator.setVisionMeasurementStdDevs(new MatBuilder<>(Nat.N3(), Nat.N1()).fill(trust, trust, trust));
+            // BROKEN, JEC 2024 Matbuilder deprecated
+            //swervePoseEstimator.setVisionMeasurementStdDevs(new MatBuilder<>(Nat.N3(), Nat.N1()).fill(trust, trust, trust));
             swervePoseEstimator.addVisionMeasurement(pose, Timer.getFPGATimestamp() - latency);
         }
     }
@@ -411,18 +415,18 @@ public final class Swerve implements Subsystem {
         this.setModuleStates(DriveConstants.SWERVE_KINEMATICS.toSwerveModuleStates(new ChassisSpeeds()));
     }
 
-    public Command followTrajectoryCommand(PathPlannerTrajectory path) {
-        return new PPSwerveControllerCommand(   //was PPSwerveControllerCommand  but JEC changed it
-            path, 
-            this::getEstimatedPose, 
-            DriveConstants.SWERVE_KINEMATICS, 
-            this.xController, 
-            this.yController, 
-            this.thetaController, 
-            this::setModuleStates,
-            true,
-            this).andThen(() -> stopDrive());
-    }
+    // public Command followTrajectoryCommand(PathPlannerTrajectory path) {
+    //     return new SwerveControllerCommand(   //was PPSwerveControllerCommand  but JEC changed it
+    //         path, 
+    //         this::getEstimatedPose, 
+    //         DriveConstants.SWERVE_KINEMATICS, 
+    //         this.xController, 
+    //         this.yController, 
+    //         this.thetaController, 
+    //         this::setModuleStates,
+    //         true,
+    //         this).andThen(() -> stopDrive());
+    // }
 
     @Override
     public void periodic() {
