@@ -273,12 +273,12 @@ public final class Swerve implements Subsystem {
 
             Pose2d pose;
 
-            //if (DriverStation.getAlliance() == Alliance.Red) {
-            //     pose = LimelightHelper.getBotPose2d_wpiRed(limelightName);
-            // } else {
-            //     pose = LimelightHelper.getBotPose2d_wpiBlue(limelightName);
-            // }
-            pose = LimelightHelper.getBotPose2d_wpiBlue(limelightName);
+            var alliance = DriverStation.getAlliance();
+            if (alliance.isPresent()  && alliance.get() == DriverStation.Alliance.Red) {
+                pose = LimelightHelper.getBotPose2d_wpiRed(limelightName);
+            } else {
+                pose = LimelightHelper.getBotPose2d_wpiBlue(limelightName);
+            }
 
            // double trust = ((1 - LimelightHelper.getTA(limelightName)) * Constants.PoseEstimatorConstants.VISION_UNTRUST);
             double latency = LimelightHelper.getLatency_Pipeline(limelightName) / 1000.0;
