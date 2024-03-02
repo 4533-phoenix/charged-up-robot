@@ -66,15 +66,15 @@ public final class Constants {
                 new Translation2d(-WHEEL_BASE / 2, -TRACK_WIDTH / 2)
         );
 
-        public static final int FRONT_LEFT_DRIVE_MOTOR_ID = 8;
-        public static final int FRONT_RIGHT_DRIVE_MOTOR_ID = 2;
-        public static final int BACK_LEFT_DRIVE_MOTOR_ID = 4;
-        public static final int BACK_RIGHT_DRIVE_MOTOR_ID = 6;
+        public static final int FRONT_LEFT_DRIVE_MOTOR_ID = 1;
+        public static final int FRONT_RIGHT_DRIVE_MOTOR_ID = 3;
+        public static final int BACK_LEFT_DRIVE_MOTOR_ID = 5;
+        public static final int BACK_RIGHT_DRIVE_MOTOR_ID = 7;
 
-        public static final int FRONT_LEFT_STEER_MOTOR_ID = 1;
-        public static final int FRONT_RIGHT_STEER_MOTOR_ID = 3;
-        public static final int BACK_LEFT_STEER_MOTOR_ID = 5;
-        public static final int BACK_RIGHT_STEER_MOTOR_ID = 7;
+        public static final int FRONT_LEFT_STEER_MOTOR_ID = 2;
+        public static final int FRONT_RIGHT_STEER_MOTOR_ID = 4;
+        public static final int BACK_LEFT_STEER_MOTOR_ID = 6;
+        public static final int BACK_RIGHT_STEER_MOTOR_ID = 8;
 
         public static final boolean FRONT_LEFT_DRIVE_ENCODER_REVERSED = false;
         public static final boolean FRONT_RIGHT_DRIVE_ENCODER_REVERSED = true;

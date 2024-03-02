@@ -132,9 +132,9 @@ public final class SwerveModule {
      * @return Absolute position of the absolute encoder in radians without applying encoder offset
      */
     public double getAbsoluteEncoderValue() {
-        //return absoluteEncoder.getAbsolutePosition() * (Math.PI / 180.00) * (this.absoluteEncoderReversed ? -1.0 : 1.0); //using phoenix 5 used to return radians
+        //return absoluteEncoder.getAbsolutePosition() * (Math.PI / 180.00) * (this.absoluteEncoderReversed ? -1.0 : 1.0); //using phoenix 5 used to return degrees
         // now CTRE phoenix 6 returns rotations.
-        return Rotation2d.fromRotations(absoluteEncoder.getAbsolutePosition().getValue()).getRadians() * (Math.PI / 180.00) * (this.absoluteEncoderReversed ? -1.0 : 1.0);
+        return Rotation2d.fromRotations(absoluteEncoder.getAbsolutePosition().getValue()).getRadians() * (this.absoluteEncoderReversed ? -1.0 : 1.0);
     }
 
     /**
