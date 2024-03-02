@@ -105,22 +105,27 @@ public final class SwerveModule {
     /**
      * Gives the position of the steer absolute encoder in radians, on a scale of 0 to 6.28
      * 
-     * @return Position of the absolute encoder in radians and apply encoder offset
+     * @return Position of the absolute encoder in radians
      */
     public double getAbsoluteEncoderRad() {
-        // in 2023 this getAbsolutePostion returned an angle in degrees by default.
+               // in 2023 this getAbsolutePostion returned an angle in degrees by default.
         // see https://store.ctr-electronics.com/content/api/java/html/classcom_1_1ctre_1_1phoenix_1_1sensors_1_1_c_a_n_coder.html#a6f3d322d9755702e75da4273f63e587e
         // in 2024 aka CTRE phoenix v6 it now returns rotation.
         // see https://api.ctr-electronics.com/phoenix6/release/java/com/ctre/phoenix6/hardware/CANcoder.html
         // see https://pro.docs.ctr-electronics.com/en/latest/docs/migration/migration-guide/index.html   
         //double angle = absoluteEncoder.getAbsolutePosition();
         double angle = Rotation2d.fromRotations(absoluteEncoder.getAbsolutePosition().getValue()).getRadians();
+        //JEC if you needed degrees you could also getValue() * 360.0 which will turn rotations into degrees.
         angle *= Math.PI / 180.0;
         angle %= 2.0 * Math.PI;
         angle -= absoluteEncoderOffsetRad;
-
-        if (angle < 0.0)
-            angle += 2.0 * Math.PI;
+        // this should be a while < 0.0 if possible.
+        // if (angle < 0.0)
+        //     angle += 2.0 * Math.PI;
+        while (angle < 0.0)
+        {
+            angle += 2.0 * Math.PI; // unwrap full circle not just 180deg
+        }
 
         return angle * (this.absoluteEncoderReversed ? -1.0 : 1.0);
     }
@@ -129,12 +134,12 @@ public final class SwerveModule {
      * Gives the absolute reading of where the absolute encoder thinks it is in radians
      * Used for reading the absolute encoder offset
      * 
-     * @return Absolute position of the absolute encoder in radians without applying encoder offset
+     * @return Absolute position of the absolute encoder in radians
      */
     public double getAbsoluteEncoderValue() {
         //return absoluteEncoder.getAbsolutePosition() * (Math.PI / 180.00) * (this.absoluteEncoderReversed ? -1.0 : 1.0); //using phoenix 5 used to return degrees
-        // now CTRE phoenix 6 returns rotations.
-        return Rotation2d.fromRotations(absoluteEncoder.getAbsolutePosition().getValue()).getRadians() * (this.absoluteEncoderReversed ? -1.0 : 1.0);
+        // now CTRE phoenix 6 returns rotations, unless you .getRadians()
+        return Rotation2d.fromRotations(absoluteEncoder.getAbsolutePosition().getValue()).getRadians()  * (this.absoluteEncoderReversed ? -1.0 : 1.0);
     }
 
     /**

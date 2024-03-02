@@ -86,25 +86,25 @@ public final class Constants {
         public static final boolean BACK_LEFT_STEER_ENCODER_REVERSED = false;
         public static final boolean BACK_RIGHT_STEER_ENCODER_REVERSED = false;
 
-        public static final int FRONT_LEFT_STEER_ABSOLUTE_ENCODER_ID = 10;
-        public static final int FRONT_RIGHT_STEER_ABSOLUTE_ENCODER_ID = 11;
-        public static final int BACK_LEFT_STEER_ABSOLUTE_ENCODER_ID = 12;
-        public static final int BACK_RIGHT_STEER_ABSOLUTE_ENCODER_ID = 13;
+        public static final int FRONT_LEFT_STEER_ABSOLUTE_ENCODER_ID = 9;
+        public static final int FRONT_RIGHT_STEER_ABSOLUTE_ENCODER_ID = 10;
+        public static final int BACK_LEFT_STEER_ABSOLUTE_ENCODER_ID = 11;
+        public static final int BACK_RIGHT_STEER_ABSOLUTE_ENCODER_ID = 12;
 
         public static final boolean FRONT_LEFT_STEER_ABSOLUTE_ENCODER_REVERSED = false;
         public static final boolean FRONT_RIGHT_STEER_ABSOLUTE_ENCODER_REVERSED = false;
         public static final boolean BACK_LEFT_STEER_ABSOLUTE_ENCODER_REVERSED = false;
         public static final boolean BACK_RIGHT_STEER_ABSOLUTE_ENCODER_REVERSED = false;
 
-		// Offsets for swerve modules. Should be equal to absolute encoder reading when wheel is facing straight forward
+		// Offsets for swerve modules. Should be equal to absolute encoder reading when wheel is facing straight forward with bevel gear to left.
         public static final double FRONT_LEFT_STEER_ABSOLUTE_ENCODER_OFFSET = 3.5459;
         public static final double FRONT_RIGHT_STEER_ABSOLUTE_ENCODER_OFFSET = 1.6874;
         public static final double BACK_LEFT_STEER_ABSOLUTE_ENCODER_OFFSET = 6.8554;
         public static final double BACK_RIGHT_STEER_ABSOLUTE_ENCODER_OFFSET = 0.6259;
 
-        public static final double DRIVE_MAX_PHYSICAL_VELOCITY = Units.feetToMeters(14.6);
+        public static final double DRIVE_MAX_PHYSICAL_VELOCITY = Units.feetToMeters(10); // JEC was 14.6
 
-        public static final double DRIVE_MAX_VELOCITY = Units.feetToMeters(12.0);
+        public static final double DRIVE_MAX_VELOCITY = Units.feetToMeters(8.0);  //JEC was 12.0
         public static final double DRIVE_MAX_ROTATIONAL_VELOCITY = 1.0 * 2.0 * Math.PI; // rad/s
 
         public static final double DRIVE_MAX_VELOCITY_SLOW = Units.feetToMeters(3.0);
@@ -113,8 +113,8 @@ public final class Constants {
         public static final double DRIVE_MAX_VELOCITY_FAST = Units.feetToMeters(14.6);
         public static final double DRIVE_MAX_ROTATIONAL_VELOCITY_FAST = 0.25 * 2.0 * Math.PI; // rad/s
 
-        public static final double DRIVE_MAX_ACCELERATION = 10.0; // m/s^2
-        public static final double DRIVE_MAX_ROTATIONAL_ACCELERATION = 25.0; // rad/s^2
+        public static final double DRIVE_MAX_ACCELERATION = 6.0; // m/s^2  //JEC was 10.0
+        public static final double DRIVE_MAX_ROTATIONAL_ACCELERATION = 10.0; // rad/s^2 JEC was 25.0
 
         public static final double CHARGE_STATION_PITCH_DEADBAND = 1.5; // degrees
     }

@@ -3,26 +3,17 @@ package frc.robot.subsystems;
 import frc.robot.controls.PSController.Axis;
 import frc.robot.controls.PSController.Button;
 import frc.robot.controls.PSController.Side;
-import frc.robot.helpers.LimelightHelper;
-//import edu.wpi.first.wpilibj2.command.Command;
+// import frc.robot.helpers.LimelightHelper;
+// import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Subsystem;
-//import frc.robot.Constants;
+// import frc.robot.Constants;
 import frc.robot.Robot;
 import frc.robot.Constants.*;
 
 import com.kauailabs.navx.frc.AHRS;
-// import com.pathplanner.lib.auto.AutoBuilder;
-// import com.pathplanner.lib.commands.PathPlannerAuto;
-// import com.pathplanner.lib.path.PathConstraints;
-// import com.pathplanner.lib.path.PathPlannerPath;
+// import com.pathplanner.lib.PathPlannerTrajectory.PathPlannerState;
+// import com.pathplanner.lib.commands.PPSwerveControllerCommand;
 // import com.pathplanner.lib.path.PathPlannerTrajectory;
-// import com.pathplanner.lib.path.PathPlannerTrajectory.State;
-// import com.pathplanner.lib.util.HolonomicPathFollowerConfig;
-
-// import com.pathplanner.lib.util.ReplanningConfig;
-// import edu.wpi.first.wpilibj2.command.SwerveControllerCommand;
-//import com.pathplanner.lib.commands.SwerveControllerCommand;
-//import edu.wpi.first.wpilibj2.command.SwerveControllerCommand; 
 
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.SPI;
@@ -43,7 +34,7 @@ import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-//import edu.wpi.first.math.trajectory.Trajectory.State;
+// import edu.wpi.first.math.trajectory.Trajectory.State;
 
 public final class Swerve implements Subsystem {
     private SwerveModule[] swerveMods;
@@ -266,27 +257,26 @@ public final class Swerve implements Subsystem {
     }
 
     public void addVisionPose2d() {
-        for (String limelightName : LimelightConstants.LIMELIGHT_NAMES) {
-            if (!LimelightHelper.getTV(limelightName)) {
-                continue;
-            }
+        // for (String limelightName : LimelightConstants.LIMELIGHT_NAMES) {
+            // if (!LimelightHelper.getTV(limelightName)) {
+            //     continue;
+            // }
 
-            Pose2d pose;
+            // Pose2d pose;
 
-            var alliance = DriverStation.getAlliance();
-            if (alliance.isPresent()  && alliance.get() == DriverStation.Alliance.Red) {
-                pose = LimelightHelper.getBotPose2d_wpiRed(limelightName);
-            } else {
-                pose = LimelightHelper.getBotPose2d_wpiBlue(limelightName);
-            }
+            // var alliance = DriverStation.getAlliance();
+            // if (alliance.isPresent()  && alliance.get() == DriverStation.Alliance.Red) {
+            //     pose = LimelightHelper.getBotPose2d_wpiRed(limelightName);
+            // } else {
+            //     pose = LimelightHelper.getBotPose2d_wpiBlue(limelightName);
+            // }
 
            // double trust = ((1 - LimelightHelper.getTA(limelightName)) * Constants.PoseEstimatorConstants.VISION_UNTRUST);
-            double latency = LimelightHelper.getLatency_Pipeline(limelightName) / 1000.0;
+            // double latency = LimelightHelper.getLatency_Pipeline(limelightName) / 1000.0;
 
-            // BROKEN, JEC 2024 Matbuilder deprecated
-            //swervePoseEstimator.setVisionMeasurementStdDevs(new MatBuilder<>(Nat.N3(), Nat.N1()).fill(trust, trust, trust));
-            swervePoseEstimator.addVisionMeasurement(pose, Timer.getFPGATimestamp() - latency);
-        }
+            // swervePoseEstimator.setVisionMeasurementStdDevs(new MatBuilder<>(Nat.N3(), Nat.N1()).fill(trust, trust, trust));
+            // swervePoseEstimator.addVisionMeasurement(pose, Timer.getFPGATimestamp() - latency);
+        // }
     }
 
     public void updatePoseEstimator() {
@@ -416,7 +406,7 @@ public final class Swerve implements Subsystem {
     }
 
     // public Command followTrajectoryCommand(PathPlannerTrajectory path) {
-    //     return new SwerveControllerCommand(   //was PPSwerveControllerCommand  but JEC changed it
+    //     return new PPSwerveControllerCommand(
     //         path, 
     //         this::getEstimatedPose, 
     //         DriveConstants.SWERVE_KINEMATICS, 
